@@ -35,20 +35,16 @@ export function toCurl(request: ApiRequest, opts: CurlOptions): string {
   }
   if (request.json) {
     parts.push(`-H 'Content-Type: application/json'`)
-    // Indent the pretty-printed body to sit under -d. Only the printer's own
-    // newlines match; newlines inside a value are already JSON-escaped.
     const body = JSON.stringify(request.json, null, 2).replaceAll('\n', `\n${INDENT}`)
     parts.push(`-d ${shellQuote(body)}`)
   }
   for (const [key, value] of formFields(request.form ?? {})) {
-    // A browser never learns a picked file's path, so the name stands in for it.
     const field = value instanceof File ? `${key}=@${value.name}` : `${key}=${value}`
     parts.push(`-F ${shellQuote(field)}`)
   }
   return parts.join(` \\\n${INDENT}`)
 }
 
-/** True when the command carries a file placeholder the user must edit. */
 export function hasFileField(request: ApiRequest): boolean {
   return formFields(request.form ?? {}).some(([, value]) => value instanceof File)
 }

@@ -77,7 +77,6 @@ function LookupsPanel() {
 
   return (
     <div className="grid gap-3 sm:gap-4 lg:grid-cols-[210px_1fr]">
-      {/* Lookup picker: vertical glass segment on desktop */}
       <div className="glass-card hidden flex-col gap-1 rounded-xl p-2 backdrop-blur-xl lg:flex">
         <p className="px-2.5 pb-1 text-[10px] font-semibold tracking-wider text-muted-foreground/70 uppercase">
           Directory Query
@@ -101,7 +100,6 @@ function LookupsPanel() {
         ))}
       </div>
 
-      {/* Lookup picker: dropdown on mobile */}
       <div className="flex flex-col gap-1.5 lg:hidden">
         <Label className="text-xs">Lookup Query Type</Label>
         <Select value={type} onValueChange={setType}>

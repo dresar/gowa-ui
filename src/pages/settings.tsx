@@ -29,7 +29,6 @@ export default function SettingsPage() {
         description="Active gateway connectivity, server telemetry, and visual preferences."
       />
 
-      {/* Connection Card */}
       <Card className="glass-card rounded-xl backdrop-blur-xl">
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
@@ -69,7 +68,6 @@ export default function SettingsPage() {
         </CardContent>
       </Card>
 
-      {/* Server Capabilities */}
       <Card className="glass-card rounded-xl backdrop-blur-xl">
         <CardHeader className="pb-3">
           <CardTitle className="flex items-center gap-2 text-sm font-semibold">
@@ -110,7 +108,6 @@ export default function SettingsPage() {
         </CardContent>
       </Card>
 
-      {/* Visual Appearance */}
       <Card className="glass-card rounded-xl backdrop-blur-xl">
         <CardHeader className="pb-3">
           <CardTitle className="flex items-center gap-2 text-sm font-semibold">

@@ -73,7 +73,6 @@ class WsClient {
         const event = JSON.parse(message.data) as WsEvent
         if (event && typeof event.code === 'string') emitWsEvent(event)
       } catch {
-        // non-JSON frames are ignored
       }
     }
 

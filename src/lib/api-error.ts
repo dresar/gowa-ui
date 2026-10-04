@@ -14,8 +14,6 @@ export function isApiError(value: unknown): value is ApiError {
 }
 
 export function toApiError(error: unknown): ApiError {
-  // AxiosError first: axios v1 exposes status/code/message on the error
-  // itself, which would satisfy the structural ApiError check.
   if (error instanceof AxiosError) {
     const data = error.response?.data as Partial<ResponseData<unknown>> | undefined
     return {

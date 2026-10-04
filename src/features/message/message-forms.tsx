@@ -46,7 +46,6 @@ function MessageActionForm({
   const jid = useRecipientJid()
   const mutation = useActionMutation(
     (vars: { messageId: string; phone: string }) =>
-      // Some actions answer without results; only a scheduled forward carries a schedule.
       exec<SendResult | undefined>(request(vars.messageId, vars.phone)),
     { successMessage: (r) => (r?.schedule_id ? r.status : successMessage), onSuccess },
   )

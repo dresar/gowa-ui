@@ -20,8 +20,6 @@ export function FileOrUrlInput({
 }) {
   const fileInput = useRef<HTMLInputElement>(null)
 
-  // The file picker is uncontrolled, so clearing the selection in state has to
-  // be mirrored onto the element or it keeps showing the old filename.
   useEffect(() => {
     if (!value.file && fileInput.current) fileInput.current.value = ''
   }, [value.file])

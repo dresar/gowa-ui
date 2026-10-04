@@ -55,7 +55,6 @@
 }
 
 :root {
-  /* Clean Minimalist Glassmorphism - Light Mode */
   --background: oklch(0.975 0.005 220);
   --foreground: oklch(0.18 0.02 240);
   --card: oklch(1 0 0 / 75%);
@@ -94,7 +93,6 @@
 }
 
 .dark {
-  /* Clean Minimalist Glassmorphism - Obsidian & WhatsApp Emerald */
   --background: oklch(0.125 0.018 245);
   --foreground: oklch(0.94 0.01 220);
   --card: oklch(0.17 0.022 245 / 65%);
@@ -178,7 +176,6 @@
 }
 
 @layer components {
-  /* Ambient canvas background */
   .ambient-glow {
     background-image: 
       radial-gradient(at 0% 0%, oklch(0.72 0.18 155 / 6%) 0px, transparent 50%),
@@ -186,7 +183,6 @@
       radial-gradient(at 50% 100%, oklch(0.72 0.18 155 / 4%) 0px, transparent 60%);
   }
 
-  /* Staggered page-enter */
   .stagger > * {
     animation: rise 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
   }
@@ -206,22 +202,18 @@
     animation-delay: 200ms;
   }
 
-  /* Glassmorphism panels */
   .glass-card {
     @apply backdrop-blur-xl bg-card border border-border shadow-xs;
   }
 
-  /* Interactive card hover lift with subtle glass shine */
   .card-lift {
     @apply transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md hover:border-primary/30;
   }
 
-  /* Pulsing live-status dot */
   .live-dot {
     animation: live-pulse 2s ease-in-out infinite;
   }
 
-  /* Radar pulse ripple for live connection */
   .radar-ring {
     animation: radar 2s cubic-bezier(0, 0, 0.2, 1) infinite;
   }

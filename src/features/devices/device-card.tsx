@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import {
+  CheckCircle,
   CircleUserRound,
   KeyRound,
   MoreVertical,
@@ -9,7 +10,6 @@ import {
   Trash2,
   Unplug,
   Webhook,
-  CheckCircle,
 } from 'lucide-react'
 import { toast } from 'sonner'
 import { logoutDevice, reconnectDevice, removeDevice } from '@/api/devices'
@@ -92,15 +92,15 @@ export function DeviceCard({
   return (
     <Card
       className={cn(
-        'card-lift glass-card gap-3.5 rounded-xl transition-all duration-200',
+        'card-lift glass-card gap-3 rounded-xl border border-border/70 transition-all duration-200',
         selected &&
           'border-primary/50 bg-primary/[0.04] ring-1 ring-primary/30 shadow-md shadow-primary/5',
       )}
     >
-      <CardHeader className="flex flex-row items-start justify-between gap-2 space-y-0 pb-1">
+      <CardHeader className="flex flex-row items-start justify-between gap-2 p-3.5 pb-1">
         <div className="flex min-w-0 items-center gap-3">
           <div className="relative">
-            <Avatar size="lg" className="border border-border/80 shadow-2xs">
+            <Avatar className="size-10 border border-border/80 shadow-2xs">
               {avatar.data?.url && (
                 <AvatarImage src={avatar.data.url} alt={device.display_name || device.id} />
               )}
@@ -109,12 +109,12 @@ export function DeviceCard({
               </AvatarFallback>
             </Avatar>
             {device.state === 'logged_in' && (
-              <span className="absolute -bottom-0.5 -right-0.5 size-3 rounded-full border-2 border-background bg-emerald-500" />
+              <span className="absolute -bottom-0.5 -right-0.5 size-2.5 rounded-full border-2 border-background bg-emerald-500 shadow-xs shadow-emerald-500/50" />
             )}
           </div>
           <div className="min-w-0">
             <div className="flex items-center gap-1.5">
-              <p className="truncate text-sm font-semibold text-foreground">
+              <p className="truncate text-xs font-semibold text-foreground">
                 {device.display_name || device.id}
               </p>
               {selected && (
@@ -124,17 +124,17 @@ export function DeviceCard({
                 </span>
               )}
             </div>
-            <p className="truncate font-mono text-[11px] text-muted-foreground">
-              {device.jid || device.phone_number || 'Unpaired session'}
+            <p className="truncate font-mono text-[10px] text-muted-foreground">
+              {device.phone_number || device.jid || 'Unpaired session'}
             </p>
           </div>
         </div>
         <StateBadge state={device.state} />
       </CardHeader>
 
-      <CardContent className="space-y-1 text-[11px] text-muted-foreground">
+      <CardContent className="space-y-1 p-3.5 pt-0 text-[11px] text-muted-foreground">
         <div className="flex items-center justify-between">
-          <span className="text-muted-foreground/80">Device ID:</span>
+          <span className="text-muted-foreground/80">Slot ID:</span>
           <span className="rounded bg-muted/60 px-1.5 py-0.5 font-mono text-[10px] text-foreground">
             {device.id}
           </span>
@@ -145,68 +145,68 @@ export function DeviceCard({
         </div>
       </CardContent>
 
-      <CardFooter className="flex items-center justify-between gap-2 pt-2">
-        <Button
-          variant={selected ? 'default' : 'outline'}
-          size="sm"
-          onClick={() => selectDevice(device.id)}
-          disabled={selected}
-          className="h-7.5 text-xs font-medium"
-        >
-          {selected ? 'Active Scope' : 'Select'}
-        </Button>
+      <CardFooter className="flex items-center justify-between gap-2 p-3.5 pt-2 border-t border-border/40">
+        <div className="flex flex-1 items-center gap-1.5">
+          <Button
+            variant={selected ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => selectDevice(device.id)}
+            disabled={selected}
+            className="h-8 flex-1 rounded-[6px] text-xs font-semibold active:scale-[0.98]"
+          >
+            {selected ? 'Active Scope' : 'Select'}
+          </Button>
 
-        <div className="flex items-center gap-1">
           {device.state !== 'logged_in' && (
             <Button
               variant="outline"
               size="sm"
               onClick={() => onLoginQr(device)}
-              className="h-7.5 gap-1.5 border-primary/30 bg-primary/10 text-xs font-medium text-primary hover:bg-primary/20"
+              className="h-8 flex-1 gap-1 rounded-[6px] border-primary/30 bg-primary/10 text-xs font-semibold text-primary hover:bg-primary/20 active:scale-[0.98]"
             >
               <QrCode className="size-3.5" />
-              Pair
+              <span>Pair QR</span>
             </Button>
           )}
-
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon-sm"
-                aria-label="Device actions"
-                className="h-7.5 w-7.5"
-              >
-                <MoreVertical className="size-3.5" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="text-xs">
-              <DropdownMenuItem onClick={() => onLoginQr(device)}>
-                <QrCode className="size-3.5 text-primary" /> Login with QR
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => onLoginCode(device)}>
-                <KeyRound className="size-3.5" /> Login with Pairing Code
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => reconnect.mutate()}>
-                <RefreshCw className="size-3.5" /> Reconnect Session
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => logout.mutate()}>
-                <Unplug className="size-3.5" /> Logout Device
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setWebhookOpen(true)}>
-                <Webhook className="size-3.5 text-primary" /> Webhook Setup
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem
-                variant="destructive"
-                onClick={() => setConfirmDelete(true)}
-                className="text-destructive"
-              >
-                <Trash2 className="size-3.5" /> Delete Slot
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
         </div>
+
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              aria-label="Device actions"
+              className="size-8 rounded-[6px]"
+            >
+              <MoreVertical className="size-3.5" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="text-xs">
+            <DropdownMenuItem onClick={() => onLoginQr(device)}>
+              <QrCode className="size-3.5 text-primary" /> Login with QR
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => onLoginCode(device)}>
+              <KeyRound className="size-3.5" /> Login with Pairing Code
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => reconnect.mutate()}>
+              <RefreshCw className="size-3.5" /> Reconnect Session
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => logout.mutate()}>
+              <Unplug className="size-3.5" /> Logout Device
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setWebhookOpen(true)}>
+              <Webhook className="size-3.5 text-primary" /> Webhook Setup
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
+              variant="destructive"
+              onClick={() => setConfirmDelete(true)}
+              className="text-destructive"
+            >
+              <Trash2 className="size-3.5" /> Delete Slot
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </CardFooter>
 
       <DeviceWebhookDialog device={device} open={webhookOpen} onOpenChange={setWebhookOpen} />
@@ -220,10 +220,10 @@ export function DeviceCard({
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="h-8 text-xs">Cancel</AlertDialogCancel>
+            <AlertDialogCancel className="h-8 text-xs font-semibold">Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={() => remove.mutate()}
-              className="h-8 bg-destructive text-xs text-white hover:bg-destructive/90"
+              className="h-8 bg-destructive text-xs font-semibold text-white hover:bg-destructive/90"
             >
               Delete Slot
             </AlertDialogAction>

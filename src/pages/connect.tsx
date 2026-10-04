@@ -73,7 +73,6 @@ export default function ConnectPage() {
 
   return (
     <div className="ambient-glow relative flex min-h-svh items-center justify-center overflow-hidden bg-background p-4 sm:p-6">
-      {/* Background ambient lighting */}
       <div
         aria-hidden
         className="pointer-events-none absolute -top-40 left-1/2 -translate-x-1/2 h-96 w-full max-w-4xl bg-[radial-gradient(ellipse_at_center,oklch(0.72_0.18_155/15%),transparent_70%)] blur-2xl"
@@ -97,7 +96,6 @@ export default function ConnectPage() {
         </CardHeader>
         <CardContent>
           <form className="flex flex-col gap-4" onSubmit={onSubmit}>
-            {/* Server URL Input with quick presets */}
             <div className="flex flex-col gap-1.5">
               <div className="flex items-center justify-between">
                 <Label htmlFor="server-url" className="text-xs font-medium">
@@ -133,7 +131,6 @@ export default function ConnectPage() {
               </div>
             </div>
 
-            {/* Optional Basic Auth */}
             <div className="grid grid-cols-2 gap-3">
               <div className="flex flex-col gap-1.5">
                 <Label htmlFor="username" className="text-xs font-medium">
@@ -170,7 +167,6 @@ export default function ConnectPage() {
               </div>
             </div>
 
-            {/* Feedback messages */}
             {error && (
               <div className="rounded-lg border border-destructive/30 bg-destructive/10 p-2.5 text-xs text-destructive">
                 {error}

@@ -58,8 +58,6 @@ const STATUS_FILTERS: { value: ScheduleStatus | 'all'; label: string }[] = [
   { value: 'cancelled', label: 'Cancelled' },
 ]
 
-// The eleven kinds a scheduled send can be, in the order the compose forms
-// present them.
 const MESSAGE_TYPES: { value: string; label: string }[] = [
   { value: 'text', label: 'Text' },
   { value: 'image', label: 'Image' },
@@ -123,7 +121,6 @@ function ScheduleRow({
   busy: boolean
   run: (action: ScheduleAction, id: string) => void
 }) {
-  // Mirrors the server: a running send, or a finished one, takes no action.
   const canCancel = item.status === 'active' || item.status === 'paused' || item.status === 'failed'
 
   return (
@@ -213,16 +210,12 @@ function ScheduleTable({ device }: { device: string }) {
     refetchInterval: 10_000,
     placeholderData: keepPreviousData,
   })
-  // Prefix key: an action changes the row's status, so every filtered view is stale.
   const refresh = () => void queryClient.invalidateQueries({ queryKey: ['schedules', device] })
 
   const pause = useActionMutation(pauseSchedule, { successMessage: 'Schedule paused' })
   const resume = useActionMutation(resumeSchedule, { successMessage: 'Schedule resumed' })
   const cancel = useActionMutation(cancelSchedule, { successMessage: 'Schedule cancelled' })
 
-  // The three mutations live here rather than per row, so the hook count stays
-  // flat as the page fills. Rows read back the id in flight to disable only
-  // themselves instead of the whole table.
   const pendingId = pause.isPending
     ? pause.variables
     : resume.isPending
@@ -232,7 +225,6 @@ function ScheduleTable({ device }: { device: string }) {
         : undefined
 
   const run = (action: ScheduleAction, id: string) => {
-    // Refresh on failure too: a 400 means the row moved on, so re-sync it.
     const options = { onSettled: refresh }
     if (action === 'pause') pause.mutate(id, options)
     else if (action === 'resume') resume.mutate(id, options)
@@ -383,6 +375,5 @@ function ScheduleTable({ device }: { device: string }) {
 export default function ScheduledPage() {
   const device = useSelectedDevice()
   if (!device) return <DeviceGuard />
-  // Remount on device switch so the filter and page reset with the data.
   return <ScheduleTable key={device} device={device} />
 }

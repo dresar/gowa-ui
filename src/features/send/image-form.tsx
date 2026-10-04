@@ -42,7 +42,6 @@ export function SendImageForm() {
     view_once: viewOnce,
     allow_reshare: allowReshare || undefined,
     quality,
-    // view_once messages cannot be forwarded per the WhatsApp protocol
     is_forwarded: false,
     ...draft,
   }

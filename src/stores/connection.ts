@@ -87,14 +87,12 @@ export const useConnection = create<ConnectionState>()(
           }
         }
 
-        // 1. Same-origin check: when served directly by GOWA at http://localhost:3000/
         const origin = sameOriginBaseUrl()
         if ((await probeServer(origin)) === 'ok') {
           set({ baseUrl: origin, status: 'connected' })
           return
         }
 
-        // 2. Default backend URL check (e.g. http://localhost:3000)
         const defaultServer = normalizeBaseUrl(
           (import.meta.env.VITE_DEFAULT_SERVER_URL as string | undefined) || 'http://localhost:3000',
         )
@@ -105,7 +103,6 @@ export const useConnection = create<ConnectionState>()(
           }
         }
 
-        // 3. /gowa dev proxy fallback for local Vite dev
         if (origin.includes(':5173')) {
           const gowaProxy = `${origin}/gowa`
           if ((await probeServer(gowaProxy)) === 'ok') {

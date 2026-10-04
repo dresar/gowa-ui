@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react'
+import { useState, type FormEvent, type ReactNode } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Loader2, Plus } from 'lucide-react'
 import { toast } from 'sonner'
@@ -18,13 +18,27 @@ import { Label } from '@/components/ui/label'
 import { toApiError } from '@/lib/api-error'
 import { useDeviceStore } from '@/stores/device'
 
-export function CreateDeviceDialog() {
+export interface CreateDeviceDialogProps {
+  trigger?: ReactNode
+  open?: boolean
+  onOpenChange?: (open: boolean) => void
+}
+
+export function CreateDeviceDialog({
+  trigger,
+  open: controlledOpen,
+  onOpenChange: controlledOnOpenChange,
+}: CreateDeviceDialogProps = {}) {
   const queryClient = useQueryClient()
   const selectDevice = useDeviceStore((state) => state.selectDevice)
-  const [open, setOpen] = useState(false)
+  const [internalOpen, setInternalOpen] = useState(false)
   const [deviceId, setDeviceId] = useState('')
   const [webhookUrl, setWebhookUrl] = useState('')
   const [webhookSecret, setWebhookSecret] = useState('')
+
+  const isControlled = controlledOpen !== undefined
+  const isOpen = isControlled ? controlledOpen : internalOpen
+  const setIsOpen = isControlled ? (controlledOnOpenChange ?? (() => {})) : setInternalOpen
 
   const mutation = useMutation({
     mutationFn: addDevice,
@@ -32,7 +46,7 @@ export function CreateDeviceDialog() {
       toast.success(`Device ${device.id} added`)
       void queryClient.invalidateQueries({ queryKey: ['devices'] })
       selectDevice(device.id)
-      setOpen(false)
+      setIsOpen(false)
       setDeviceId('')
       setWebhookUrl('')
       setWebhookSecret('')
@@ -50,13 +64,17 @@ export function CreateDeviceDialog() {
   }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button>
-          <Plus className="size-4" />
-          Add device
-        </Button>
-      </DialogTrigger>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      {trigger ? (
+        <DialogTrigger asChild>{trigger}</DialogTrigger>
+      ) : !isControlled ? (
+        <DialogTrigger asChild>
+          <Button size="sm" className="h-8 gap-1.5 rounded-lg text-xs font-semibold">
+            <Plus className="size-3.5" />
+            <span>Add device</span>
+          </Button>
+        </DialogTrigger>
+      ) : null}
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Add device</DialogTitle>
@@ -92,9 +110,9 @@ export function CreateDeviceDialog() {
             />
           </div>
           <DialogFooter>
-            <Button type="submit" disabled={mutation.isPending}>
-              {mutation.isPending && <Loader2 className="size-4 animate-spin" />}
-              Add device
+            <Button type="submit" disabled={mutation.isPending} className="h-8 text-xs font-semibold">
+              {mutation.isPending && <Loader2 className="size-3.5 animate-spin" />}
+              <span>Add device</span>
             </Button>
           </DialogFooter>
         </form>
