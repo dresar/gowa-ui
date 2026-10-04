@@ -1,4 +1,4 @@
-import { useEffect, useState, type FormEvent } from 'react'
+import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { CheckCircle2, Globe, KeyRound, Loader2, Lock, ShieldCheck, User } from 'lucide-react'
 import { Navigate, useNavigate } from 'react-router-dom'
 import { Logo } from '@/components/layout/logo'
@@ -28,13 +28,16 @@ export default function ConnectPage() {
   const [password, setPassword] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const hasAttemptedRef = useRef(false)
 
   useEffect(() => {
+    if (hasAttemptedRef.current) return
     if (url && (status === 'unconfigured' || status === 'booting')) {
+      hasAttemptedRef.current = true
       let active = true
       const tryAutoConnect = async () => {
         setSubmitting(true)
-        const result = await connect(url, username || undefined, password || undefined)
+        const result = await connect(url)
         if (active) {
           setSubmitting(false)
           if (result === 'ok') {
@@ -47,7 +50,7 @@ export default function ConnectPage() {
         active = false
       }
     }
-  }, [url, status, username, password, connect, navigate])
+  }, [url, status, connect, navigate])
 
   if (status === 'connected') return <Navigate to="/" replace />
 
