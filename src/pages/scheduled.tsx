@@ -79,7 +79,7 @@ type ScheduleAction = 'pause' | 'resume' | 'cancel'
 function statusVariant(status: ScheduledSend['status']) {
   if (status === 'failed') return 'destructive' as const
   if (status === 'completed' || status === 'active' || status === 'running')
-    return 'default' as const
+    return 'emerald' as const
   return 'secondary' as const
 }
 
@@ -327,7 +327,7 @@ function ScheduleTable({ device }: { device: string }) {
         />
       )}
       {rows.length > 0 && (
-        <div className="rounded-lg border">
+        <div className="glass-card rounded-xl overflow-hidden backdrop-blur-xl border border-border/70 shadow-xs">
           <Table>
             <TableHeader>
               <TableRow>

@@ -58,29 +58,29 @@ const lookups: LookupType[] = [
   {
     value: 'avatar',
     label: 'Avatar',
-    description: 'Fetch a profile picture by phone or group.',
+    description: "Fetch a user's profile picture by phone or LID.",
     icon: Image,
     form: <AvatarForm />,
   },
   {
     value: 'business',
     label: 'Business profile',
-    description: "Fetch a WhatsApp Business account's public profile.",
+    description: "Look up a business user's profile, catalog, and category.",
     icon: Store,
     form: <BusinessProfileForm />,
   },
 ]
 
-function LookupPanel() {
+function LookupsPanel() {
   const [type, setType] = useState('info')
   const active = lookups.find((item) => item.value === type) ?? lookups[0]
 
   return (
-    <div className="grid gap-4 lg:grid-cols-[200px_1fr]">
-      {/* Lookup picker: vertical list on desktop */}
-      <div className="hidden flex-col gap-1 lg:flex">
-        <p className="text-muted-foreground px-3 text-[11px] font-medium tracking-wider uppercase">
-          Lookup
+    <div className="grid gap-3 sm:gap-4 lg:grid-cols-[210px_1fr]">
+      {/* Lookup picker: vertical glass segment on desktop */}
+      <div className="glass-card hidden flex-col gap-1 rounded-xl p-2 backdrop-blur-xl lg:flex">
+        <p className="px-2.5 pb-1 text-[10px] font-semibold tracking-wider text-muted-foreground/70 uppercase">
+          Directory Query
         </p>
         {lookups.map(({ value, label, icon: Icon }) => (
           <button
@@ -89,26 +89,26 @@ function LookupPanel() {
             onClick={() => setType(value)}
             aria-pressed={type === value}
             className={cn(
-              'flex items-center gap-2.5 rounded-full px-3 py-2 text-left text-sm font-medium transition-colors',
+              'flex items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-left text-xs font-medium transition-all duration-150',
               type === value
-                ? 'bg-accent text-accent-foreground'
-                : 'text-muted-foreground hover:bg-accent/50 hover:text-accent-foreground',
+                ? 'border border-primary/25 bg-primary/12 font-semibold text-primary shadow-2xs'
+                : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground',
             )}
           >
-            <Icon className="size-4" />
-            {label}
+            <Icon className="size-3.5" />
+            <span>{label}</span>
           </button>
         ))}
       </div>
 
       {/* Lookup picker: dropdown on mobile */}
-      <div className="flex flex-col gap-2 lg:hidden">
-        <Label>Lookup type</Label>
+      <div className="flex flex-col gap-1.5 lg:hidden">
+        <Label className="text-xs">Lookup Query Type</Label>
         <Select value={type} onValueChange={setType}>
-          <SelectTrigger>
+          <SelectTrigger className="h-8.5 text-xs">
             <SelectValue />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className="text-xs">
             {lookups.map((item) => (
               <SelectItem key={item.value} value={item.value}>
                 {item.label}
@@ -118,13 +118,13 @@ function LookupPanel() {
         </Select>
       </div>
 
-      <Card>
-        <div key={active.value} className="animate-in fade-in flex flex-col gap-4 duration-200">
-          <CardHeader>
-            <CardTitle className="text-base">{active.label}</CardTitle>
-            <CardDescription>{active.description}</CardDescription>
+      <Card className="glass-card rounded-xl backdrop-blur-xl">
+        <div key={active.value} className="animate-in fade-in flex flex-col gap-3 p-4 sm:p-5 duration-200">
+          <CardHeader className="p-0 pb-3 border-b border-border/50">
+            <CardTitle className="text-sm font-semibold">{active.label}</CardTitle>
+            <CardDescription className="text-xs">{active.description}</CardDescription>
           </CardHeader>
-          <CardContent>{active.form}</CardContent>
+          <CardContent className="p-0 pt-2">{active.form}</CardContent>
         </div>
       </Card>
     </div>
@@ -135,46 +135,63 @@ export default function AccountPage() {
   const device = useSelectedDevice()
 
   return (
-    <>
+    <div className="flex flex-col gap-4 sm:gap-5">
       <PageHeader
-        title="Account"
-        description="Profile, privacy, contacts and lookups for the selected device."
+        title="Account & Identity"
+        description="Active device profile settings, contact directories, and privacy configuration."
       />
-      {!device ? (
+      {device === null ? (
         <DeviceGuard />
       ) : (
-        <Tabs defaultValue="profile">
-          <TabsList>
-            <TabsTrigger value="profile">
-              <CircleUserRound className="size-4" />
-              My profile
-            </TabsTrigger>
-            <TabsTrigger value="lookup">
-              <ScanSearch className="size-4" />
-              Lookup
-            </TabsTrigger>
-          </TabsList>
-          <TabsContent value="profile" className="flex max-w-2xl flex-col gap-4">
-            <MyProfileCard />
-            <ActionCard title="Change avatar" description="Update your own profile picture.">
-              <ChangeAvatarForm />
-            </ActionCard>
-            <ActionCard title="Change push name" description="Update your WhatsApp display name.">
-              <PushnameForm />
-            </ActionCard>
-            <ActionCard title="My privacy" description="Your current privacy settings.">
-              <PrivacyView />
-            </ActionCard>
-            <ActionCard title="My contacts" description="Contacts synced to this device.">
+        <>
+          <RecipientBar />
+          <Tabs defaultValue="profile" className="gap-3">
+            <TabsList className="h-9 rounded-lg border border-border/70 bg-card/60 p-1 backdrop-blur-md">
+              <TabsTrigger value="profile" className="h-7 rounded-md text-xs font-medium">
+                My Profile
+              </TabsTrigger>
+              <TabsTrigger value="lookups" className="h-7 rounded-md text-xs font-medium">
+                <ScanSearch className="size-3.5" />
+                Directory Search
+              </TabsTrigger>
+              <TabsTrigger value="contacts" className="h-7 rounded-md text-xs font-medium">
+                Synced Contacts
+              </TabsTrigger>
+              <TabsTrigger value="privacy" className="h-7 rounded-md text-xs font-medium">
+                Privacy Settings
+              </TabsTrigger>
+            </TabsList>
+            <TabsContent value="profile" className="flex flex-col gap-4 pt-1">
+              <MyProfileCard />
+              <div className="grid gap-3 sm:grid-cols-2">
+                <ActionCard
+                  icon={CircleUserRound}
+                  title="Push Name"
+                  description="The display name other WhatsApp users see for you."
+                >
+                  <PushnameForm />
+                </ActionCard>
+                <ActionCard
+                  icon={Image}
+                  title="Profile Picture"
+                  description="Upload a new avatar or remove your current one."
+                >
+                  <ChangeAvatarForm />
+                </ActionCard>
+              </div>
+            </TabsContent>
+            <TabsContent value="lookups" className="pt-1">
+              <LookupsPanel />
+            </TabsContent>
+            <TabsContent value="contacts" className="pt-1">
               <ContactsView />
-            </ActionCard>
-          </TabsContent>
-          <TabsContent value="lookup" className="flex flex-col gap-4">
-            <RecipientBar showStatus={false} />
-            <LookupPanel />
-          </TabsContent>
-        </Tabs>
+            </TabsContent>
+            <TabsContent value="privacy" className="pt-1">
+              <PrivacyView />
+            </TabsContent>
+          </Tabs>
+        </>
       )}
-    </>
+    </div>
   )
 }

@@ -14,7 +14,6 @@ export default function ChatsPage() {
   const messagePane = useRef<HTMLDivElement>(null)
   const selected = selectedChatForDevice(selection, device)
 
-  // On stacked layouts the message pane sits below the fold, so bring it into view.
   const handleSelect = (chat: ChatInfo) => {
     if (!device) return
     setSelection({ deviceId: device, chat })
@@ -24,17 +23,17 @@ export default function ChatsPage() {
   if (!device) {
     return (
       <div className="flex flex-col gap-4">
-        <PageHeader title="Chats" description="Stored conversations for this device." />
+        <PageHeader title="Chat History" description="Live stored WhatsApp conversations for this device." />
         <DeviceGuard />
       </div>
     )
   }
 
   return (
-    <div className="flex flex-col gap-4 lg:h-[calc(100svh-8.5rem)]">
-      <PageHeader title="Chats" description="Stored conversations for this device." />
-      <div className="grid gap-4 lg:min-h-0 lg:flex-1 lg:grid-cols-[320px_1fr]">
-        <Card className="h-[24rem] overflow-hidden p-3 lg:h-auto lg:min-h-0">
+    <div className="flex flex-col gap-3 sm:gap-4 lg:h-[calc(100svh-8rem)]">
+      <PageHeader title="Chat History" description="Live stored WhatsApp conversations for this device." />
+      <div className="grid gap-3 sm:gap-4 lg:min-h-0 lg:flex-1 lg:grid-cols-[330px_1fr]">
+        <Card className="glass-card h-[24rem] overflow-hidden rounded-xl p-3 backdrop-blur-xl lg:h-auto lg:min-h-0">
           <ChatList
             key={device}
             deviceId={device}
@@ -44,14 +43,19 @@ export default function ChatsPage() {
         </Card>
         <Card
           ref={messagePane}
-          className="h-[calc(100svh-9rem)] min-h-[26rem] overflow-hidden p-3 lg:h-auto lg:min-h-0"
+          className="glass-card h-[calc(100svh-9rem)] min-h-[26rem] overflow-hidden rounded-xl p-3 backdrop-blur-xl lg:h-auto lg:min-h-0"
         >
           {selected ? (
             <MessageView key={`${device}:${selected.jid}`} chat={selected} deviceId={device} />
           ) : (
-            <div className="text-muted-foreground flex h-full flex-col items-center justify-center gap-2">
-              <MessagesSquare className="size-8" />
-              <p className="text-sm">Select a chat to view its messages</p>
+            <div className="flex h-full flex-col items-center justify-center gap-2.5 text-muted-foreground">
+              <div className="flex size-12 items-center justify-center rounded-xl border border-border/80 bg-muted/40 text-primary shadow-2xs">
+                <MessagesSquare className="size-6" />
+              </div>
+              <p className="text-xs font-medium text-foreground">Select a conversation</p>
+              <p className="text-[11px] text-muted-foreground">
+                Click any chat from the left panel to stream stored messages
+              </p>
             </div>
           )}
         </Card>

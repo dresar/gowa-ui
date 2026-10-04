@@ -1,3 +1,4 @@
+import { BellRing, PhoneOff } from 'lucide-react'
 import { ActionCard } from '@/components/shared/action-card'
 import { PageHeader } from '@/components/shared/page-header'
 import { CallRejectForm } from '@/features/call/call-reject-form'
@@ -8,22 +9,27 @@ export default function MiscPage() {
   const device = useSelectedDevice()
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4 sm:gap-5">
       <PageHeader
-        title="Channels & Calls"
-        description="Newsletters this device follows and call handling."
+        title="Channels & Telephony"
+        description="WhatsApp channel / newsletter subscriptions and incoming call routing."
       />
 
       {!device ? (
         <DeviceGuard />
       ) : (
         <div className="grid items-start gap-4 lg:grid-cols-2">
-          <ActionCard title="Newsletters" description="Channels this device follows.">
+          <ActionCard
+            icon={BellRing}
+            title="Channel Broadcasts"
+            description="Newsletters and public updates followed by this WhatsApp device."
+          >
             <NewsletterList />
           </ActionCard>
           <ActionCard
-            title="Reject call"
-            description="Reject an incoming call using the caller JID and call ID from the webhook."
+            icon={PhoneOff}
+            title="Reject Incoming Call"
+            description="Reject a voice/video call using caller JID and Call ID payload from webhooks."
           >
             <CallRejectForm />
           </ActionCard>

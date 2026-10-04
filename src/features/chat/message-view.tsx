@@ -35,21 +35,29 @@ function MessageBubble({ message, deviceId }: { message: MessageInfo; deviceId: 
     <div className={cn('flex', message.is_from_me ? 'justify-end' : 'justify-start')}>
       <div
         className={cn(
-          'max-w-[75%] rounded-2xl px-3 py-2 text-sm shadow-xs',
-          message.is_from_me ? 'bg-bubble-out rounded-br-sm' : 'bg-bubble-in rounded-bl-sm border',
+          'max-w-[82%] rounded-xl px-3 py-2 text-xs sm:text-[13px] shadow-2xs backdrop-blur-md transition-all',
+          message.is_from_me
+            ? 'rounded-tr-xs border border-emerald-500/25 bg-emerald-500/15 text-foreground'
+            : 'rounded-tl-xs border border-border/80 bg-card/85 text-foreground',
         )}
       >
         {!message.is_from_me && (
-          <p className="text-muted-foreground mb-0.5 font-mono text-xs">
+          <p className="mb-0.5 font-mono text-[10px] font-semibold text-primary">
             {senderDisplayName(message)}
           </p>
         )}
-        {message.content && <p className="break-words whitespace-pre-wrap">{message.content}</p>}
+        {message.content && <p className="break-words whitespace-pre-wrap leading-relaxed">{message.content}</p>}
         {hasMedia && <MessageMedia message={message} deviceId={deviceId} />}
         {message.reactions && message.reactions.length > 0 && (
-          <p className="mt-1 text-xs">{message.reactions.map((r) => r.emoji).join(' ')}</p>
+          <div className="mt-1 flex flex-wrap gap-1">
+            {message.reactions.map((r) => (
+              <span key={r.emoji} className="rounded-md border border-border/60 bg-muted/60 px-1 py-0.2 text-[10px]">
+                {r.emoji}
+              </span>
+            ))}
+          </div>
         )}
-        <p className="text-muted-foreground mt-1 text-right text-[10px]">
+        <p className="mt-1 text-right font-mono text-[9px] text-muted-foreground/80">
           {formatDate(message.timestamp)}
         </p>
       </div>
@@ -118,25 +126,29 @@ export function MessageView({ chat, deviceId }: { chat: ChatInfo; deviceId: stri
 
   return (
     <div className="flex h-full flex-col gap-3">
-      <div className="flex items-start justify-between gap-2 border-b pb-3">
+      {/* Header bar for selected chat */}
+      <div className="flex items-center justify-between border-b border-border/60 pb-2.5">
         <div className="min-w-0">
-          <h2 className="truncate font-medium">{chatDisplayName(resolvedChat)}</h2>
-          <p className="text-muted-foreground truncate font-mono text-xs">{resolvedChat.jid}</p>
+          <p className="truncate text-sm font-semibold text-foreground">
+            {chatDisplayName(resolvedChat)}
+          </p>
+          <p className="truncate font-mono text-[10px] text-muted-foreground">{resolvedChat.jid}</p>
         </div>
         <ChatControls chat={resolvedChat} />
       </div>
 
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+      {/* Filter toolbar */}
+      <div className="flex items-center justify-between gap-2">
         <Input
-          className="sm:max-w-xs"
-          placeholder="Search messages"
+          className="h-7.5 max-w-xs text-xs"
+          placeholder="Filter messages in this chat…"
           value={search}
           onChange={(event) => {
             setSearch(event.target.value)
             setOffset(0)
           }}
         />
-        <label className="text-muted-foreground flex items-center gap-2 text-sm">
+        <label className="flex items-center gap-1.5 text-xs text-muted-foreground select-none">
           <Switch
             checked={mediaOnly}
             onCheckedChange={(value) => {
@@ -144,23 +156,22 @@ export function MessageView({ chat, deviceId }: { chat: ChatInfo; deviceId: stri
               setOffset(0)
             }}
           />
-          Media only
+          <span className="hidden sm:inline">Media only</span>
         </label>
       </div>
 
+      {/* Message stream */}
       <div ref={messageList} className="min-h-0 flex-1">
-        <ScrollArea className="bg-muted/40 size-full rounded-lg border p-3">
+        <ScrollArea className="size-full rounded-xl border border-border/60 bg-muted/20 p-3 backdrop-blur-xs">
           {query.isLoading ? (
             <div className="flex justify-center p-6">
-              <Loader2 className="text-muted-foreground size-5 animate-spin" />
+              <Loader2 className="size-5 animate-spin text-primary" />
             </div>
           ) : messages.length === 0 ? (
-            <div className="text-muted-foreground flex flex-col gap-1 p-6 text-center text-sm">
-              <p>No messages stored for this chat yet.</p>
-              <p className="text-xs">
-                Messages appear here as they are sent or received, and as WhatsApp history sync
-                batches are processed after pairing. Contacts synced from your address book start
-                without message history.
+            <div className="flex flex-col gap-1 p-6 text-center text-xs text-muted-foreground">
+              <p className="font-medium text-foreground">No messages stored for this chat yet.</p>
+              <p className="text-[11px]">
+                Messages will appear as sent/received or when history sync completes.
               </p>
             </div>
           ) : (
@@ -172,7 +183,7 @@ export function MessageView({ chat, deviceId }: { chat: ChatInfo; deviceId: stri
                   <div key={message.id}>
                     {showDateSeparator && (
                       <div className="flex justify-center py-1">
-                        <span className="bg-card text-muted-foreground rounded-full border px-3 py-0.5 text-xs shadow-xs">
+                        <span className="rounded-md border border-border/60 bg-card/85 px-2.5 py-0.5 font-mono text-[10px] text-muted-foreground shadow-2xs backdrop-blur-xs">
                           {new Date(message.timestamp).toLocaleDateString(undefined, {
                             day: 'numeric',
                             month: 'short',
@@ -190,42 +201,50 @@ export function MessageView({ chat, deviceId }: { chat: ChatInfo; deviceId: stri
         </ScrollArea>
       </div>
 
-      <div className="text-muted-foreground flex items-center justify-between text-xs">
-        <span>{total} messages</span>
+      {/* Pagination toolbar */}
+      <div className="flex items-center justify-between text-[11px] text-muted-foreground">
+        <span>{total} messages stored</span>
         <div className="flex gap-1">
           <Button
             variant="outline"
-            size="sm"
+            size="xs"
             disabled={offset === 0}
             onClick={() => setOffset(Math.max(0, offset - PAGE_SIZE))}
+            className="h-6.5 text-[11px]"
           >
             Newer
           </Button>
           <Button
             variant="outline"
-            size="sm"
+            size="xs"
             disabled={offset + PAGE_SIZE >= total}
             onClick={() => setOffset(offset + PAGE_SIZE)}
+            className="h-6.5 text-[11px]"
           >
             Older
           </Button>
         </div>
       </div>
 
-      {/* Inside the form so the schedule's native constraints gate Send. */}
-      <form className="flex flex-col gap-3" onSubmit={onSend}>
+      {/* Interactive composer */}
+      <form className="flex flex-col gap-2" onSubmit={onSend}>
         <ScheduleFields draft={scheduleDraft} patch={patchSchedule} />
         <div className="flex gap-2">
           <Input
-            placeholder="Type a message"
+            placeholder="Type a message to dispatch…"
             value={draft}
             onChange={(event) => setDraft(event.target.value)}
+            className="h-8.5 text-xs"
           />
-          <Button type="submit" disabled={sendMutation.isPending || !draft.trim()}>
+          <Button
+            type="submit"
+            disabled={sendMutation.isPending || !draft.trim()}
+            className="h-8.5 gap-1.5 px-3.5 text-xs font-semibold"
+          >
             {sendMutation.isPending ? (
-              <Loader2 className="size-4 animate-spin" />
+              <Loader2 className="size-3.5 animate-spin" />
             ) : (
-              <Send className="size-4" />
+              <Send className="size-3.5" />
             )}
             Send
           </Button>
