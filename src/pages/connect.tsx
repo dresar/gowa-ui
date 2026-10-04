@@ -22,7 +22,9 @@ export default function ConnectPage() {
   const connect = useConnection((state) => state.connect)
 
   const [url, setUrl] = useState(
-    storedUrl ?? (import.meta.env.VITE_DEFAULT_SERVER_URL as string | undefined) ?? 'http://localhost:3000',
+    storedUrl ??
+      (import.meta.env.VITE_DEFAULT_SERVER_URL as string | undefined) ??
+      (typeof window !== 'undefined' && window.location.origin ? window.location.origin : 'http://localhost:3000'),
   )
   const [username, setUsername] = useState(storedUser ?? '')
   const [password, setPassword] = useState('')

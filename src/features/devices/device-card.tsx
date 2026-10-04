@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { Link } from 'react-router-dom'
 import {
   CheckCircle,
   CircleUserRound,
@@ -7,6 +8,7 @@ import {
   MoreVertical,
   QrCode,
   RefreshCw,
+  Send,
   Trash2,
   Unplug,
   Webhook,
@@ -157,7 +159,20 @@ export function DeviceCard({
             {selected ? 'Active Scope' : 'Select'}
           </Button>
 
-          {device.state !== 'logged_in' && (
+          {device.state === 'logged_in' ? (
+            <Button
+              asChild
+              variant="outline"
+              size="sm"
+              onClick={() => selectDevice(device.id)}
+              className="h-8 flex-1 gap-1 rounded-[6px] border-primary/30 bg-primary/10 text-xs font-semibold text-primary hover:bg-primary/20 active:scale-[0.98]"
+            >
+              <Link to="/messaging">
+                <Send className="size-3" />
+                <span>Message</span>
+              </Link>
+            </Button>
+          ) : (
             <Button
               variant="outline"
               size="sm"

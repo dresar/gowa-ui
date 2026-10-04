@@ -7,7 +7,6 @@ import {
   Smartphone,
   Unplug,
 } from 'lucide-react'
-import { EmptyState } from '@/components/shared/empty-state'
 import { PageHeader } from '@/components/shared/page-header'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
@@ -224,21 +223,64 @@ export default function DashboardPage() {
       )}
 
       {devices && devices.length === 0 && (
-        <EmptyState
-          icon={Smartphone}
-          title="No WhatsApp devices registered"
-          hint="Create a new device slot above, then link your phone via QR scan or WhatsApp pairing code."
-          action={
+        <Card className="border border-border/70 bg-card/60 backdrop-blur-xl shadow-xs">
+          <CardContent className="flex flex-col items-center gap-4 py-10 text-center sm:py-12">
+            <div className="relative flex size-14 items-center justify-center rounded-xl border border-primary/25 bg-primary/10 text-primary shadow-md">
+              <Smartphone className="size-7" />
+              <span className="absolute -top-1 -right-1 flex size-3">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75" />
+                <span className="relative inline-flex size-3 rounded-full bg-primary" />
+              </span>
+            </div>
+
+            <div className="flex max-w-md flex-col gap-1.5">
+              <h2 className="font-heading text-base font-bold tracking-tight text-foreground sm:text-lg">
+                No WhatsApp Devices Registered
+              </h2>
+              <p className="text-xs leading-relaxed text-muted-foreground">
+                Provision a session slot to begin pairing physical phones, automating broadcasts, and synchronizing contacts.
+              </p>
+            </div>
+
+            <div className="grid w-full max-w-xl gap-2.5 sm:grid-cols-3 text-left">
+              <div className="rounded-lg border border-border/60 bg-muted/30 p-3">
+                <div className="flex items-center gap-1.5 text-[11px] font-semibold text-foreground">
+                  <span className="flex size-4 items-center justify-center rounded bg-primary/20 text-[10px] font-bold text-primary">1</span>
+                  <span>Register Slot</span>
+                </div>
+                <p className="mt-1 text-[10px] text-muted-foreground leading-normal">
+                  Allocate an isolated WhatsApp Multi-Device session container.
+                </p>
+              </div>
+              <div className="rounded-lg border border-border/60 bg-muted/30 p-3">
+                <div className="flex items-center gap-1.5 text-[11px] font-semibold text-foreground">
+                  <span className="flex size-4 items-center justify-center rounded bg-primary/20 text-[10px] font-bold text-primary">2</span>
+                  <span>Pair Phone</span>
+                </div>
+                <p className="mt-1 text-[10px] text-muted-foreground leading-normal">
+                  Scan dynamic QR code or use WhatsApp pairing code.
+                </p>
+              </div>
+              <div className="rounded-lg border border-border/60 bg-muted/30 p-3">
+                <div className="flex items-center gap-1.5 text-[11px] font-semibold text-foreground">
+                  <span className="flex size-4 items-center justify-center rounded bg-primary/20 text-[10px] font-bold text-primary">3</span>
+                  <span>Broadcast & Stream</span>
+                </div>
+                <p className="mt-1 text-[10px] text-muted-foreground leading-normal">
+                  Dispatch messages, receive webhooks, and manage groups.
+                </p>
+              </div>
+            </div>
+
             <Button
-              size="sm"
               onClick={() => setCreateOpen(true)}
-              className="mt-2 h-8 gap-1.5 rounded-lg text-xs font-semibold"
+              className="mt-1 h-8 gap-1.5 rounded-lg text-xs font-semibold shadow-xs"
             >
               <Plus className="size-3.5" />
               <span>Register First Device</span>
             </Button>
-          }
-        />
+          </CardContent>
+        </Card>
       )}
 
       {devices && devices.length > 0 && filteredDevices.length === 0 && (
