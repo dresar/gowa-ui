@@ -34,6 +34,7 @@ export default defineConfig(({ mode }) => {
         '/newsletter': { target: backendUrl, changeOrigin: true },
         '/call': { target: backendUrl, changeOrigin: true },
         '/schedule': { target: backendUrl, changeOrigin: true },
+        '/bot': { target: backendUrl, changeOrigin: true },
         '/ws': { target: backendUrl, changeOrigin: true, ws: true },
       },
     },

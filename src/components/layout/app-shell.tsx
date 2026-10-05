@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import {
+  Bot,
   CalendarClock,
   CircleUserRound,
   LayoutDashboard,
@@ -7,9 +8,12 @@ import {
   Menu,
   MessagesSquare,
   Plus,
+  ScrollText,
   Send,
   Settings,
+  ShieldCheck,
   Smartphone,
+  Sparkles,
   UserRound,
   Users,
   Wrench,
@@ -47,6 +51,15 @@ const navGroups = [
     ],
   },
   {
+    label: 'Bot & Automation',
+    items: [
+      { to: '/bot/auto-replies', label: 'Auto Responder', icon: Bot },
+      { to: '/bot/ai', label: 'AI Assistant', icon: Sparkles },
+      { to: '/bot/groups', label: 'Group Moderation', icon: ShieldCheck },
+      { to: '/bot/logs', label: 'Bot Activity Logs', icon: ScrollText },
+    ],
+  },
+  {
     label: 'Directory',
     items: [
       { to: '/groups', label: 'Groups', icon: Users },
@@ -67,6 +80,11 @@ const routeTitles: Record<string, { label: string; icon: typeof LayoutDashboard 
   '/messaging': { label: 'Messaging', icon: Send },
   '/scheduled': { label: 'Scheduled', icon: CalendarClock },
   '/chats': { label: 'Chats', icon: MessagesSquare },
+  '/bot/auto-replies': { label: 'Auto Responder', icon: Bot },
+  '/bot/rules': { label: 'Auto Responder', icon: Bot },
+  '/bot/ai': { label: 'AI Assistant', icon: Sparkles },
+  '/bot/groups': { label: 'Group Moderation', icon: ShieldCheck },
+  '/bot/logs': { label: 'Bot Activity Logs', icon: ScrollText },
   '/groups': { label: 'Groups', icon: Users },
   '/account': { label: 'Account', icon: UserRound },
   '/misc': { label: 'Channels', icon: Wrench },
@@ -234,10 +252,8 @@ export function AppShell() {
 
   return (
     <div className="ambient-glow bg-background relative flex h-screen w-full overflow-hidden">
-      {/* Background # straight transparent grid lines across all pages */}
       <div aria-hidden="true" className="grid-pattern pointer-events-none fixed inset-0 z-0" />
 
-      {/* Stationary Desktop Sidebar */}
       <aside className="border-sidebar-border/70 bg-sidebar/80 sticky top-0 z-20 hidden h-screen w-60 shrink-0 flex-col overflow-y-auto border-r backdrop-blur-xl md:flex select-none">
         <div className="border-sidebar-border/70 relative flex h-14 shrink-0 items-center border-b px-4">
           <div className="pointer-events-none absolute right-0 bottom-0 left-0 h-px bg-gradient-to-r from-red-500/40 via-rose-500/20 to-transparent" />
@@ -282,9 +298,7 @@ export function AppShell() {
         </SheetContent>
       </Sheet>
 
-      {/* Main Viewport Column with Stationary Header and Independent Scrollable Content */}
       <div className="relative z-10 flex h-screen min-w-0 flex-1 flex-col overflow-hidden">
-        {/* Stationary Header */}
         <header className="border-border/60 bg-background/80 shrink-0 sticky top-0 z-40 flex h-14 items-center justify-between gap-2 border-b px-3 backdrop-blur-xl sm:gap-3 sm:px-6 select-none">
           <div className="pointer-events-none absolute right-0 bottom-0 left-0 h-px bg-gradient-to-r from-red-500/40 via-rose-500/20 to-transparent" />
           <div className="flex min-w-0 items-center gap-2 sm:gap-2.5">
@@ -324,7 +338,6 @@ export function AppShell() {
           </div>
         </header>
 
-        {/* Content area: the only area that scrolls vertically */}
         <main className="flex-1 min-h-0 overflow-y-auto p-3.5 pb-20 sm:p-5 md:p-6 md:pb-6">
           <div
             key={location.pathname}
