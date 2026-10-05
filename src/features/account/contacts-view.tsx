@@ -79,7 +79,7 @@ export function ContactsView() {
           <Input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search by name or number…"
+            placeholder="Search"
             className="h-8.5 rounded-lg pl-8 text-xs"
           />
         </div>

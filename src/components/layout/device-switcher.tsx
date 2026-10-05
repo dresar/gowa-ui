@@ -23,6 +23,18 @@ const stateDots: Record<DeviceState, string> = {
   disconnected: 'bg-muted-foreground/40',
 }
 
+function formatDeviceLabel(device?: { id: string; display_name?: string } | null): string {
+  if (!device) return 'Device'
+  if (device.display_name && device.display_name.trim().length > 0) {
+    return device.display_name.trim()
+  }
+  const id = device.id
+  if (id.length > 13) {
+    return `${id.slice(0, 4)}...${id.slice(-4)}`
+  }
+  return id
+}
+
 export function DeviceSwitcher() {
   const { data: devices, isLoading } = useDevices()
   const selectedDeviceId = useDeviceStore((state) => state.selectedDeviceId)
@@ -36,7 +48,7 @@ export function DeviceSwitcher() {
   }, [devices, selectedDeviceId, selectDevice])
 
   if (isLoading) {
-    return <Skeleton className="h-8 w-32 rounded-lg" />
+    return <Skeleton className="h-8 w-28 shrink-0 rounded-lg sm:w-36" />
   }
 
   if (!devices || devices.length === 0) {
@@ -46,7 +58,7 @@ export function DeviceSwitcher() {
           variant="outline"
           size="sm"
           onClick={() => setCreateOpen(true)}
-          className="h-8 gap-1.5 rounded-lg border-red-500/30 bg-gradient-to-r from-red-500/15 to-rose-500/10 text-xs font-semibold text-red-500 hover:border-red-500/50 hover:from-red-500/25 hover:to-rose-500/15 dark:text-red-400"
+          className="h-8 shrink-0 gap-1.5 rounded-lg border-red-500/30 bg-gradient-to-r from-red-500/15 to-rose-500/10 text-xs font-semibold text-red-500 hover:border-red-500/50 hover:from-red-500/25 hover:to-rose-500/15 dark:text-red-400"
         >
           <Plus className="size-3.5" />
           <span>Add Device</span>
@@ -64,11 +76,11 @@ export function DeviceSwitcher() {
         <SelectTrigger
           size="sm"
           className={cn(
-            'border-border/70 bg-card/70 hover:border-primary/40 h-8 w-40 rounded-lg text-xs backdrop-blur-md transition-all sm:w-48 md:w-56',
+            'border-border/70 bg-card/70 hover:border-primary/40 h-8 max-w-[130px] shrink-0 overflow-hidden rounded-lg text-xs backdrop-blur-md transition-all sm:max-w-[170px] md:max-w-[210px]',
             !selectedDeviceId && 'border-amber-500/50 text-amber-500',
           )}
         >
-          <div className="flex min-w-0 items-center gap-2">
+          <div className="flex min-w-0 flex-1 items-center gap-1.5 overflow-hidden">
             {selectedDevice ? (
               <span
                 className={cn('size-2 shrink-0 rounded-full', stateDots[selectedDevice.state])}
@@ -76,11 +88,20 @@ export function DeviceSwitcher() {
             ) : (
               <Smartphone className="size-3.5 shrink-0 animate-pulse text-amber-500" />
             )}
-            <SelectValue placeholder="Select device session">
+            <SelectValue placeholder="Device">
               {selectedDevice ? (
-                <span className="truncate">{selectedDevice.display_name || selectedDevice.id}</span>
+                <span
+                  className="max-w-[80px] truncate font-mono text-[11px] sm:max-w-[110px] md:max-w-[140px]"
+                  title={
+                    selectedDevice.display_name
+                      ? `${selectedDevice.display_name} (${selectedDevice.id})`
+                      : selectedDevice.id
+                  }
+                >
+                  {formatDeviceLabel(selectedDevice)}
+                </span>
               ) : (
-                <span className="font-semibold text-amber-500">Select Device</span>
+                <span className="truncate font-semibold text-amber-500">Device</span>
               )}
             </SelectValue>
           </div>
@@ -89,9 +110,11 @@ export function DeviceSwitcher() {
           {devices.map((device) => (
             <SelectItem key={device.id} value={device.id} className="text-xs">
               <span className={cn('size-2 shrink-0 rounded-full', stateDots[device.state])} />
-              <div className="flex flex-col truncate">
-                <span className="truncate font-medium">{device.display_name || device.id}</span>
-                <span className="text-muted-foreground font-mono text-[10px]">
+              <div className="flex min-w-0 flex-1 flex-col truncate">
+                <span className="truncate font-medium">
+                  {device.display_name || formatDeviceLabel(device)}
+                </span>
+                <span className="text-muted-foreground truncate font-mono text-[10px]">
                   {device.phone_number || device.jid || device.id}
                 </span>
               </div>
@@ -106,7 +129,7 @@ export function DeviceSwitcher() {
               className="text-primary hover:bg-primary/10 h-7 w-full justify-start gap-1.5 rounded-md px-2 text-xs font-semibold"
             >
               <Plus className="size-3.5" />
-              <span>Add Device Slot</span>
+              <span>Add Device</span>
             </Button>
           </div>
         </SelectContent>

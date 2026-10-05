@@ -190,7 +190,7 @@ function TimezoneField({ value, onChange }: { value: string; onChange: (zone: st
         </PopoverTrigger>
         <PopoverContent className="w-(--radix-popover-trigger-width) p-0" align="start">
           <Command defaultValue={value}>
-            <CommandInput placeholder="Search timezone..." />
+            <CommandInput placeholder="Search" />
             <CommandList>
               <CommandEmpty>No timezone found.</CommandEmpty>
               <CommandGroup>

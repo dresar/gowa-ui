@@ -11,8 +11,8 @@ export default function MiscPage() {
   return (
     <div className="flex flex-col gap-4 sm:gap-5">
       <PageHeader
-        title="Channels & Telephony"
-        description="WhatsApp channel / newsletter subscriptions and incoming call routing."
+        title="Channels"
+        description="Channel subscriptions and call routing."
       />
 
       {!device ? (

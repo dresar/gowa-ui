@@ -238,7 +238,7 @@ function ActPanel() {
               className="font-mono text-xs"
               value={messageId}
               onChange={(event) => setMessageId(event.target.value)}
-              placeholder="e.g. 3EB0XXXXX"
+              placeholder="3EB0XXXXX"
             />
           </div>
           <div className="flex flex-col gap-1.5">
@@ -271,8 +271,8 @@ export default function MessagingPage() {
   return (
     <div className="flex flex-col gap-4 sm:gap-5">
       <PageHeader
-        title="Messaging Console"
-        description="Select recipient scope, dispatch rich media payloads, or perform message actions."
+        title="Messaging"
+        description="Dispatch payloads and manage messages."
       />
       {device === null ? (
         <DeviceGuard />

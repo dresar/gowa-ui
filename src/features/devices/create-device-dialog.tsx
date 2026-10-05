@@ -87,7 +87,7 @@ export function CreateDeviceDialog({
             <Label htmlFor="device-id">Device ID (optional)</Label>
             <Input
               id="device-id"
-              placeholder="auto-generated when empty"
+              placeholder="Auto"
               value={deviceId}
               onChange={(event) => setDeviceId(event.target.value)}
             />

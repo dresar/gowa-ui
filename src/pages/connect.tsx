@@ -182,7 +182,7 @@ export default function ConnectPage() {
             )}
             {status === 'unauthorized' && !error && (
               <div className="border-destructive/30 bg-destructive/10 text-destructive rounded-lg border p-2.5 text-xs">
-                The stored credentials were rejected — please enter them again.
+                Credentials rejected. Re-enter credentials.
               </div>
             )}
             {status === 'unreachable' && !error && (
@@ -199,12 +199,12 @@ export default function ConnectPage() {
               {submitting ? (
                 <>
                   <Loader2 className="size-3.5 animate-spin" />
-                  <span>Connecting to Gateway…</span>
+                  <span>Connecting…</span>
                 </>
               ) : (
                 <>
                   <CheckCircle2 className="size-3.5" />
-                  <span>Connect to Gateway</span>
+                  <span>Connect</span>
                 </>
               )}
             </Button>

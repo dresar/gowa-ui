@@ -98,7 +98,7 @@ export function DeviceWebhookDialog({
               <Label htmlFor="device-webhook-secret">Secret (optional)</Label>
               <Input
                 id="device-webhook-secret"
-                placeholder="used to sign payloads (X-Hub-Signature-256)"
+                placeholder="Secret"
                 value={secret}
                 onChange={(event) => setSecret(event.target.value)}
               />
@@ -107,7 +107,7 @@ export function DeviceWebhookDialog({
               <Label htmlFor="device-webhook-events">Events (optional)</Label>
               <Input
                 id="device-webhook-events"
-                placeholder="comma-separated; empty forwards all events"
+                placeholder="Events"
                 value={events}
                 onChange={(event) => setEvents(event.target.value)}
               />

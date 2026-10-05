@@ -112,10 +112,10 @@ export function DeviceGuard() {
                 </div>
                 <div>
                   <CardTitle className="text-sm font-semibold sm:text-base">
-                    Select Active WhatsApp Session
+                    Select Session
                   </CardTitle>
                   <CardDescription className="text-xs">
-                    Choose a registered device below to run device-scoped operations on this page.
+                    Choose a device for this page.
                   </CardDescription>
                 </div>
               </div>
@@ -126,7 +126,7 @@ export function DeviceGuard() {
                 className="h-8 gap-1.5 self-start rounded-lg border-red-500/30 text-xs font-semibold text-red-500 hover:border-red-500/50 hover:bg-red-500/10 sm:self-auto dark:text-red-400"
               >
                 <Plus className="size-3.5" />
-                <span>New Device Slot</span>
+                <span>Add Device</span>
               </Button>
             </div>
           </CardHeader>
@@ -213,7 +213,7 @@ export function DeviceGuard() {
               className="h-8 gap-1.5 rounded-lg text-xs font-semibold shadow-xs"
             >
               <Plus className="size-3.5" />
-              <span>Register Device Slot</span>
+              <span>Register Slot</span>
             </Button>
             <Button
               asChild
@@ -222,7 +222,7 @@ export function DeviceGuard() {
             >
               <Link to="/">
                 <LayoutDashboard className="size-3.5" />
-                <span>Go to Devices Overview</span>
+                <span>View Devices</span>
               </Link>
             </Button>
           </div>

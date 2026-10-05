@@ -72,7 +72,7 @@ export function GroupDirectory({ onSelect }: { onSelect: (group: MyGroup) => voi
           <Search className="text-muted-foreground absolute top-2.5 left-2.5 size-4" />
           <Input
             className="pl-8"
-            placeholder="Search groups by name or ID"
+            placeholder="Search"
             value={search}
             onChange={(event) => setSearch(event.target.value)}
           />

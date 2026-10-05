@@ -138,8 +138,8 @@ export default function AccountPage() {
   return (
     <div className="flex flex-col gap-4 sm:gap-5">
       <PageHeader
-        title="Account & Identity"
-        description="Active device profile settings, contact directories, and privacy configuration."
+        title="Account"
+        description="Profile, contacts, and privacy configuration."
       />
       {device === null ? (
         <DeviceGuard />
@@ -149,17 +149,17 @@ export default function AccountPage() {
           <Tabs defaultValue="profile" className="gap-3">
             <TabsList className="border-border/70 bg-card/60 h-9 rounded-lg border p-1 backdrop-blur-md">
               <TabsTrigger value="profile" className="h-7 rounded-md text-xs font-medium">
-                My Profile
+                Profile
               </TabsTrigger>
               <TabsTrigger value="lookups" className="h-7 rounded-md text-xs font-medium">
                 <ScanSearch className="size-3.5" />
-                Directory Search
+                Lookups
               </TabsTrigger>
               <TabsTrigger value="contacts" className="h-7 rounded-md text-xs font-medium">
-                Synced Contacts
+                Contacts
               </TabsTrigger>
               <TabsTrigger value="privacy" className="h-7 rounded-md text-xs font-medium">
-                Privacy Settings
+                Privacy
               </TabsTrigger>
             </TabsList>
             <TabsContent value="profile" className="flex flex-col gap-4 pt-1">

@@ -93,7 +93,7 @@ export function ParticipantsPanel({ groupJid }: { groupJid: string }) {
         }}
       >
         <Input
-          placeholder="628xxxxxxxxxx, comma-separated"
+          placeholder="628xxxxxxxxxx"
           value={newParticipants}
           onChange={(event) => setNewParticipants(event.target.value)}
         />

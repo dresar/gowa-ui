@@ -36,7 +36,7 @@ export function CallRejectForm() {
         <Label htmlFor="call-id">Call ID</Label>
         <Input
           id="call-id"
-          placeholder="Call ID from the webhook event"
+          placeholder="Call-ID"
           value={callId}
           onChange={(event) => setCallId(event.target.value)}
           required

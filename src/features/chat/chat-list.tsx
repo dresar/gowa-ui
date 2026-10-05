@@ -51,7 +51,7 @@ export function ChatList({
           <Search className="text-muted-foreground absolute top-2.5 left-2.5 size-3.5" />
           <Input
             className="h-8 pl-8 text-xs font-medium"
-            placeholder="Search conversations…"
+            placeholder="Search"
             value={search}
             onChange={(event) => {
               setSearch(event.target.value)
@@ -67,7 +67,7 @@ export function ChatList({
               setOffset(0)
             }}
           />
-          <span>Media attachments only</span>
+          <span>Media only</span>
         </label>
       </div>
 

@@ -62,14 +62,14 @@ const navGroups = [
 ]
 
 const routeTitles: Record<string, { label: string; icon: typeof LayoutDashboard }> = {
-  '/': { label: 'WhatsApp Devices', icon: LayoutDashboard },
-  '/messaging': { label: 'Messaging Studio', icon: Send },
-  '/scheduled': { label: 'Scheduled Queue', icon: CalendarClock },
-  '/chats': { label: 'Chat History', icon: MessagesSquare },
-  '/groups': { label: 'Group Directory', icon: Users },
-  '/account': { label: 'Account & Identity', icon: UserRound },
-  '/misc': { label: 'Channels & Calls', icon: Wrench },
-  '/settings': { label: 'Settings & Diagnostics', icon: Settings },
+  '/': { label: 'Devices', icon: LayoutDashboard },
+  '/messaging': { label: 'Messaging', icon: Send },
+  '/scheduled': { label: 'Scheduled', icon: CalendarClock },
+  '/chats': { label: 'Chats', icon: MessagesSquare },
+  '/groups': { label: 'Groups', icon: Users },
+  '/account': { label: 'Account', icon: UserRound },
+  '/misc': { label: 'Channels', icon: Wrench },
+  '/settings': { label: 'Settings', icon: Settings },
 }
 
 function SidebarActiveSession() {
@@ -119,21 +119,21 @@ function SidebarActiveSession() {
 
   return (
     <>
-      <div className="mx-2.5 my-2 flex items-center justify-between gap-2 rounded-lg border border-amber-500/30 bg-amber-500/10 p-2">
-        <div className="flex items-center gap-2">
-          <Smartphone className="size-4 animate-pulse text-amber-500" />
-          <div className="flex flex-col">
-            <span className="text-[11px] font-semibold text-amber-600 dark:text-amber-400">
-              No Active Session
+      <div className="mx-2.5 my-2 flex shrink-0 items-center justify-between gap-2 rounded-lg border border-amber-500/30 bg-amber-500/10 p-2">
+        <div className="flex min-w-0 items-center gap-2">
+          <Smartphone className="size-4 shrink-0 animate-pulse text-amber-500" />
+          <div className="flex min-w-0 flex-col">
+            <span className="truncate text-[11px] font-semibold text-amber-600 dark:text-amber-400">
+              No Session
             </span>
-            <span className="text-muted-foreground text-[10px]">Select or pair device</span>
+            <span className="text-muted-foreground truncate text-[10px]">Pair device</span>
           </div>
         </div>
         <Button
           size="xs"
           variant="outline"
           onClick={() => setCreateOpen(true)}
-          className="h-6 gap-1 rounded-[5px] border-amber-500/40 text-[10px] font-semibold text-amber-600 hover:bg-amber-500/20 dark:text-amber-400"
+          className="h-6 shrink-0 gap-1 rounded-[5px] border-amber-500/40 text-[10px] font-semibold text-amber-600 hover:bg-amber-500/20 dark:text-amber-400"
         >
           <Plus className="size-2.5" />
           <span>Add</span>
@@ -230,12 +230,13 @@ export function AppShell() {
   }
 
   return (
-    <div className="ambient-glow bg-background relative flex min-h-svh overflow-x-hidden">
+    <div className="ambient-glow bg-background relative flex h-svh w-full overflow-hidden">
       {/* Background # straight transparent grid lines across all pages */}
       <div aria-hidden="true" className="grid-pattern pointer-events-none fixed inset-0 z-0" />
 
-      <aside className="border-sidebar-border/70 bg-sidebar/80 relative z-10 hidden w-60 shrink-0 flex-col border-r backdrop-blur-xl md:flex">
-        <div className="border-sidebar-border/70 relative flex h-14 items-center border-b px-4">
+      {/* Stationary Desktop Sidebar */}
+      <aside className="border-sidebar-border/70 bg-sidebar/80 relative z-20 hidden h-svh w-60 shrink-0 flex-col border-r backdrop-blur-xl md:flex select-none">
+        <div className="border-sidebar-border/70 relative flex h-14 shrink-0 items-center border-b px-4">
           <div className="pointer-events-none absolute right-0 bottom-0 left-0 h-px bg-gradient-to-r from-red-500/40 via-rose-500/20 to-transparent" />
           <Logo />
         </div>
@@ -246,7 +247,7 @@ export function AppShell() {
           <NavContent />
         </ScrollArea>
 
-        <div className="border-sidebar-border/70 border-t p-3">
+        <div className="border-sidebar-border/70 shrink-0 border-t p-3">
           <div className="text-muted-foreground flex items-center justify-between rounded-lg border border-red-500/20 bg-gradient-to-r from-red-500/10 via-rose-500/5 to-transparent px-2.5 py-1.5 text-[11px] backdrop-blur-xs">
             <div className="flex items-center gap-1.5">
               <span className="size-1.5 rounded-full bg-red-500 shadow-xs shadow-red-500/80" />
@@ -278,35 +279,37 @@ export function AppShell() {
         </SheetContent>
       </Sheet>
 
-      <div className="relative z-10 flex min-w-0 flex-1 flex-col">
-        <header className="border-border/60 bg-background/80 sticky top-0 z-30 flex h-14 items-center justify-between gap-3 border-b px-4 backdrop-blur-xl sm:px-6">
+      {/* Main Viewport Column with Stationary Header and Independent Scrollable Content */}
+      <div className="relative z-10 flex h-svh min-w-0 flex-1 flex-col overflow-hidden">
+        {/* Stationary Header */}
+        <header className="border-border/60 bg-background/80 shrink-0 sticky top-0 z-30 flex h-14 items-center justify-between gap-2 border-b px-3 backdrop-blur-xl sm:gap-3 sm:px-6 select-none">
           <div className="pointer-events-none absolute right-0 bottom-0 left-0 h-px bg-gradient-to-r from-red-500/40 via-rose-500/20 to-transparent" />
-          <div className="flex items-center gap-2.5">
+          <div className="flex min-w-0 items-center gap-2 sm:gap-2.5">
             <Button
               variant="ghost"
               size="icon-sm"
               aria-label="Open navigation"
               onClick={() => setMobileNavOpen(true)}
-              className="size-8 md:hidden"
+              className="size-8 shrink-0 md:hidden"
             >
               <Menu className="size-4" />
             </Button>
-            <div className="flex items-center gap-2">
-              <div className="hidden size-7 items-center justify-center rounded-md border border-red-500/30 bg-gradient-to-br from-red-500/20 via-rose-500/10 to-transparent text-red-500 shadow-2xs md:flex dark:text-red-400">
+            <div className="flex min-w-0 items-center gap-2">
+              <div className="hidden size-7 shrink-0 items-center justify-center rounded-md border border-red-500/30 bg-gradient-to-br from-red-500/20 via-rose-500/10 to-transparent text-red-500 shadow-2xs md:flex dark:text-red-400">
                 <CurrentIcon className="size-3.5" />
               </div>
-              <h1 className="text-foreground text-xs font-semibold sm:text-sm">
+              <h1 className="text-foreground truncate text-xs font-semibold sm:text-sm">
                 {currentRoute.label}
               </h1>
             </div>
           </div>
 
-          <div className="ml-auto flex items-center gap-2 sm:gap-2.5">
+          <div className="ml-auto flex shrink-0 items-center gap-2 sm:gap-2.5">
             <DeviceSwitcher />
             <Button
               asChild
               size="sm"
-              className="hidden h-8 gap-1.5 rounded-lg text-xs font-semibold sm:inline-flex"
+              className="hidden h-8 shrink-0 gap-1.5 rounded-lg text-xs font-semibold sm:inline-flex"
             >
               <Link to="/messaging">
                 <Send className="size-3" />
@@ -318,7 +321,8 @@ export function AppShell() {
           </div>
         </header>
 
-        <main className="flex-1 p-3.5 pb-20 sm:p-5 md:p-6 md:pb-6">
+        {/* Content area: the only area that scrolls vertically */}
+        <main className="flex-1 min-h-0 overflow-y-auto p-3.5 pb-20 sm:p-5 md:p-6 md:pb-6">
           <div
             key={location.pathname}
             className="stagger mx-auto flex max-w-5xl flex-col gap-4 sm:gap-5"

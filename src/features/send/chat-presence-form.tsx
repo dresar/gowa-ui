@@ -44,7 +44,7 @@ export function SendChatPresenceForm() {
         </Select>
       </div>
       <FormActions
-        submitLabel="Send chat presence"
+        submitLabel="Send presence"
         pending={mutation.isPending}
         disabled={!jid}
         request={chatPresenceRequest(payload)}

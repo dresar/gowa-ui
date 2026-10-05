@@ -52,8 +52,8 @@ export default function DashboardPage() {
   return (
     <div className="flex flex-col gap-4 sm:gap-5">
       <PageHeader
-        title="WhatsApp Devices"
-        description="Multi-device session orchestration and telemetry."
+        title="Devices"
+        description="Multi-device session orchestration."
         actions={
           <Button
             size="sm"
@@ -151,7 +151,7 @@ export default function DashboardPage() {
             <Input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search devices by name, phone or ID…"
+              placeholder="Search"
               className="h-8.5 rounded-lg pl-8 text-xs"
             />
           </div>
@@ -286,7 +286,7 @@ export default function DashboardPage() {
               className="mt-1 h-8 gap-1.5 rounded-lg text-xs font-semibold shadow-xs"
             >
               <Plus className="size-3.5" />
-              <span>Register First Device</span>
+              <span>Register Device</span>
             </Button>
           </CardContent>
         </Card>

@@ -88,7 +88,7 @@ export function ReactForm({ messageId }: MessageActionProps) {
         <Input
           value={emoji}
           onChange={(event) => setEmoji(event.target.value)}
-          placeholder="👍 (empty removes the reaction)"
+          placeholder="👍"
         />
       </div>
     </MessageActionForm>
@@ -100,7 +100,7 @@ export function UpdateForm({ messageId }: MessageActionProps) {
   return (
     <MessageActionForm
       messageId={messageId}
-      submitLabel="Update message"
+      submitLabel="Update"
       successMessage="Message updated"
       extraValid={message.trim().length > 0}
       request={(id, phone) => updateRequest(id, { phone, message })}
@@ -117,7 +117,7 @@ export function DeleteForm({ messageId }: MessageActionProps) {
   return (
     <MessageActionForm
       messageId={messageId}
-      submitLabel="Delete for everyone"
+      submitLabel="Delete"
       successMessage="Message deleted"
       request={(id, phone) => deleteRequest(id, { phone })}
     />
@@ -128,7 +128,7 @@ export function RevokeForm({ messageId }: MessageActionProps) {
   return (
     <MessageActionForm
       messageId={messageId}
-      submitLabel="Revoke message"
+      submitLabel="Revoke"
       successMessage="Message revoked"
       request={(id, phone) => revokeRequest(id, { phone })}
     />
@@ -139,7 +139,7 @@ export function ReadForm({ messageId }: MessageActionProps) {
   return (
     <MessageActionForm
       messageId={messageId}
-      submitLabel="Mark as read"
+      submitLabel="Mark read"
       successMessage="Marked as read"
       request={(id, phone) => readRequest(id, { phone })}
     />
@@ -183,7 +183,7 @@ export function ForwardForm({ messageId }: MessageActionProps) {
   return (
     <MessageActionForm
       messageId={messageId}
-      submitLabel="Forward message"
+      submitLabel="Forward"
       successMessage="Message forwarded"
       onSuccess={reset}
       request={(id, phone) => forwardRequest(id, { phone, force_reupload: reupload, ...draft })}

@@ -238,7 +238,7 @@ function ScheduleTable({ device }: { device: string }) {
     <div className="flex flex-col gap-4">
       <PageHeader
         title="Scheduled"
-        description="Delayed and recurring WhatsApp sends for the selected device."
+        description="Delayed and recurring messages."
         actions={
           <ToggleGroup
             type="single"
@@ -265,7 +265,7 @@ function ScheduleTable({ device }: { device: string }) {
           <Search className="text-muted-foreground absolute top-2.5 left-2 size-4" />
           <Input
             className="pl-8"
-            placeholder="Search recipient or message"
+            placeholder="Search"
             value={search}
             onChange={(event) => {
               setSearch(event.target.value)

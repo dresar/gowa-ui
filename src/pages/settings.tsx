@@ -25,8 +25,8 @@ export default function SettingsPage() {
   return (
     <div className="flex max-w-2xl flex-col gap-4">
       <PageHeader
-        title="Settings & Diagnostics"
-        description="Active gateway connectivity, server telemetry, and visual preferences."
+        title="Settings"
+        description="Gateway telemetry and preferences."
       />
 
       <Card className="glass-card rounded-xl backdrop-blur-xl">

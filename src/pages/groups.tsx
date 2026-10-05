@@ -51,7 +51,7 @@ export default function GroupsPage() {
     <>
       <PageHeader
         title="Groups"
-        description="Groups this device belongs to — select one to manage it."
+        description="Device group memberships."
         actions={
           <>
             <HeaderDialog
@@ -61,7 +61,7 @@ export default function GroupsPage() {
                   Preview link
                 </Button>
               }
-              title="Group info from link"
+              title="Preview group"
               description="Preview a group before joining."
             >
               <InfoFromLinkForm />
@@ -70,10 +70,10 @@ export default function GroupsPage() {
               trigger={
                 <Button variant="outline" size="sm">
                   <Link className="size-4" />
-                  Join with link
+                  Join link
                 </Button>
               }
-              title="Join with link"
+              title="Join group"
               description="Join a group from its invite link."
             >
               <JoinWithLinkForm />

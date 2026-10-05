@@ -151,7 +151,7 @@ export function MessageView({ chat, deviceId }: { chat: ChatInfo; deviceId: stri
       <div className="flex items-center justify-between gap-2">
         <Input
           className="h-7.5 max-w-xs text-xs"
-          placeholder="Filter messages in this chat…"
+          placeholder="Search"
           value={search}
           onChange={(event) => {
             setSearch(event.target.value)
@@ -241,7 +241,7 @@ export function MessageView({ chat, deviceId }: { chat: ChatInfo; deviceId: stri
         <ScheduleFields draft={scheduleDraft} patch={patchSchedule} />
         <div className="flex gap-2">
           <Input
-            placeholder="Type a message to dispatch…"
+            placeholder="Message"
             value={draft}
             onChange={(event) => setDraft(event.target.value)}
             className="h-8.5 text-xs"

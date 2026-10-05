@@ -31,7 +31,7 @@ export function PushnameForm() {
           id="push-name"
           value={pushName}
           onChange={(event) => setPushName(event.target.value)}
-          placeholder="Your display name"
+          placeholder="Name"
           required
         />
       </div>
@@ -41,7 +41,7 @@ export function PushnameForm() {
         className="self-start"
       >
         {mutation.isPending && <Loader2 className="size-4 animate-spin" />}
-        Update push name
+        Update name
       </Button>
     </form>
   )

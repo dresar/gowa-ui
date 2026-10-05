@@ -48,7 +48,7 @@ export function CreateGroupForm() {
         <Textarea
           id="create-group-participants"
           rows={4}
-          placeholder="628xxxxxxxxxx, one per line or comma-separated"
+          placeholder="628xxxxxxxxxx"
           value={participants}
           onChange={(event) => setParticipants(event.target.value)}
         />
