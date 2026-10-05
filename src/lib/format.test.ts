@@ -83,6 +83,12 @@ describe('formatNextRun', () => {
   it('formats overdue for past times', () => {
     const past10m = new Date(baseNow.getTime() - 10 * 60_000).toISOString()
     expect(formatNextRun(past10m, baseNow).relative).toBe('10m overdue')
+
+    const past2h = new Date(baseNow.getTime() - 2 * 3600_000).toISOString()
+    expect(formatNextRun(past2h, baseNow).relative).toBe('2h overdue')
+
+    const past3d = new Date(baseNow.getTime() - 72 * 3600_000).toISOString()
+    expect(formatNextRun(past3d, baseNow).relative).toBe('3d overdue')
   })
 
   it('formats tomorrow for next day', () => {

@@ -105,16 +105,25 @@ export async function changePushName(push_name: string): Promise<void> {
   await http.post('/user/pushname', { push_name })
 }
 
-export function getPrivacy(): Promise<PrivacyResponse> {
-  return results<PrivacyResponse>(http.get('/user/my/privacy'))
+export function getPrivacy(deviceId?: string): Promise<PrivacyResponse> {
+  const config = deviceId
+    ? { headers: { 'X-Device-Id': encodeURIComponent(deviceId) } }
+    : undefined
+  return results<PrivacyResponse>(http.get('/user/my/privacy', config))
 }
 
-export function listNewsletters(): Promise<NewslettersResponse> {
-  return results<NewslettersResponse>(http.get('/user/my/newsletters'))
+export function listNewsletters(deviceId?: string): Promise<NewslettersResponse> {
+  const config = deviceId
+    ? { headers: { 'X-Device-Id': encodeURIComponent(deviceId) } }
+    : undefined
+  return results<NewslettersResponse>(http.get('/user/my/newsletters', config))
 }
 
-export function listContacts(): Promise<ContactsResponse> {
-  return results<ContactsResponse>(http.get('/user/my/contacts'))
+export function listContacts(deviceId?: string): Promise<ContactsResponse> {
+  const config = deviceId
+    ? { headers: { 'X-Device-Id': encodeURIComponent(deviceId) } }
+    : undefined
+  return results<ContactsResponse>(http.get('/user/my/contacts', config))
 }
 
 export function checkUser(phone: string): Promise<CheckResponse> {

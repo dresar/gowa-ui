@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { keepPreviousData, useQuery } from '@tanstack/react-query'
 import { Loader2, Plus, Search, Smartphone } from 'lucide-react'
 import { listChats, type ChatInfo } from '@/api/chat'
+import { ErrorNotice } from '@/components/shared/error-notice'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { ScrollArea } from '@/components/ui/scroll-area'
@@ -9,7 +10,7 @@ import { Switch } from '@/components/ui/switch'
 import { CreateDeviceDialog } from '@/features/devices/create-device-dialog'
 import { chatListQueryKey } from '@/features/chat/device-scope'
 import { chatDisplayName } from '@/features/chat/display-name'
-import { isDeviceNotFoundError, toApiError } from '@/lib/api-error'
+import { isDeviceNotFoundError } from '@/lib/api-error'
 import { formatDate, isZeroTime } from '@/lib/format'
 import { cn } from '@/lib/utils'
 
@@ -101,9 +102,13 @@ export function ChatList({
             </Button>
           </div>
         ) : query.error ? (
-          <p className="text-destructive p-6 text-center text-xs">
-            {toApiError(query.error).message}
-          </p>
+          <div className="p-3">
+            <ErrorNotice
+              title="Failed to load chats"
+              error={query.error}
+              onRetry={() => void query.refetch()}
+            />
+          </div>
         ) : chats.length === 0 ? (
           <p className="text-muted-foreground p-6 text-center text-xs">No conversations found</p>
         ) : (

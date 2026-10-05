@@ -105,8 +105,11 @@ export interface ParticipantsPayload {
   participants: string[]
 }
 
-export async function listMyGroups(): Promise<MyGroup[]> {
-  const response = await results<{ data: MyGroup[] | null }>(http.get('/user/my/groups'))
+export async function listMyGroups(deviceId?: string): Promise<MyGroup[]> {
+  const config = deviceId
+    ? { headers: { 'X-Device-Id': encodeURIComponent(deviceId) } }
+    : undefined
+  const response = await results<{ data: MyGroup[] | null }>(http.get('/user/my/groups', config))
   return response?.data ?? []
 }
 

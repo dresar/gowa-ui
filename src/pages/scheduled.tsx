@@ -21,10 +21,10 @@ import {
   type ScheduleStatus,
 } from '@/api/schedule'
 import { EmptyState } from '@/components/shared/empty-state'
+import { ErrorNotice } from '@/components/shared/error-notice'
 import { PageHeader } from '@/components/shared/page-header'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import {
   Select,
@@ -47,7 +47,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 import { CreateDeviceDialog } from '@/features/devices/create-device-dialog'
 import { DeviceGuard, useSelectedDevice } from '@/hooks/use-device-guard'
 import { useActionMutation } from '@/hooks/use-action-mutation'
-import { isDeviceNotFoundError, toApiError } from '@/lib/api-error'
+import { isDeviceNotFoundError } from '@/lib/api-error'
 import { formatDate, formatNextRun } from '@/lib/format'
 
 const PAGE_SIZE = 25
@@ -260,22 +260,31 @@ function ScheduleTable({ device }: { device: string }) {
   const query = useQuery({
     queryKey: ['schedules', device, status, search, messageType, offset],
     queryFn: () =>
-      listSchedules({
-        status: status === 'all' ? undefined : status,
-        search: search || undefined,
-        message_type: messageType === 'all' ? undefined : messageType,
-        limit: PAGE_SIZE,
-        offset,
-      }),
+      listSchedules(
+        {
+          status: status === 'all' ? undefined : status,
+          search: search || undefined,
+          message_type: messageType === 'all' ? undefined : messageType,
+          limit: PAGE_SIZE,
+          offset,
+        },
+        device,
+      ),
     enabled: Boolean(device),
     refetchInterval: 10_000,
     placeholderData: keepPreviousData,
   })
   const refresh = () => void queryClient.invalidateQueries({ queryKey: ['schedules', device] })
 
-  const pause = useActionMutation(pauseSchedule, { successMessage: 'Schedule paused' })
-  const resume = useActionMutation(resumeSchedule, { successMessage: 'Schedule resumed' })
-  const cancel = useActionMutation(cancelSchedule, { successMessage: 'Schedule cancelled' })
+  const pause = useActionMutation((id: string) => pauseSchedule(id, device), {
+    successMessage: 'Schedule paused',
+  })
+  const resume = useActionMutation((id: string) => resumeSchedule(id, device), {
+    successMessage: 'Schedule resumed',
+  })
+  const cancel = useActionMutation((id: string) => cancelSchedule(id, device), {
+    successMessage: 'Schedule cancelled',
+  })
 
   const pendingId = pause.isPending
     ? pause.variables
@@ -371,11 +380,11 @@ function ScheduleTable({ device }: { device: string }) {
           }
         />
       ) : query.error ? (
-        <Card className="border-destructive/50">
-          <CardContent className="text-destructive py-4 text-sm">
-            {toApiError(query.error).message}
-          </CardContent>
-        </Card>
+        <ErrorNotice
+          title="Failed to load schedules"
+          error={query.error}
+          onRetry={() => void query.refetch()}
+        />
       ) : null}
       {query.isLoading && (
         <div className="flex flex-col gap-2 rounded-lg border p-2">
@@ -452,6 +461,16 @@ function ScheduleTable({ device }: { device: string }) {
 
 export default function ScheduledPage() {
   const device = useSelectedDevice()
-  if (!device) return <DeviceGuard />
+  if (!device) {
+    return (
+      <div className="flex flex-col gap-4">
+        <PageHeader
+          title="Scheduled"
+          description="Delayed and recurring messages."
+        />
+        <DeviceGuard />
+      </div>
+    )
+  }
   return <ScheduleTable key={device} device={device} />
 }

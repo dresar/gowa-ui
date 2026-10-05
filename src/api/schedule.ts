@@ -39,14 +39,26 @@ export interface ScheduleList {
   pagination: Pagination
 }
 
-export function listSchedules(params: ScheduleListParams = {}): Promise<ScheduleList> {
-  return results<ScheduleList>(http.get('/send/schedules', { params }))
+export function listSchedules(
+  params: ScheduleListParams = {},
+  deviceId?: string,
+): Promise<ScheduleList> {
+  const config = {
+    params,
+    headers: deviceId ? { 'X-Device-Id': encodeURIComponent(deviceId) } : undefined,
+  }
+  return results<ScheduleList>(http.get('/send/schedules', config))
 }
 
-function action(id: string, name: 'pause' | 'resume' | 'cancel'): Promise<void> {
-  return http.post(`/send/schedules/${encodeURIComponent(id)}/${name}`).then(() => undefined)
+function action(id: string, name: 'pause' | 'resume' | 'cancel', deviceId?: string): Promise<void> {
+  const config = deviceId
+    ? { headers: { 'X-Device-Id': encodeURIComponent(deviceId) } }
+    : undefined
+  return http
+    .post(`/send/schedules/${encodeURIComponent(id)}/${name}`, undefined, config)
+    .then(() => undefined)
 }
 
-export const pauseSchedule = (id: string) => action(id, 'pause')
-export const resumeSchedule = (id: string) => action(id, 'resume')
-export const cancelSchedule = (id: string) => action(id, 'cancel')
+export const pauseSchedule = (id: string, deviceId?: string) => action(id, 'pause', deviceId)
+export const resumeSchedule = (id: string, deviceId?: string) => action(id, 'resume', deviceId)
+export const cancelSchedule = (id: string, deviceId?: string) => action(id, 'cancel', deviceId)

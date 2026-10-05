@@ -37,10 +37,17 @@ export function basicAuthHeader(username: string, password: string): string {
 export function isDeviceNotFoundError(error: unknown): boolean {
   if (!error) return false
   const apiError = toApiError(error)
-  return (
-    apiError.code === 'DEVICE_NOT_FOUND' ||
-    apiError.code === 'DEVICE_ID_REQUIRED' ||
-    (typeof apiError.message === 'string' &&
-      apiError.message.toLowerCase().includes('device not found'))
-  )
+  if (apiError.code === 'DEVICE_NOT_FOUND' || apiError.code === 'DEVICE_ID_REQUIRED') {
+    return true
+  }
+  if (typeof apiError.message === 'string') {
+    const msg = apiError.message.toLowerCase()
+    return (
+      msg.includes('device not found') ||
+      msg.includes('device_id is required') ||
+      msg.includes('device id is required') ||
+      msg.includes('device identification required')
+    )
+  }
+  return false
 }

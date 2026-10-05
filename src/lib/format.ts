@@ -86,7 +86,14 @@ export function formatNextRun(
   let relative = ''
   if (diffMs < -60_000) {
     const pastMin = Math.abs(diffMin)
-    relative = pastMin < 60 ? `${pastMin}m overdue` : `${Math.abs(diffHours)}h overdue`
+    if (pastMin < 60) {
+      relative = `${pastMin}m overdue`
+    } else if (Math.abs(diffHours) < 24) {
+      relative = `${Math.abs(diffHours)}h overdue`
+    } else {
+      const pastDays = Math.round(Math.abs(diffHours) / 24)
+      relative = `${pastDays}d overdue`
+    }
   } else if (diffMs < 60_000) {
     relative = 'due now'
   } else if (diffMin < 60) {

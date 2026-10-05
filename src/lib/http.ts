@@ -1,6 +1,7 @@
 import axios, { type AxiosInstance, type AxiosResponse } from 'axios'
-import type { ResponseData } from '@/api/types'
-import { basicAuthHeader, toApiError } from '@/lib/api-error'
+import type { RegistryDevice, ResponseData } from '@/api/types'
+import { basicAuthHeader, isDeviceNotFoundError, toApiError } from '@/lib/api-error'
+import { queryClient } from '@/lib/query-client'
 import { useConnection } from '@/stores/connection'
 import { useDeviceStore } from '@/stores/device'
 
@@ -12,9 +13,19 @@ http.interceptors.request.use((config) => {
   if (username && password && !config.headers.Authorization) {
     config.headers.Authorization = basicAuthHeader(username, password)
   }
-  const deviceId = useDeviceStore.getState().selectedDeviceId
-  if (deviceId && !config.headers['X-Device-Id']) {
-    config.headers['X-Device-Id'] = encodeURIComponent(deviceId)
+  if (!config.headers['X-Device-Id']) {
+    let deviceId = useDeviceStore.getState().selectedDeviceId
+    const cachedDevices = queryClient.getQueryData<RegistryDevice[]>(['devices'])
+    if (cachedDevices && cachedDevices.length > 0) {
+      const exists = deviceId ? cachedDevices.some((d) => d.id === deviceId) : false
+      if (!exists) {
+        deviceId = cachedDevices[0].id
+        useDeviceStore.getState().selectDevice(deviceId)
+      }
+    }
+    if (deviceId) {
+      config.headers['X-Device-Id'] = encodeURIComponent(deviceId)
+    }
   }
   return config
 })
@@ -26,16 +37,12 @@ http.interceptors.response.use(
     if (apiError.status === 401) {
       useConnection.getState().markUnauthorized()
     }
-    if (
-      apiError.code === 'DEVICE_NOT_FOUND' ||
-      (apiError.status === 404 &&
-        typeof apiError.message === 'string' &&
-        apiError.message.toLowerCase().includes('device not found'))
-    ) {
+    if (isDeviceNotFoundError(apiError)) {
       const current = useDeviceStore.getState().selectedDeviceId
       if (current) {
         useDeviceStore.getState().selectDevice(null)
       }
+      void queryClient.invalidateQueries({ queryKey: ['devices'] })
     }
     return Promise.reject(apiError)
   },

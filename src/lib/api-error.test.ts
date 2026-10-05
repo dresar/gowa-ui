@@ -51,9 +51,18 @@ describe('isDeviceNotFoundError', () => {
     expect(isDeviceNotFoundError(error)).toBe(true)
   })
 
-  it('returns true when message mentions device not found', () => {
-    const error = new Error('Device not found; create a device first')
-    expect(isDeviceNotFoundError(error)).toBe(true)
+  it('returns true when message mentions device not found or device required', () => {
+    expect(isDeviceNotFoundError(new Error('Device not found; create a device first'))).toBe(true)
+    expect(
+      isDeviceNotFoundError(
+        new Error('device_id is required via X-Device-Id header or device_id query'),
+      ),
+    ).toBe(true)
+    expect(
+      isDeviceNotFoundError(
+        new Error('device identification required: set the X-Device-Id header or pass device_id'),
+      ),
+    ).toBe(true)
   })
 
   it('returns false for unrelated errors or nil', () => {

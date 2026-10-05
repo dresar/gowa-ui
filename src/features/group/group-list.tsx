@@ -15,6 +15,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
+import { ErrorNotice } from '@/components/shared/error-notice'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -44,7 +45,7 @@ export function GroupDirectory({ onSelect }: { onSelect: (group: MyGroup) => voi
     refetch,
   } = useQuery({
     queryKey: ['groups', deviceId],
-    queryFn: listMyGroups,
+    queryFn: () => listMyGroups(deviceId || undefined),
     enabled: !!deviceId,
   })
 
@@ -102,11 +103,11 @@ export function GroupDirectory({ onSelect }: { onSelect: (group: MyGroup) => voi
           }
         />
       ) : error ? (
-        <Card className="border-destructive/50">
-          <CardContent className="text-destructive py-4 text-sm">
-            Failed to load groups: {toApiError(error).message}
-          </CardContent>
-        </Card>
+        <ErrorNotice
+          title="Failed to load groups"
+          error={error}
+          onRetry={() => refetch()}
+        />
       ) : null}
 
       {isLoading && (

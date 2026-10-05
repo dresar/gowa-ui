@@ -3,12 +3,13 @@ import { useNavigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { Search, Send, Users } from 'lucide-react'
 import { listContacts } from '@/api/user'
+import { ErrorNotice } from '@/components/shared/error-notice'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useSelectedDevice } from '@/hooks/use-device-guard'
-import { isDeviceNotFoundError, toApiError } from '@/lib/api-error'
+import { isDeviceNotFoundError } from '@/lib/api-error'
 import { useRecipientStore } from '@/stores/recipient'
 
 export function ContactsView() {
@@ -17,9 +18,9 @@ export function ContactsView() {
   const [search, setSearch] = useState('')
   const setRecipient = useRecipientStore((state) => state.setRecipient)
 
-  const { data, isLoading, error } = useQuery({
+  const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['contacts', device],
-    queryFn: listContacts,
+    queryFn: () => listContacts(device || undefined),
     enabled: !!device,
   })
 
@@ -60,11 +61,7 @@ export function ContactsView() {
         </div>
       )
     }
-    return (
-      <div className="border-destructive/30 bg-destructive/10 text-destructive rounded-lg border p-3 text-xs">
-        {toApiError(error).message}
-      </div>
-    )
+    return <ErrorNotice title="Failed to load contacts" error={error} onRetry={() => refetch()} />
   }
 
   if (contacts.length === 0) {
