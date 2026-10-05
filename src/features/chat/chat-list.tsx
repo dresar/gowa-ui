@@ -88,11 +88,18 @@ export function ChatList({
                   className={cn(
                     'group/item flex w-full items-center gap-2.5 px-3 py-2 text-left transition-all duration-150',
                     selectedJid === chat.jid
-                      ? 'text-foreground border-l-2 border-red-500 bg-gradient-to-r from-red-500/15 via-rose-500/10 to-transparent font-medium'
+                      ? 'text-foreground border-l-2 border-red-500 bg-gradient-to-r from-red-500/20 via-rose-500/12 to-transparent font-medium shadow-2xs shadow-red-500/10'
                       : 'hover:bg-muted/40 text-muted-foreground hover:text-foreground',
                   )}
                 >
-                  <span className="border-border/70 bg-card/80 font-heading text-foreground flex size-8 shrink-0 items-center justify-center rounded-lg border text-xs font-bold shadow-2xs">
+                  <span
+                    className={cn(
+                      'font-heading flex size-8 shrink-0 items-center justify-center rounded-lg border text-xs font-bold shadow-2xs transition-colors',
+                      selectedJid === chat.jid
+                        ? 'border-red-500/40 bg-gradient-to-br from-red-500/20 to-rose-500/10 text-red-500 dark:text-red-400'
+                        : 'border-border/70 bg-card/80 text-foreground',
+                    )}
+                  >
                     {chatDisplayName(chat).slice(0, 1).toUpperCase()}
                   </span>
                   <span className="flex min-w-0 flex-col">

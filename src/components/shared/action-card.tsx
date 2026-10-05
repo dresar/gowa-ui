@@ -17,7 +17,7 @@ export function ActionCard({
       <CardHeader className="pb-3">
         <div className="flex items-center gap-2.5">
           {Icon && (
-            <span className="border-primary/25 bg-primary/10 text-primary flex size-7.5 shrink-0 items-center justify-center rounded-lg border shadow-2xs">
+            <span className="flex size-7.5 shrink-0 items-center justify-center rounded-lg border border-red-500/30 bg-gradient-to-br from-red-500/20 to-rose-500/10 text-red-500 shadow-2xs dark:text-red-400">
               <Icon className="size-3.5" />
             </span>
           )}

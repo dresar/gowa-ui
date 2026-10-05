@@ -96,7 +96,7 @@ export function DeviceCard({
       className={cn(
         'card-lift glass-card border-border/70 gap-3 rounded-xl border transition-all duration-200',
         selected &&
-          'border-red-500/50 bg-gradient-to-br from-red-500/[0.06] via-rose-500/[0.03] to-transparent shadow-md ring-1 shadow-red-500/10 ring-red-500/30',
+          'border-red-500/60 bg-gradient-to-br from-red-500/12 via-rose-500/6 to-transparent shadow-lg ring-1 shadow-red-500/15 ring-red-500/40',
       )}
     >
       <CardHeader className="flex flex-row items-start justify-between gap-2 p-3.5 pb-1">
@@ -120,7 +120,7 @@ export function DeviceCard({
                 {device.display_name || device.id}
               </p>
               {selected && (
-                <span className="py-0.2 flex items-center gap-0.5 rounded border border-red-500/30 bg-gradient-to-r from-red-500/20 to-rose-500/10 px-1 text-[9px] font-semibold text-red-500 dark:text-red-400">
+                <span className="py-0.2 flex items-center gap-0.5 rounded border border-red-500/40 bg-gradient-to-r from-red-600 to-rose-600 px-1.5 text-[9px] font-bold text-white shadow-xs shadow-red-600/30">
                   <CheckCircle className="size-2.5" />
                   Active
                 </span>

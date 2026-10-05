@@ -78,17 +78,15 @@ export default function ConnectPage() {
   return (
     <div className="ambient-glow bg-background relative flex min-h-svh items-center justify-center overflow-hidden p-4 sm:p-6">
       {/* Background # straight transparent grid lines across all pages */}
-      <div
-        aria-hidden="true"
-        className="grid-pattern pointer-events-none fixed inset-0 z-0 opacity-90"
-      />
+      <div aria-hidden="true" className="grid-pattern pointer-events-none fixed inset-0 z-0" />
       <div
         aria-hidden
-        className="pointer-events-none absolute -top-40 left-1/2 z-0 h-96 w-full max-w-4xl -translate-x-1/2 bg-[radial-gradient(ellipse_at_center,oklch(0.64_0.25_25/20%),transparent_70%)] blur-2xl"
+        className="pointer-events-none absolute -top-40 left-1/2 z-0 h-96 w-full max-w-4xl -translate-x-1/2 bg-[radial-gradient(ellipse_at_center,oklch(0.64_0.25_25/25%),transparent_70%)] blur-2xl"
       />
 
       <Card className="glass-card border-border/70 relative z-10 w-full max-w-md shadow-2xl backdrop-blur-2xl">
-        <CardHeader className="gap-2 pb-4">
+        <div className="pointer-events-none absolute top-0 right-0 left-0 h-1 rounded-t-xl bg-gradient-to-r from-red-600 via-rose-600 to-red-500 shadow-xs shadow-red-600/50" />
+        <CardHeader className="gap-2 pt-5 pb-4">
           <div className="flex items-center justify-between">
             <Logo className="[&_img]:size-8" />
             <div className="flex items-center gap-1 rounded-md border border-red-500/30 bg-gradient-to-r from-red-500/15 to-rose-500/10 px-2 py-0.5 text-[10px] font-medium text-red-500 dark:text-red-400">
@@ -115,14 +113,14 @@ export default function ConnectPage() {
                   <button
                     type="button"
                     onClick={() => selectPreset('http://localhost:3000')}
-                    className="bg-muted/60 text-muted-foreground rounded px-1.5 py-0.5 font-mono text-[10px] transition-colors hover:bg-red-500/15 hover:text-red-500"
+                    className="border-border/60 bg-muted/60 text-muted-foreground rounded border px-1.5 py-0.5 font-mono text-[10px] transition-all hover:border-red-500/40 hover:bg-gradient-to-r hover:from-red-500/15 hover:to-rose-500/10 hover:text-red-500"
                   >
                     :3000
                   </button>
                   <button
                     type="button"
                     onClick={() => selectPreset('http://localhost:5173/gowa')}
-                    className="bg-muted/60 text-muted-foreground rounded px-1.5 py-0.5 font-mono text-[10px] transition-colors hover:bg-red-500/15 hover:text-red-500"
+                    className="border-border/60 bg-muted/60 text-muted-foreground rounded border px-1.5 py-0.5 font-mono text-[10px] transition-all hover:border-red-500/40 hover:bg-gradient-to-r hover:from-red-500/15 hover:to-rose-500/10 hover:text-red-500"
                   >
                     /gowa
                   </button>

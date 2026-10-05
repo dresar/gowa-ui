@@ -71,12 +71,12 @@ export default function DashboardPage() {
           type="button"
           onClick={() => setFilter('all')}
           className={cn(
-            'glass-card flex items-center gap-3 rounded-xl p-3.5 text-left backdrop-blur-xl transition-all',
+            'glass-card card-lift flex items-center gap-3 rounded-xl p-3.5 text-left backdrop-blur-xl transition-all',
             filter === 'all' &&
-              'border-red-500/50 bg-gradient-to-br from-red-500/10 via-rose-500/5 to-transparent shadow-xs ring-1 shadow-red-500/10 ring-red-500/30',
+              'border-red-500/60 bg-gradient-to-br from-red-500/15 via-rose-500/8 to-transparent shadow-md ring-1 shadow-red-500/15 ring-red-500/40',
           )}
         >
-          <div className="flex size-9 shrink-0 items-center justify-center rounded-lg border border-red-500/30 bg-gradient-to-br from-red-500/15 to-rose-500/10 text-red-500 shadow-2xs dark:text-red-400">
+          <div className="flex size-9 shrink-0 items-center justify-center rounded-lg border border-red-500/35 bg-gradient-to-br from-red-500/20 via-rose-500/15 to-transparent text-red-500 shadow-2xs dark:text-red-400">
             <Smartphone className="size-4" />
           </div>
           <div className="min-w-0">
@@ -89,7 +89,7 @@ export default function DashboardPage() {
           type="button"
           onClick={() => setFilter('logged_in')}
           className={cn(
-            'glass-card flex items-center gap-3 rounded-xl p-3.5 text-left backdrop-blur-xl transition-all',
+            'glass-card card-lift flex items-center gap-3 rounded-xl p-3.5 text-left backdrop-blur-xl transition-all',
             filter === 'logged_in' && 'border-emerald-500/50 ring-1 ring-emerald-500/30',
           )}
         >
@@ -108,7 +108,7 @@ export default function DashboardPage() {
           type="button"
           onClick={() => setFilter('connecting')}
           className={cn(
-            'glass-card flex items-center gap-3 rounded-xl p-3.5 text-left backdrop-blur-xl transition-all',
+            'glass-card card-lift flex items-center gap-3 rounded-xl p-3.5 text-left backdrop-blur-xl transition-all',
             filter === 'connecting' && 'border-amber-500/50 ring-1 ring-amber-500/30',
           )}
         >
@@ -127,7 +127,7 @@ export default function DashboardPage() {
           type="button"
           onClick={() => setFilter('disconnected')}
           className={cn(
-            'glass-card flex items-center gap-3 rounded-xl p-3.5 text-left backdrop-blur-xl transition-all',
+            'glass-card card-lift flex items-center gap-3 rounded-xl p-3.5 text-left backdrop-blur-xl transition-all',
             filter === 'disconnected' &&
               'border-muted-foreground/50 ring-muted-foreground/30 ring-1',
           )}
@@ -162,7 +162,7 @@ export default function DashboardPage() {
               className={cn(
                 'rounded-lg px-2.5 py-1 text-xs font-medium transition-all',
                 filter === 'all'
-                  ? 'bg-gradient-to-r from-red-600 via-rose-600 to-red-500 font-semibold text-white shadow-xs shadow-red-600/20'
+                  ? 'bg-gradient-to-r from-red-600 via-rose-600 to-red-500 font-semibold text-white shadow-xs shadow-red-600/30'
                   : 'bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground',
               )}
             >
@@ -174,7 +174,7 @@ export default function DashboardPage() {
               className={cn(
                 'rounded-lg px-2.5 py-1 text-xs font-medium transition-colors',
                 filter === 'logged_in'
-                  ? 'bg-emerald-600 font-semibold text-white'
+                  ? 'border border-emerald-500/40 bg-emerald-500/20 font-semibold text-emerald-400 shadow-xs'
                   : 'bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground',
               )}
             >
@@ -186,7 +186,7 @@ export default function DashboardPage() {
               className={cn(
                 'rounded-lg px-2.5 py-1 text-xs font-medium transition-colors',
                 filter === 'connecting'
-                  ? 'bg-amber-600 font-semibold text-white'
+                  ? 'border border-amber-500/40 bg-amber-500/20 font-semibold text-amber-400 shadow-xs'
                   : 'bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground',
               )}
             >
@@ -198,7 +198,7 @@ export default function DashboardPage() {
               className={cn(
                 'rounded-lg px-2.5 py-1 text-xs font-medium transition-colors',
                 filter === 'disconnected'
-                  ? 'bg-slate-700 font-semibold text-white'
+                  ? 'border-border/80 bg-muted/80 text-foreground border font-semibold shadow-xs'
                   : 'bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground',
               )}
             >

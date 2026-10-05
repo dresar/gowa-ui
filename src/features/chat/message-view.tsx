@@ -37,7 +37,7 @@ function MessageBubble({ message, deviceId }: { message: MessageInfo; deviceId: 
         className={cn(
           'max-w-[82%] rounded-xl px-3 py-2 text-xs shadow-2xs backdrop-blur-md transition-all sm:text-[13px]',
           message.is_from_me
-            ? 'text-foreground rounded-tr-xs border border-red-500/30 bg-gradient-to-br from-red-500/20 via-rose-500/15 to-red-500/10'
+            ? 'rounded-tr-xs border border-red-400/30 bg-gradient-to-br from-red-600 via-rose-600 to-red-700 text-white shadow-xs shadow-red-950/30'
             : 'border-border/80 bg-card/85 text-foreground rounded-tl-xs border',
         )}
       >
@@ -62,7 +62,12 @@ function MessageBubble({ message, deviceId }: { message: MessageInfo; deviceId: 
             ))}
           </div>
         )}
-        <p className="text-muted-foreground/80 mt-1 text-right font-mono text-[9px]">
+        <p
+          className={cn(
+            'mt-1 text-right font-mono text-[9px]',
+            message.is_from_me ? 'text-white/80' : 'text-muted-foreground/80',
+          )}
+        >
           {formatDate(message.timestamp)}
         </p>
       </div>

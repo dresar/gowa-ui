@@ -107,7 +107,7 @@ export function DeviceGuard() {
           <CardHeader className="p-4 sm:p-5">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div className="flex items-center gap-3">
-                <div className="border-primary/20 bg-primary/10 text-primary flex size-10 shrink-0 items-center justify-center rounded-lg border shadow-2xs">
+                <div className="flex size-10 shrink-0 items-center justify-center rounded-lg border border-red-500/30 bg-gradient-to-br from-red-500/20 to-rose-500/10 text-red-500 shadow-2xs dark:text-red-400">
                   <Smartphone className="size-5" />
                 </div>
                 <div>
@@ -123,7 +123,7 @@ export function DeviceGuard() {
                 variant="outline"
                 size="sm"
                 onClick={() => setCreateOpen(true)}
-                className="border-primary/30 text-primary hover:bg-primary/10 h-8 gap-1.5 self-start rounded-lg text-xs font-semibold sm:self-auto"
+                className="h-8 gap-1.5 self-start rounded-lg border-red-500/30 text-xs font-semibold text-red-500 hover:border-red-500/50 hover:bg-red-500/10 sm:self-auto dark:text-red-400"
               >
                 <Plus className="size-3.5" />
                 <span>New Device Slot</span>
@@ -153,11 +153,11 @@ export function DeviceGuard() {
     <div className="flex flex-col gap-4">
       <Card className="border-border/70 bg-card/60 shadow-xs backdrop-blur-xl">
         <CardContent className="flex flex-col items-center gap-4 py-10 text-center sm:py-12">
-          <div className="border-primary/25 bg-primary/10 text-primary relative flex size-14 items-center justify-center rounded-xl border shadow-md">
+          <div className="relative flex size-14 items-center justify-center rounded-xl border border-red-500/35 bg-gradient-to-br from-red-500/20 via-rose-500/10 to-transparent text-red-500 shadow-md shadow-red-500/20 dark:text-red-400">
             <Smartphone className="size-7" />
             <span className="absolute -top-1 -right-1 flex size-3">
-              <span className="bg-primary absolute inline-flex h-full w-full animate-ping rounded-full opacity-75" />
-              <span className="bg-primary relative inline-flex size-3 rounded-full" />
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75" />
+              <span className="relative inline-flex size-3 rounded-full bg-red-500" />
             </span>
           </div>
 
@@ -174,7 +174,7 @@ export function DeviceGuard() {
           <div className="grid w-full max-w-xl gap-2.5 text-left sm:grid-cols-3">
             <div className="border-border/60 bg-muted/30 rounded-lg border p-3">
               <div className="text-foreground flex items-center gap-1.5 text-[11px] font-semibold">
-                <span className="bg-primary/20 text-primary flex size-4 items-center justify-center rounded text-[10px] font-bold">
+                <span className="flex size-4 items-center justify-center rounded bg-gradient-to-r from-red-600 to-rose-600 text-[10px] font-bold text-white shadow-2xs">
                   1
                 </span>
                 <span>Register Slot</span>
@@ -185,7 +185,7 @@ export function DeviceGuard() {
             </div>
             <div className="border-border/60 bg-muted/30 rounded-lg border p-3">
               <div className="text-foreground flex items-center gap-1.5 text-[11px] font-semibold">
-                <span className="bg-primary/20 text-primary flex size-4 items-center justify-center rounded text-[10px] font-bold">
+                <span className="flex size-4 items-center justify-center rounded bg-gradient-to-r from-red-600 to-rose-600 text-[10px] font-bold text-white shadow-2xs">
                   2
                 </span>
                 <span>Pair Phone</span>
@@ -196,7 +196,7 @@ export function DeviceGuard() {
             </div>
             <div className="border-border/60 bg-muted/30 rounded-lg border p-3">
               <div className="text-foreground flex items-center gap-1.5 text-[11px] font-semibold">
-                <span className="bg-primary/20 text-primary flex size-4 items-center justify-center rounded text-[10px] font-bold">
+                <span className="flex size-4 items-center justify-center rounded bg-gradient-to-r from-red-600 to-rose-600 text-[10px] font-bold text-white shadow-2xs">
                   3
                 </span>
                 <span>Ready to Use</span>

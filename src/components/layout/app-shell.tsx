@@ -84,7 +84,7 @@ function SidebarActiveSession() {
     return (
       <Link
         to="/account"
-        className="group mx-2.5 my-2 flex items-center gap-2.5 rounded-lg border border-red-500/30 bg-gradient-to-r from-red-500/12 via-rose-500/8 to-transparent p-2 shadow-2xs transition-all hover:border-red-500/50 hover:from-red-500/20 hover:via-rose-500/12"
+        className="group mx-2.5 my-2 flex items-center gap-2.5 rounded-lg border border-red-500/35 bg-gradient-to-r from-red-500/15 via-rose-500/10 to-transparent p-2 shadow-xs shadow-red-500/10 transition-all hover:border-red-500/60 hover:from-red-500/22 hover:via-rose-500/14"
       >
         <div className="relative">
           <Avatar className="size-8 border border-red-500/40 shadow-xs shadow-red-500/20">
@@ -105,7 +105,7 @@ function SidebarActiveSession() {
             <span className="text-foreground truncate text-[11px] font-semibold">
               {activeDevice.display_name || activeDevice.id}
             </span>
-            <span className="py-0.2 rounded bg-gradient-to-r from-red-600 to-rose-600 px-1.5 font-mono text-[9px] font-semibold text-white shadow-2xs">
+            <span className="rounded bg-gradient-to-r from-red-600 via-rose-600 to-red-500 px-1.5 py-0.5 font-mono text-[9px] font-bold text-white shadow-xs shadow-red-600/30">
               Active
             </span>
           </div>
@@ -168,7 +168,7 @@ function NavContent({ onNavigate }: { onNavigate?: () => void }) {
                   cn(
                     'group/nav relative flex items-center gap-2.5 rounded-[7px] px-3 py-1.5 text-xs font-medium transition-all duration-150',
                     isActive
-                      ? 'border border-red-500/30 bg-gradient-to-r from-red-500/15 via-rose-500/10 to-transparent font-semibold text-red-500 shadow-2xs shadow-red-500/10 dark:text-red-400'
+                      ? 'border-y border-r border-l-2 border-red-500 border-red-500/25 bg-gradient-to-r from-red-500/20 via-rose-500/12 to-transparent font-semibold text-red-500 shadow-2xs shadow-red-500/15 dark:text-red-400'
                       : 'text-muted-foreground hover:bg-accent/50 hover:text-foreground',
                   )
                 }
@@ -215,10 +215,11 @@ export function AppShell() {
 
   if (status === 'booting') {
     return (
-      <div className="ambient-glow flex min-h-svh items-center justify-center">
-        <div className="flex flex-col items-center gap-3">
-          <Loader2 className="text-primary size-6 animate-spin" />
-          <p className="text-muted-foreground text-xs">Connecting to GOWA session…</p>
+      <div className="ambient-glow bg-background relative flex min-h-svh items-center justify-center">
+        <div aria-hidden="true" className="grid-pattern pointer-events-none fixed inset-0 z-0" />
+        <div className="relative z-10 flex flex-col items-center gap-3">
+          <Loader2 className="size-6 animate-spin text-red-500" />
+          <p className="text-muted-foreground text-xs font-medium">Connecting to GOWA session…</p>
         </div>
       </div>
     )
@@ -229,15 +230,13 @@ export function AppShell() {
   }
 
   return (
-    <div className="ambient-glow bg-background/95 relative flex min-h-svh overflow-x-hidden">
+    <div className="ambient-glow bg-background relative flex min-h-svh overflow-x-hidden">
       {/* Background # straight transparent grid lines across all pages */}
-      <div
-        aria-hidden="true"
-        className="grid-pattern pointer-events-none fixed inset-0 z-0 opacity-90"
-      />
+      <div aria-hidden="true" className="grid-pattern pointer-events-none fixed inset-0 z-0" />
 
       <aside className="border-sidebar-border/70 bg-sidebar/80 relative z-10 hidden w-60 shrink-0 flex-col border-r backdrop-blur-xl md:flex">
-        <div className="border-sidebar-border/70 flex h-14 items-center border-b px-4">
+        <div className="border-sidebar-border/70 relative flex h-14 items-center border-b px-4">
+          <div className="pointer-events-none absolute right-0 bottom-0 left-0 h-px bg-gradient-to-r from-red-500/40 via-rose-500/20 to-transparent" />
           <Logo />
         </div>
 
@@ -248,7 +247,7 @@ export function AppShell() {
         </ScrollArea>
 
         <div className="border-sidebar-border/70 border-t p-3">
-          <div className="border-border/50 bg-card/50 text-muted-foreground flex items-center justify-between rounded-lg border px-2.5 py-1.5 text-[11px] backdrop-blur-xs">
+          <div className="text-muted-foreground flex items-center justify-between rounded-lg border border-red-500/20 bg-gradient-to-r from-red-500/10 via-rose-500/5 to-transparent px-2.5 py-1.5 text-[11px] backdrop-blur-xs">
             <div className="flex items-center gap-1.5">
               <span className="size-1.5 rounded-full bg-red-500 shadow-xs shadow-red-500/80" />
               <span>Core v9.6</span>
@@ -281,6 +280,7 @@ export function AppShell() {
 
       <div className="relative z-10 flex min-w-0 flex-1 flex-col">
         <header className="border-border/60 bg-background/80 sticky top-0 z-30 flex h-14 items-center justify-between gap-3 border-b px-4 backdrop-blur-xl sm:px-6">
+          <div className="pointer-events-none absolute right-0 bottom-0 left-0 h-px bg-gradient-to-r from-red-500/40 via-rose-500/20 to-transparent" />
           <div className="flex items-center gap-2.5">
             <Button
               variant="ghost"
@@ -292,7 +292,7 @@ export function AppShell() {
               <Menu className="size-4" />
             </Button>
             <div className="flex items-center gap-2">
-              <div className="hidden size-7 items-center justify-center rounded-md border border-red-500/25 bg-gradient-to-br from-red-500/15 to-transparent text-red-500 shadow-2xs md:flex dark:text-red-400">
+              <div className="hidden size-7 items-center justify-center rounded-md border border-red-500/30 bg-gradient-to-br from-red-500/20 via-rose-500/10 to-transparent text-red-500 shadow-2xs md:flex dark:text-red-400">
                 <CurrentIcon className="size-3.5" />
               </div>
               <h1 className="text-foreground text-xs font-semibold sm:text-sm">
@@ -328,6 +328,7 @@ export function AppShell() {
         </main>
 
         <nav className="border-border/70 bg-background/90 fixed right-0 bottom-0 left-0 z-30 flex h-14 items-center justify-around border-t px-2 backdrop-blur-xl md:hidden">
+          <div className="pointer-events-none absolute top-0 right-0 left-0 h-px bg-gradient-to-r from-red-500/40 via-rose-500/20 to-transparent" />
           <NavLink
             to="/"
             end

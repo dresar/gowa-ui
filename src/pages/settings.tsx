@@ -33,7 +33,7 @@ export default function SettingsPage() {
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
             <CardTitle className="flex items-center gap-2 text-sm font-semibold">
-              <Globe className="text-primary size-4" />
+              <Globe className="size-4 text-red-500 dark:text-red-400" />
               Gateway Connection
             </CardTitle>
             <span className="flex items-center gap-1 rounded-md border border-red-500/30 bg-gradient-to-r from-red-500/15 to-rose-500/10 px-2 py-0.5 text-[10px] font-medium text-red-500 dark:text-red-400">
@@ -71,7 +71,7 @@ export default function SettingsPage() {
       <Card className="glass-card rounded-xl backdrop-blur-xl">
         <CardHeader className="pb-3">
           <CardTitle className="flex items-center gap-2 text-sm font-semibold">
-            <Server className="text-primary size-4" />
+            <Server className="size-4 text-red-500 dark:text-red-400" />
             Server Architecture
           </CardTitle>
           <CardDescription className="text-xs">
@@ -115,7 +115,7 @@ export default function SettingsPage() {
       <Card className="glass-card rounded-xl backdrop-blur-xl">
         <CardHeader className="pb-3">
           <CardTitle className="flex items-center gap-2 text-sm font-semibold">
-            <Sun className="text-primary size-4" />
+            <Sun className="size-4 text-red-500 dark:text-red-400" />
             Visual Appearance
           </CardTitle>
           <CardDescription className="text-xs">

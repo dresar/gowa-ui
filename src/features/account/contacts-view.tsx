@@ -106,7 +106,7 @@ export function ContactsView() {
               >
                 <div className="flex min-w-0 items-center gap-3">
                   <Avatar className="border-border/80 size-8 border">
-                    <AvatarFallback className="bg-primary/10 text-primary text-[10px] font-bold">
+                    <AvatarFallback className="bg-red-500/10 text-[10px] font-bold text-red-500 dark:text-red-400">
                       {initials}
                     </AvatarFallback>
                   </Avatar>
@@ -122,7 +122,7 @@ export function ContactsView() {
                   size="xs"
                   variant="outline"
                   onClick={() => onMessage(contact.jid)}
-                  className="border-primary/30 text-primary hover:bg-primary/10 h-7 gap-1 rounded-[6px] text-[11px] font-semibold active:scale-[0.98]"
+                  className="h-7 gap-1 rounded-[6px] border-red-500/30 text-[11px] font-semibold text-red-500 hover:border-red-500/50 hover:bg-red-500/10 active:scale-[0.98] dark:text-red-400"
                 >
                   <Send className="size-3" />
                   <span>Message</span>

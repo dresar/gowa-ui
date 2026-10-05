@@ -90,7 +90,7 @@ function LookupsPanel() {
             className={cn(
               'flex items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-left text-xs font-medium transition-all duration-150',
               type === value
-                ? 'border-primary/25 bg-primary/12 text-primary border font-semibold shadow-2xs'
+                ? 'border-y border-r border-l-2 border-red-500 border-red-500/25 bg-gradient-to-r from-red-500/20 via-rose-500/12 to-transparent font-semibold text-red-500 shadow-2xs shadow-red-500/15 dark:text-red-400'
                 : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground',
             )}
           >
