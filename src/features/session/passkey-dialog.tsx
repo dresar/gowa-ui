@@ -58,7 +58,7 @@ export function PasskeyDialog() {
     <Dialog open={prompt !== null} onOpenChange={(open) => !open && setPrompt(null)}>
       <DialogContent className="sm:max-w-sm">
         <DialogHeader>
-          <DialogTitle>Confirm passkey pairing</DialogTitle>
+          <DialogTitle>Passkey Request</DialogTitle>
           <DialogDescription>
             Device {prompt?.deviceId} received a passkey request. Confirm only if the code below
             matches the one shown on your phone.
@@ -73,7 +73,7 @@ export function PasskeyDialog() {
           </Button>
           <Button onClick={confirm} disabled={confirming}>
             {confirming && <Loader2 className="size-4 animate-spin" />}
-            Codes match — confirm
+            Confirm
           </Button>
         </DialogFooter>
       </DialogContent>

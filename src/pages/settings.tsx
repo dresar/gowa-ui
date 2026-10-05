@@ -62,7 +62,7 @@ export default function SettingsPage() {
               className="border-destructive/30 text-destructive hover:bg-destructive/10 h-8 gap-1.5"
             >
               <LogOut className="size-3.5" />
-              Disconnect Session
+              Disconnect
             </Button>
           </div>
         </CardContent>

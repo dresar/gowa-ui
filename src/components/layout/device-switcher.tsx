@@ -12,6 +12,7 @@ import {
 import { Skeleton } from '@/components/ui/skeleton'
 import { CreateDeviceDialog } from '@/features/devices/create-device-dialog'
 import { useDevices } from '@/hooks/use-devices'
+import { formatDeviceLabel } from '@/lib/format'
 import { cn } from '@/lib/utils'
 import { useDeviceStore } from '@/stores/device'
 import type { DeviceState } from '@/api/types'
@@ -21,18 +22,6 @@ const stateDots: Record<DeviceState, string> = {
   connected: 'bg-sky-500 shadow-xs shadow-sky-500/50',
   connecting: 'bg-amber-500 animate-pulse',
   disconnected: 'bg-muted-foreground/40',
-}
-
-function formatDeviceLabel(device?: { id: string; display_name?: string } | null): string {
-  if (!device) return 'Device'
-  if (device.display_name && device.display_name.trim().length > 0) {
-    return device.display_name.trim()
-  }
-  const id = device.id
-  if (id.length > 13) {
-    return `${id.slice(0, 4)}...${id.slice(-4)}`
-  }
-  return id
 }
 
 export function DeviceSwitcher() {
@@ -76,7 +65,7 @@ export function DeviceSwitcher() {
         <SelectTrigger
           size="sm"
           className={cn(
-            'border-border/70 bg-card/70 hover:border-primary/40 h-8 max-w-[130px] shrink-0 overflow-hidden rounded-lg text-xs backdrop-blur-md transition-all sm:max-w-[170px] md:max-w-[210px]',
+            'border-border/70 bg-card/70 hover:border-primary/40 h-8 w-fit max-w-[120px] shrink-0 overflow-hidden rounded-lg text-xs backdrop-blur-md transition-all sm:max-w-[160px] md:max-w-[190px]',
             !selectedDeviceId && 'border-amber-500/50 text-amber-500',
           )}
         >
@@ -88,10 +77,10 @@ export function DeviceSwitcher() {
             ) : (
               <Smartphone className="size-3.5 shrink-0 animate-pulse text-amber-500" />
             )}
-            <SelectValue placeholder="Device">
+            <SelectValue placeholder="Device" className="min-w-0 flex-1 truncate block">
               {selectedDevice ? (
                 <span
-                  className="max-w-[80px] truncate font-mono text-[11px] sm:max-w-[110px] md:max-w-[140px]"
+                  className="truncate block font-mono text-[11px]"
                   title={
                     selectedDevice.display_name
                       ? `${selectedDevice.display_name} (${selectedDevice.id})`
@@ -101,7 +90,7 @@ export function DeviceSwitcher() {
                   {formatDeviceLabel(selectedDevice)}
                 </span>
               ) : (
-                <span className="truncate font-semibold text-amber-500">Device</span>
+                <span className="truncate block font-semibold text-amber-500">Device</span>
               )}
             </SelectValue>
           </div>

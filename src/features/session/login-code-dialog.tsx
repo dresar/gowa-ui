@@ -86,7 +86,7 @@ export function LoginCodeDialog({
     <Dialog open={device !== null} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-sm">
         <DialogHeader>
-          <DialogTitle>Login with pairing code</DialogTitle>
+          <DialogTitle>Pairing Code</DialogTitle>
           <DialogDescription>
             WhatsApp → Linked devices → Link a device → Link with phone number instead
           </DialogDescription>
@@ -96,7 +96,7 @@ export function LoginCodeDialog({
             <p className="font-mono text-3xl font-semibold tracking-widest">{pairCode}</p>
             <Button variant="outline" size="sm" onClick={copyCode}>
               {copied ? <Check className="size-4" /> : <Copy className="size-4" />}
-              {copied ? 'Copied' : 'Copy code'}
+              {copied ? 'Copied' : 'Copy'}
             </Button>
             <p className="text-muted-foreground text-center text-sm">
               Enter this code on your phone — waiting for pairing…
@@ -116,7 +116,7 @@ export function LoginCodeDialog({
             </div>
             <Button type="submit" disabled={submitting || !phone.trim()}>
               {submitting && <Loader2 className="size-4 animate-spin" />}
-              Get pairing code
+              Pair Code
             </Button>
           </form>
         )}

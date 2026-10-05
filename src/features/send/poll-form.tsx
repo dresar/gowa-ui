@@ -62,7 +62,7 @@ export function SendPollForm() {
         {options.map((option, index) => (
           <div key={index} className="flex items-center gap-2">
             <Input
-              placeholder={`Option ${index + 1}`}
+              placeholder="Option"
               value={option}
               onChange={(event) => setOption(index, event.target.value)}
             />
@@ -85,7 +85,7 @@ export function SendPollForm() {
           onClick={addOption}
         >
           <Plus />
-          Add option
+          Add
         </Button>
       </div>
       <div className="flex flex-col gap-2">
@@ -100,7 +100,7 @@ export function SendPollForm() {
       </div>
       <ScheduleFields draft={draft} patch={patch} />
       <FormActions
-        submitLabel="Send poll"
+        submitLabel="Send"
         pending={mutation.isPending}
         disabled={!jid}
         request={pollRequest(payload)}

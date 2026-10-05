@@ -28,6 +28,7 @@ import { PasskeyDialog } from '@/features/session/passkey-dialog'
 import { useAppInfo } from '@/hooks/use-app-info'
 import { useDeviceAvatar } from '@/hooks/use-device-avatar'
 import { useDevices } from '@/hooks/use-devices'
+import { formatDeviceLabel } from '@/lib/format'
 import { cn } from '@/lib/utils'
 import { useConnection } from '@/stores/connection'
 import { useDeviceStore } from '@/stores/device'
@@ -103,14 +104,16 @@ function SidebarActiveSession() {
         <div className="min-w-0 flex-1">
           <div className="flex items-center justify-between">
             <span className="text-foreground truncate text-[11px] font-semibold">
-              {activeDevice.display_name || activeDevice.id}
+              {activeDevice.display_name || formatDeviceLabel(activeDevice)}
             </span>
             <span className="rounded bg-gradient-to-r from-red-600 via-rose-600 to-red-500 px-1.5 py-0.5 font-mono text-[9px] font-bold text-white shadow-xs shadow-red-600/30">
               Active
             </span>
           </div>
           <span className="text-muted-foreground block truncate font-mono text-[10px]">
-            {activeDevice.phone_number || activeDevice.jid || activeDevice.id}
+            {activeDevice.phone_number ||
+              activeDevice.jid ||
+              (activeDevice.display_name ? formatDeviceLabel(activeDevice) : 'Active Session')}
           </span>
         </div>
       </Link>
@@ -230,12 +233,12 @@ export function AppShell() {
   }
 
   return (
-    <div className="ambient-glow bg-background relative flex h-svh w-full overflow-hidden">
+    <div className="ambient-glow bg-background relative flex h-screen w-full overflow-hidden">
       {/* Background # straight transparent grid lines across all pages */}
       <div aria-hidden="true" className="grid-pattern pointer-events-none fixed inset-0 z-0" />
 
       {/* Stationary Desktop Sidebar */}
-      <aside className="border-sidebar-border/70 bg-sidebar/80 relative z-20 hidden h-svh w-60 shrink-0 flex-col border-r backdrop-blur-xl md:flex select-none">
+      <aside className="border-sidebar-border/70 bg-sidebar/80 sticky top-0 z-20 hidden h-screen w-60 shrink-0 flex-col overflow-y-auto border-r backdrop-blur-xl md:flex select-none">
         <div className="border-sidebar-border/70 relative flex h-14 shrink-0 items-center border-b px-4">
           <div className="pointer-events-none absolute right-0 bottom-0 left-0 h-px bg-gradient-to-r from-red-500/40 via-rose-500/20 to-transparent" />
           <Logo />
@@ -280,9 +283,9 @@ export function AppShell() {
       </Sheet>
 
       {/* Main Viewport Column with Stationary Header and Independent Scrollable Content */}
-      <div className="relative z-10 flex h-svh min-w-0 flex-1 flex-col overflow-hidden">
+      <div className="relative z-10 flex h-screen min-w-0 flex-1 flex-col overflow-hidden">
         {/* Stationary Header */}
-        <header className="border-border/60 bg-background/80 shrink-0 sticky top-0 z-30 flex h-14 items-center justify-between gap-2 border-b px-3 backdrop-blur-xl sm:gap-3 sm:px-6 select-none">
+        <header className="border-border/60 bg-background/80 shrink-0 sticky top-0 z-40 flex h-14 items-center justify-between gap-2 border-b px-3 backdrop-blur-xl sm:gap-3 sm:px-6 select-none">
           <div className="pointer-events-none absolute right-0 bottom-0 left-0 h-px bg-gradient-to-r from-red-500/40 via-rose-500/20 to-transparent" />
           <div className="flex min-w-0 items-center gap-2 sm:gap-2.5">
             <Button
@@ -298,9 +301,9 @@ export function AppShell() {
               <div className="hidden size-7 shrink-0 items-center justify-center rounded-md border border-red-500/30 bg-gradient-to-br from-red-500/20 via-rose-500/10 to-transparent text-red-500 shadow-2xs md:flex dark:text-red-400">
                 <CurrentIcon className="size-3.5" />
               </div>
-              <h1 className="text-foreground truncate text-xs font-semibold sm:text-sm">
+              <span className="text-foreground truncate text-xs font-semibold sm:text-sm">
                 {currentRoute.label}
-              </h1>
+              </span>
             </div>
           </div>
 

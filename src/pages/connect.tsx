@@ -9,9 +9,9 @@ import { Label } from '@/components/ui/label'
 import { useConnection, type TestResult } from '@/stores/connection'
 
 const errorMessages: Record<Exclude<TestResult, 'ok'>, string> = {
-  unauthorized: 'The server rejected these credentials (401 Unauthorized).',
-  'not-gowa': 'That URL answered, but it does not appear to be an active GOWA server.',
-  unreachable: 'Could not reach the server. Make sure GOWA backend is running on that port.',
+  unauthorized: 'Credentials rejected (401 Unauthorized).',
+  'not-gowa': 'Not an active GOWA server.',
+  unreachable: 'Server unreachable. Verify backend is running.',
 }
 
 export default function ConnectPage() {

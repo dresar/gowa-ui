@@ -26,7 +26,7 @@ export function InviteLinkForm({ groupJid }: { groupJid: string }) {
       </label>
       <Button type="submit" disabled={mutation.isPending} className="self-start">
         {mutation.isPending && <Loader2 className="size-4 animate-spin" />}
-        Get invite link
+        Get Link
       </Button>
       <ResultPanel result={mutation.data} />
     </form>

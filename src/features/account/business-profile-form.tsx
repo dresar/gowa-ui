@@ -23,7 +23,7 @@ export function BusinessProfileForm() {
       </p>
       <Button type="submit" disabled={mutation.isPending || !jid} className="self-start">
         {mutation.isPending && <Loader2 className="size-4 animate-spin" />}
-        Get business profile
+        Get Profile
       </Button>
       {mutation.data && <BusinessProfileResult data={mutation.data} />}
     </form>

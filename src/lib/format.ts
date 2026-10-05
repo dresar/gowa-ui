@@ -34,3 +34,18 @@ export function formatDay(iso: string): string {
   const date = new Date(iso)
   return Number.isNaN(date.getTime()) ? iso : dayFormat.format(date)
 }
+
+/** Formats a device label concisely, abbreviating long UUIDs to 'xxxx...xxxx'. */
+export function formatDeviceLabel(
+  device?: { id: string; display_name?: string } | null,
+): string {
+  if (!device) return 'Device'
+  if (device.display_name && device.display_name.trim().length > 0) {
+    return device.display_name.trim()
+  }
+  const id = device.id
+  if (id.length > 13) {
+    return `${id.slice(0, 4)}...${id.slice(-4)}`
+  }
+  return id
+}

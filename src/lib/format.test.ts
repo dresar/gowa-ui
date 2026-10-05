@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { formatBytes, formatDay, isZeroTime } from './format'
+import { formatBytes, formatDay, formatDeviceLabel, isZeroTime } from './format'
 
 describe('isZeroTime', () => {
   it('treats Go zero time, epoch 0, empty, and garbage as zero', () => {
@@ -39,5 +39,24 @@ describe('formatBytes', () => {
   it('scales into MB and GB', () => {
     expect(formatBytes(50_000_000)).toBe('50 MB')
     expect(formatBytes(2_500_000_000)).toBe('2.5 GB')
+  })
+})
+
+describe('formatDeviceLabel', () => {
+  it('returns Device when device is null or undefined', () => {
+    expect(formatDeviceLabel(null)).toBe('Device')
+    expect(formatDeviceLabel(undefined)).toBe('Device')
+  })
+
+  it('uses display_name if available', () => {
+    expect(formatDeviceLabel({ id: '12345', display_name: 'Work Phone' })).toBe('Work Phone')
+  })
+
+  it('abbreviates long UUIDs to 4...4 characters', () => {
+    expect(formatDeviceLabel({ id: '26883318-fd31-4109-b368-c293f76f3964' })).toBe('2688...3964')
+  })
+
+  it('keeps short IDs intact', () => {
+    expect(formatDeviceLabel({ id: 'device-1' })).toBe('device-1')
   })
 })

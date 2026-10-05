@@ -134,6 +134,11 @@
   * {
     @apply border-border outline-ring/40;
   }
+  html,
+  body {
+    height: 100%;
+    overflow: hidden;
+  }
   body {
     @apply bg-background text-foreground selection:bg-primary/20 selection:text-primary antialiased;
     background-attachment: fixed;

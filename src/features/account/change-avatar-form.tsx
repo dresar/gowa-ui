@@ -49,7 +49,7 @@ export function ChangeAvatarForm() {
       )}
       <Button type="submit" disabled={mutation.isPending || !file} className="self-start">
         {mutation.isPending && <Loader2 className="size-4 animate-spin" />}
-        Update avatar
+        Update
       </Button>
     </form>
   )
