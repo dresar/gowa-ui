@@ -84,29 +84,32 @@ function SidebarActiveSession() {
     return (
       <Link
         to="/account"
-        className="group mx-2.5 my-2 flex items-center gap-2.5 rounded-lg border border-primary/25 bg-primary/[0.07] p-2 transition-all hover:bg-primary/[0.12] hover:border-primary/40"
+        className="group mx-2.5 my-2 flex items-center gap-2.5 rounded-lg border border-red-500/30 bg-gradient-to-r from-red-500/12 via-rose-500/8 to-transparent p-2 shadow-2xs transition-all hover:border-red-500/50 hover:from-red-500/20 hover:via-rose-500/12"
       >
         <div className="relative">
-          <Avatar className="size-8 border border-primary/30">
+          <Avatar className="size-8 border border-red-500/40 shadow-xs shadow-red-500/20">
             {avatar.data?.url && (
-              <AvatarImage src={avatar.data.url} alt={activeDevice.display_name || activeDevice.id} />
+              <AvatarImage
+                src={avatar.data.url}
+                alt={activeDevice.display_name || activeDevice.id}
+              />
             )}
-            <AvatarFallback className="bg-primary/10">
-              <CircleUserRound className="size-4 text-primary" />
+            <AvatarFallback className="bg-red-500/10">
+              <CircleUserRound className="size-4 text-red-500" />
             </AvatarFallback>
           </Avatar>
-          <span className="absolute -bottom-0.5 -right-0.5 size-2 rounded-full border border-background bg-emerald-500" />
+          <span className="border-background absolute -right-0.5 -bottom-0.5 size-2 rounded-full border bg-emerald-500" />
         </div>
         <div className="min-w-0 flex-1">
           <div className="flex items-center justify-between">
-            <span className="truncate text-[11px] font-semibold text-foreground">
+            <span className="text-foreground truncate text-[11px] font-semibold">
               {activeDevice.display_name || activeDevice.id}
             </span>
-            <span className="rounded bg-primary/20 px-1 py-0.2 font-mono text-[9px] font-semibold text-primary">
+            <span className="py-0.2 rounded bg-gradient-to-r from-red-600 to-rose-600 px-1.5 font-mono text-[9px] font-semibold text-white shadow-2xs">
               Active
             </span>
           </div>
-          <span className="block truncate font-mono text-[10px] text-muted-foreground">
+          <span className="text-muted-foreground block truncate font-mono text-[10px]">
             {activeDevice.phone_number || activeDevice.jid || activeDevice.id}
           </span>
         </div>
@@ -118,19 +121,19 @@ function SidebarActiveSession() {
     <>
       <div className="mx-2.5 my-2 flex items-center justify-between gap-2 rounded-lg border border-amber-500/30 bg-amber-500/10 p-2">
         <div className="flex items-center gap-2">
-          <Smartphone className="size-4 text-amber-500 animate-pulse" />
+          <Smartphone className="size-4 animate-pulse text-amber-500" />
           <div className="flex flex-col">
             <span className="text-[11px] font-semibold text-amber-600 dark:text-amber-400">
               No Active Session
             </span>
-            <span className="text-[10px] text-muted-foreground">Select or pair device</span>
+            <span className="text-muted-foreground text-[10px]">Select or pair device</span>
           </div>
         </div>
         <Button
           size="xs"
           variant="outline"
           onClick={() => setCreateOpen(true)}
-          className="h-6 gap-1 rounded-[5px] border-amber-500/40 text-[10px] font-semibold text-amber-600 dark:text-amber-400 hover:bg-amber-500/20"
+          className="h-6 gap-1 rounded-[5px] border-amber-500/40 text-[10px] font-semibold text-amber-600 hover:bg-amber-500/20 dark:text-amber-400"
         >
           <Plus className="size-2.5" />
           <span>Add</span>
@@ -150,7 +153,7 @@ function NavContent({ onNavigate }: { onNavigate?: () => void }) {
     <nav className="flex flex-col gap-3.5">
       {navGroups.map((group) => (
         <div key={group.label} className="flex flex-col gap-0.5">
-          <p className="px-3 pb-1 text-[10px] font-semibold tracking-wider text-muted-foreground/70 uppercase">
+          <p className="text-muted-foreground/70 px-3 pb-1 text-[10px] font-semibold tracking-wider uppercase">
             {group.label}
           </p>
           {group.items
@@ -165,7 +168,7 @@ function NavContent({ onNavigate }: { onNavigate?: () => void }) {
                   cn(
                     'group/nav relative flex items-center gap-2.5 rounded-[7px] px-3 py-1.5 text-xs font-medium transition-all duration-150',
                     isActive
-                      ? 'border border-primary/25 bg-primary/12 font-semibold text-primary shadow-2xs'
+                      ? 'border border-red-500/30 bg-gradient-to-r from-red-500/15 via-rose-500/10 to-transparent font-semibold text-red-500 shadow-2xs shadow-red-500/10 dark:text-red-400'
                       : 'text-muted-foreground hover:bg-accent/50 hover:text-foreground',
                   )
                 }
@@ -176,18 +179,18 @@ function NavContent({ onNavigate }: { onNavigate?: () => void }) {
                       className={cn(
                         'size-4 shrink-0 transition-colors',
                         isActive
-                          ? 'text-primary'
+                          ? 'text-red-500 dark:text-red-400'
                           : 'text-muted-foreground group-hover/nav:text-foreground',
                       )}
                     />
                     <span className="truncate">{label}</span>
                     {to === '/' && totalDevices > 0 && (
-                      <span className="ml-auto rounded-full bg-muted/80 px-1.5 py-0.2 font-mono text-[10px] font-semibold text-muted-foreground">
+                      <span className="bg-muted/80 py-0.2 text-muted-foreground ml-auto rounded-full px-1.5 font-mono text-[10px] font-semibold">
                         {totalDevices}
                       </span>
                     )}
                     {isActive && (
-                      <span className="ml-auto size-1.5 rounded-full bg-primary shadow-xs shadow-primary/80" />
+                      <span className="ml-auto size-1.5 rounded-full bg-gradient-to-r from-red-500 to-rose-500 shadow-xs shadow-red-500/80" />
                     )}
                   </>
                 )}
@@ -214,8 +217,8 @@ export function AppShell() {
     return (
       <div className="ambient-glow flex min-h-svh items-center justify-center">
         <div className="flex flex-col items-center gap-3">
-          <Loader2 className="size-6 animate-spin text-primary" />
-          <p className="text-xs text-muted-foreground">Connecting to GOWA session…</p>
+          <Loader2 className="text-primary size-6 animate-spin" />
+          <p className="text-muted-foreground text-xs">Connecting to GOWA session…</p>
         </div>
       </div>
     )
@@ -226,9 +229,15 @@ export function AppShell() {
   }
 
   return (
-    <div className="ambient-glow relative flex min-h-svh bg-background/95">
-      <aside className="hidden w-60 shrink-0 flex-col border-r border-sidebar-border/70 bg-sidebar/80 backdrop-blur-xl md:flex">
-        <div className="flex h-14 items-center border-b border-sidebar-border/70 px-4">
+    <div className="ambient-glow bg-background/95 relative flex min-h-svh overflow-x-hidden">
+      {/* Background # straight transparent grid lines across all pages */}
+      <div
+        aria-hidden="true"
+        className="grid-pattern pointer-events-none fixed inset-0 z-0 opacity-90"
+      />
+
+      <aside className="border-sidebar-border/70 bg-sidebar/80 relative z-10 hidden w-60 shrink-0 flex-col border-r backdrop-blur-xl md:flex">
+        <div className="border-sidebar-border/70 flex h-14 items-center border-b px-4">
           <Logo />
         </div>
 
@@ -238,13 +247,13 @@ export function AppShell() {
           <NavContent />
         </ScrollArea>
 
-        <div className="border-t border-sidebar-border/70 p-3">
-          <div className="flex items-center justify-between rounded-lg border border-border/50 bg-card/50 px-2.5 py-1.5 text-[11px] text-muted-foreground backdrop-blur-xs">
+        <div className="border-sidebar-border/70 border-t p-3">
+          <div className="border-border/50 bg-card/50 text-muted-foreground flex items-center justify-between rounded-lg border px-2.5 py-1.5 text-[11px] backdrop-blur-xs">
             <div className="flex items-center gap-1.5">
-              <span className="size-1.5 rounded-full bg-emerald-500" />
+              <span className="size-1.5 rounded-full bg-red-500 shadow-xs shadow-red-500/80" />
               <span>Core v9.6</span>
             </div>
-            <span className="font-mono text-emerald-500 font-medium">PureGo</span>
+            <span className="font-mono font-medium text-red-500 dark:text-red-400">PureGo</span>
           </div>
         </div>
       </aside>
@@ -252,9 +261,9 @@ export function AppShell() {
       <Sheet open={mobileNavOpen} onOpenChange={setMobileNavOpen}>
         <SheetContent
           side="left"
-          className="w-72 border-r border-sidebar-border/70 bg-sidebar/95 p-0 backdrop-blur-xl"
+          className="border-sidebar-border/70 bg-sidebar/95 w-72 border-r p-0 backdrop-blur-xl"
         >
-          <SheetHeader className="border-b border-sidebar-border/70 p-4">
+          <SheetHeader className="border-sidebar-border/70 border-b p-4">
             <SheetTitle asChild>
               <div>
                 <Logo />
@@ -270,23 +279,23 @@ export function AppShell() {
         </SheetContent>
       </Sheet>
 
-      <div className="flex min-w-0 flex-1 flex-col">
-        <header className="sticky top-0 z-30 flex h-14 items-center justify-between gap-3 border-b border-border/60 bg-background/80 px-4 backdrop-blur-xl sm:px-6">
+      <div className="relative z-10 flex min-w-0 flex-1 flex-col">
+        <header className="border-border/60 bg-background/80 sticky top-0 z-30 flex h-14 items-center justify-between gap-3 border-b px-4 backdrop-blur-xl sm:px-6">
           <div className="flex items-center gap-2.5">
             <Button
               variant="ghost"
               size="icon-sm"
               aria-label="Open navigation"
               onClick={() => setMobileNavOpen(true)}
-              className="md:hidden size-8"
+              className="size-8 md:hidden"
             >
               <Menu className="size-4" />
             </Button>
             <div className="flex items-center gap-2">
-              <div className="hidden size-7 items-center justify-center rounded-md border border-primary/20 bg-primary/10 text-primary md:flex">
+              <div className="hidden size-7 items-center justify-center rounded-md border border-red-500/25 bg-gradient-to-br from-red-500/15 to-transparent text-red-500 shadow-2xs md:flex dark:text-red-400">
                 <CurrentIcon className="size-3.5" />
               </div>
-              <h1 className="text-xs font-semibold text-foreground sm:text-sm">
+              <h1 className="text-foreground text-xs font-semibold sm:text-sm">
                 {currentRoute.label}
               </h1>
             </div>
@@ -296,9 +305,8 @@ export function AppShell() {
             <DeviceSwitcher />
             <Button
               asChild
-              variant="outline"
               size="sm"
-              className="hidden h-8 gap-1.5 rounded-lg border-primary/30 text-xs font-semibold text-primary hover:bg-primary/10 sm:inline-flex"
+              className="hidden h-8 gap-1.5 rounded-lg text-xs font-semibold sm:inline-flex"
             >
               <Link to="/messaging">
                 <Send className="size-3" />
@@ -311,19 +319,22 @@ export function AppShell() {
         </header>
 
         <main className="flex-1 p-3.5 pb-20 sm:p-5 md:p-6 md:pb-6">
-          <div key={location.pathname} className="stagger mx-auto flex max-w-5xl flex-col gap-4 sm:gap-5">
+          <div
+            key={location.pathname}
+            className="stagger mx-auto flex max-w-5xl flex-col gap-4 sm:gap-5"
+          >
             <Outlet />
           </div>
         </main>
 
-        <nav className="fixed bottom-0 left-0 right-0 z-30 flex h-14 items-center justify-around border-t border-border/70 bg-background/90 px-2 backdrop-blur-xl md:hidden">
+        <nav className="border-border/70 bg-background/90 fixed right-0 bottom-0 left-0 z-30 flex h-14 items-center justify-around border-t px-2 backdrop-blur-xl md:hidden">
           <NavLink
             to="/"
             end
             className={({ isActive }) =>
               cn(
                 'flex flex-col items-center gap-0.5 text-[10px] font-medium transition-colors',
-                isActive ? 'font-bold text-primary' : 'text-muted-foreground',
+                isActive ? 'font-bold text-red-500 dark:text-red-400' : 'text-muted-foreground',
               )
             }
           >
@@ -335,7 +346,7 @@ export function AppShell() {
             className={({ isActive }) =>
               cn(
                 'flex flex-col items-center gap-0.5 text-[10px] font-medium transition-colors',
-                isActive ? 'font-bold text-primary' : 'text-muted-foreground',
+                isActive ? 'font-bold text-red-500 dark:text-red-400' : 'text-muted-foreground',
               )
             }
           >
@@ -347,7 +358,7 @@ export function AppShell() {
             className={({ isActive }) =>
               cn(
                 'flex flex-col items-center gap-0.5 text-[10px] font-medium transition-colors',
-                isActive ? 'font-bold text-primary' : 'text-muted-foreground',
+                isActive ? 'font-bold text-red-500 dark:text-red-400' : 'text-muted-foreground',
               )
             }
           >
@@ -359,7 +370,7 @@ export function AppShell() {
             className={({ isActive }) =>
               cn(
                 'flex flex-col items-center gap-0.5 text-[10px] font-medium transition-colors',
-                isActive ? 'font-bold text-primary' : 'text-muted-foreground',
+                isActive ? 'font-bold text-red-500 dark:text-red-400' : 'text-muted-foreground',
               )
             }
           >
@@ -369,7 +380,7 @@ export function AppShell() {
           <button
             type="button"
             onClick={() => setMobileNavOpen(true)}
-            className="flex flex-col items-center gap-0.5 text-[10px] font-medium text-muted-foreground"
+            className="text-muted-foreground flex flex-col items-center gap-0.5 text-[10px] font-medium"
           >
             <Menu className="size-4" />
             <span>Menu</span>

@@ -9,15 +9,20 @@ const badgeVariants = cva(
   {
     variants: {
       variant: {
-        default: 'bg-primary text-primary-foreground shadow-2xs [a]:hover:bg-primary/90',
-        secondary: 'bg-secondary/70 backdrop-blur-xs text-secondary-foreground [a]:hover:bg-secondary',
+        default:
+          'bg-gradient-to-r from-red-600 via-rose-600 to-red-500 text-white shadow-2xs font-semibold [a]:hover:from-red-500 [a]:hover:to-red-600',
+        secondary:
+          'bg-secondary/70 backdrop-blur-xs text-secondary-foreground [a]:hover:bg-secondary',
         destructive:
-          'bg-destructive/12 text-destructive border border-destructive/20 focus-visible:ring-destructive/20 dark:bg-destructive/20 dark:focus-visible:ring-destructive/40 [a]:hover:bg-destructive/20',
+          'bg-destructive/15 text-destructive border border-destructive/20 focus-visible:ring-destructive/20 dark:bg-destructive/20 dark:focus-visible:ring-destructive/40 [a]:hover:bg-destructive/20',
         outline: 'border-border/80 bg-card/40 backdrop-blur-xs text-foreground [a]:hover:bg-muted',
         ghost: 'hover:bg-muted hover:text-muted-foreground dark:hover:bg-muted/50',
         link: 'text-primary underline-offset-4 hover:underline',
         emerald:
           'border-emerald-500/25 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 backdrop-blur-xs',
+        ruby: 'border-red-500/25 bg-red-500/10 text-red-600 dark:text-red-400 backdrop-blur-xs',
+        gradient:
+          'border border-red-500/30 bg-gradient-to-r from-red-500/15 via-rose-500/10 to-transparent text-red-500 dark:text-red-400 backdrop-blur-xs font-semibold',
       },
     },
     defaultVariants: {

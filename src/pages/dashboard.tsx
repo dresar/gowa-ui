@@ -1,12 +1,5 @@
 import { useMemo, useState } from 'react'
-import {
-  CheckCircle2,
-  Plus,
-  Radio,
-  Search,
-  Smartphone,
-  Unplug,
-} from 'lucide-react'
+import { CheckCircle2, Plus, Radio, Search, Smartphone, Unplug } from 'lucide-react'
 import { PageHeader } from '@/components/shared/page-header'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
@@ -33,7 +26,8 @@ export default function DashboardPage() {
 
   const total = devices?.length ?? 0
   const loggedIn = devices?.filter((d) => d.state === 'logged_in').length ?? 0
-  const connecting = devices?.filter((d) => d.state === 'connecting' || d.state === 'connected').length ?? 0
+  const connecting =
+    devices?.filter((d) => d.state === 'connecting' || d.state === 'connected').length ?? 0
   const disconnected = devices?.filter((d) => d.state === 'disconnected').length ?? 0
 
   const filteredDevices = useMemo(() => {
@@ -77,16 +71,17 @@ export default function DashboardPage() {
           type="button"
           onClick={() => setFilter('all')}
           className={cn(
-            'glass-card flex items-center gap-3 rounded-xl p-3.5 text-left transition-all backdrop-blur-xl',
-            filter === 'all' && 'border-primary/50 ring-1 ring-primary/30',
+            'glass-card flex items-center gap-3 rounded-xl p-3.5 text-left backdrop-blur-xl transition-all',
+            filter === 'all' &&
+              'border-red-500/50 bg-gradient-to-br from-red-500/10 via-rose-500/5 to-transparent shadow-xs ring-1 shadow-red-500/10 ring-red-500/30',
           )}
         >
-          <div className="flex size-9 shrink-0 items-center justify-center rounded-lg border border-border/80 bg-card/60 text-primary shadow-2xs">
+          <div className="flex size-9 shrink-0 items-center justify-center rounded-lg border border-red-500/30 bg-gradient-to-br from-red-500/15 to-rose-500/10 text-red-500 shadow-2xs dark:text-red-400">
             <Smartphone className="size-4" />
           </div>
           <div className="min-w-0">
-            <p className="text-[11px] font-medium text-muted-foreground">Total Slots</p>
-            <p className="font-heading text-lg font-bold tracking-tight text-foreground">{total}</p>
+            <p className="text-muted-foreground text-[11px] font-medium">Total Slots</p>
+            <p className="font-heading text-foreground text-lg font-bold tracking-tight">{total}</p>
           </div>
         </button>
 
@@ -94,7 +89,7 @@ export default function DashboardPage() {
           type="button"
           onClick={() => setFilter('logged_in')}
           className={cn(
-            'glass-card flex items-center gap-3 rounded-xl p-3.5 text-left transition-all backdrop-blur-xl',
+            'glass-card flex items-center gap-3 rounded-xl p-3.5 text-left backdrop-blur-xl transition-all',
             filter === 'logged_in' && 'border-emerald-500/50 ring-1 ring-emerald-500/30',
           )}
         >
@@ -102,8 +97,10 @@ export default function DashboardPage() {
             <CheckCircle2 className="size-4" />
           </div>
           <div className="min-w-0">
-            <p className="text-[11px] font-medium text-muted-foreground">Logged In</p>
-            <p className="font-heading text-lg font-bold tracking-tight text-emerald-500">{loggedIn}</p>
+            <p className="text-muted-foreground text-[11px] font-medium">Logged In</p>
+            <p className="font-heading text-lg font-bold tracking-tight text-emerald-500">
+              {loggedIn}
+            </p>
           </div>
         </button>
 
@@ -111,7 +108,7 @@ export default function DashboardPage() {
           type="button"
           onClick={() => setFilter('connecting')}
           className={cn(
-            'glass-card flex items-center gap-3 rounded-xl p-3.5 text-left transition-all backdrop-blur-xl',
+            'glass-card flex items-center gap-3 rounded-xl p-3.5 text-left backdrop-blur-xl transition-all',
             filter === 'connecting' && 'border-amber-500/50 ring-1 ring-amber-500/30',
           )}
         >
@@ -119,8 +116,10 @@ export default function DashboardPage() {
             <Radio className="size-4 animate-pulse" />
           </div>
           <div className="min-w-0">
-            <p className="text-[11px] font-medium text-muted-foreground">Connecting</p>
-            <p className="font-heading text-lg font-bold tracking-tight text-amber-500">{connecting}</p>
+            <p className="text-muted-foreground text-[11px] font-medium">Connecting</p>
+            <p className="font-heading text-lg font-bold tracking-tight text-amber-500">
+              {connecting}
+            </p>
           </div>
         </button>
 
@@ -128,29 +127,32 @@ export default function DashboardPage() {
           type="button"
           onClick={() => setFilter('disconnected')}
           className={cn(
-            'glass-card flex items-center gap-3 rounded-xl p-3.5 text-left transition-all backdrop-blur-xl',
-            filter === 'disconnected' && 'border-muted-foreground/50 ring-1 ring-muted-foreground/30',
+            'glass-card flex items-center gap-3 rounded-xl p-3.5 text-left backdrop-blur-xl transition-all',
+            filter === 'disconnected' &&
+              'border-muted-foreground/50 ring-muted-foreground/30 ring-1',
           )}
         >
-          <div className="flex size-9 shrink-0 items-center justify-center rounded-lg border border-border/60 bg-muted/40 text-muted-foreground shadow-2xs">
+          <div className="border-border/60 bg-muted/40 text-muted-foreground flex size-9 shrink-0 items-center justify-center rounded-lg border shadow-2xs">
             <Unplug className="size-4" />
           </div>
           <div className="min-w-0">
-            <p className="text-[11px] font-medium text-muted-foreground">Offline</p>
-            <p className="font-heading text-lg font-bold tracking-tight text-muted-foreground">{disconnected}</p>
+            <p className="text-muted-foreground text-[11px] font-medium">Offline</p>
+            <p className="font-heading text-muted-foreground text-lg font-bold tracking-tight">
+              {disconnected}
+            </p>
           </div>
         </button>
       </div>
 
       {devices && devices.length > 0 && (
         <div className="flex flex-col gap-2.5 sm:flex-row sm:items-center sm:justify-between">
-          <div className="relative flex-1 max-w-sm">
-            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground" />
+          <div className="relative max-w-sm flex-1">
+            <Search className="text-muted-foreground absolute top-1/2 left-2.5 size-3.5 -translate-y-1/2" />
             <Input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search devices by name, phone or ID…"
-              className="h-8.5 pl-8 text-xs rounded-lg"
+              className="h-8.5 rounded-lg pl-8 text-xs"
             />
           </div>
           <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0">
@@ -158,9 +160,9 @@ export default function DashboardPage() {
               type="button"
               onClick={() => setFilter('all')}
               className={cn(
-                'rounded-lg px-2.5 py-1 text-xs font-medium transition-colors',
+                'rounded-lg px-2.5 py-1 text-xs font-medium transition-all',
                 filter === 'all'
-                  ? 'bg-primary text-primary-foreground font-semibold'
+                  ? 'bg-gradient-to-r from-red-600 via-rose-600 to-red-500 font-semibold text-white shadow-xs shadow-red-600/20'
                   : 'bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground',
               )}
             >
@@ -172,7 +174,7 @@ export default function DashboardPage() {
               className={cn(
                 'rounded-lg px-2.5 py-1 text-xs font-medium transition-colors',
                 filter === 'logged_in'
-                  ? 'bg-emerald-600 text-white font-semibold'
+                  ? 'bg-emerald-600 font-semibold text-white'
                   : 'bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground',
               )}
             >
@@ -184,7 +186,7 @@ export default function DashboardPage() {
               className={cn(
                 'rounded-lg px-2.5 py-1 text-xs font-medium transition-colors',
                 filter === 'connecting'
-                  ? 'bg-amber-600 text-white font-semibold'
+                  ? 'bg-amber-600 font-semibold text-white'
                   : 'bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground',
               )}
             >
@@ -196,7 +198,7 @@ export default function DashboardPage() {
               className={cn(
                 'rounded-lg px-2.5 py-1 text-xs font-medium transition-colors',
                 filter === 'disconnected'
-                  ? 'bg-slate-700 text-white font-semibold'
+                  ? 'bg-slate-700 font-semibold text-white'
                   : 'bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground',
               )}
             >
@@ -208,7 +210,7 @@ export default function DashboardPage() {
 
       {error && (
         <Card className="border-destructive/40 bg-destructive/10">
-          <CardContent className="py-3 text-xs text-destructive">
+          <CardContent className="text-destructive py-3 text-xs">
             Failed to load devices: {toApiError(error).message}
           </CardContent>
         </Card>
@@ -223,50 +225,57 @@ export default function DashboardPage() {
       )}
 
       {devices && devices.length === 0 && (
-        <Card className="border border-border/70 bg-card/60 backdrop-blur-xl shadow-xs">
+        <Card className="border-border/70 bg-card/60 border shadow-xs backdrop-blur-xl">
           <CardContent className="flex flex-col items-center gap-4 py-10 text-center sm:py-12">
-            <div className="relative flex size-14 items-center justify-center rounded-xl border border-primary/25 bg-primary/10 text-primary shadow-md">
+            <div className="border-primary/25 bg-primary/10 text-primary relative flex size-14 items-center justify-center rounded-xl border shadow-md">
               <Smartphone className="size-7" />
               <span className="absolute -top-1 -right-1 flex size-3">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75" />
-                <span className="relative inline-flex size-3 rounded-full bg-primary" />
+                <span className="bg-primary absolute inline-flex h-full w-full animate-ping rounded-full opacity-75" />
+                <span className="bg-primary relative inline-flex size-3 rounded-full" />
               </span>
             </div>
 
             <div className="flex max-w-md flex-col gap-1.5">
-              <h2 className="font-heading text-base font-bold tracking-tight text-foreground sm:text-lg">
+              <h2 className="font-heading text-foreground text-base font-bold tracking-tight sm:text-lg">
                 No WhatsApp Devices Registered
               </h2>
-              <p className="text-xs leading-relaxed text-muted-foreground">
-                Provision a session slot to begin pairing physical phones, automating broadcasts, and synchronizing contacts.
+              <p className="text-muted-foreground text-xs leading-relaxed">
+                Provision a session slot to begin pairing physical phones, automating broadcasts,
+                and synchronizing contacts.
               </p>
             </div>
 
-            <div className="grid w-full max-w-xl gap-2.5 sm:grid-cols-3 text-left">
-              <div className="rounded-lg border border-border/60 bg-muted/30 p-3">
-                <div className="flex items-center gap-1.5 text-[11px] font-semibold text-foreground">
-                  <span className="flex size-4 items-center justify-center rounded bg-primary/20 text-[10px] font-bold text-primary">1</span>
+            <div className="grid w-full max-w-xl gap-2.5 text-left sm:grid-cols-3">
+              <div className="border-border/60 bg-muted/30 rounded-lg border p-3">
+                <div className="text-foreground flex items-center gap-1.5 text-[11px] font-semibold">
+                  <span className="bg-primary/20 text-primary flex size-4 items-center justify-center rounded text-[10px] font-bold">
+                    1
+                  </span>
                   <span>Register Slot</span>
                 </div>
-                <p className="mt-1 text-[10px] text-muted-foreground leading-normal">
+                <p className="text-muted-foreground mt-1 text-[10px] leading-normal">
                   Allocate an isolated WhatsApp Multi-Device session container.
                 </p>
               </div>
-              <div className="rounded-lg border border-border/60 bg-muted/30 p-3">
-                <div className="flex items-center gap-1.5 text-[11px] font-semibold text-foreground">
-                  <span className="flex size-4 items-center justify-center rounded bg-primary/20 text-[10px] font-bold text-primary">2</span>
+              <div className="border-border/60 bg-muted/30 rounded-lg border p-3">
+                <div className="text-foreground flex items-center gap-1.5 text-[11px] font-semibold">
+                  <span className="bg-primary/20 text-primary flex size-4 items-center justify-center rounded text-[10px] font-bold">
+                    2
+                  </span>
                   <span>Pair Phone</span>
                 </div>
-                <p className="mt-1 text-[10px] text-muted-foreground leading-normal">
+                <p className="text-muted-foreground mt-1 text-[10px] leading-normal">
                   Scan dynamic QR code or use WhatsApp pairing code.
                 </p>
               </div>
-              <div className="rounded-lg border border-border/60 bg-muted/30 p-3">
-                <div className="flex items-center gap-1.5 text-[11px] font-semibold text-foreground">
-                  <span className="flex size-4 items-center justify-center rounded bg-primary/20 text-[10px] font-bold text-primary">3</span>
+              <div className="border-border/60 bg-muted/30 rounded-lg border p-3">
+                <div className="text-foreground flex items-center gap-1.5 text-[11px] font-semibold">
+                  <span className="bg-primary/20 text-primary flex size-4 items-center justify-center rounded text-[10px] font-bold">
+                    3
+                  </span>
                   <span>Broadcast & Stream</span>
                 </div>
-                <p className="mt-1 text-[10px] text-muted-foreground leading-normal">
+                <p className="text-muted-foreground mt-1 text-[10px] leading-normal">
                   Dispatch messages, receive webhooks, and manage groups.
                 </p>
               </div>
@@ -284,9 +293,11 @@ export default function DashboardPage() {
       )}
 
       {devices && devices.length > 0 && filteredDevices.length === 0 && (
-        <div className="flex flex-col items-center justify-center gap-2 rounded-xl border border-border/70 bg-card/60 p-10 text-center backdrop-blur-xl">
-          <p className="text-xs font-semibold text-foreground">No matching devices</p>
-          <p className="text-[11px] text-muted-foreground">Try clearing your search query or status filter.</p>
+        <div className="border-border/70 bg-card/60 flex flex-col items-center justify-center gap-2 rounded-xl border p-10 text-center backdrop-blur-xl">
+          <p className="text-foreground text-xs font-semibold">No matching devices</p>
+          <p className="text-muted-foreground text-[11px]">
+            Try clearing your search query or status filter.
+          </p>
           <Button
             size="xs"
             variant="outline"

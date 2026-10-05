@@ -94,7 +94,8 @@ export const useConnection = create<ConnectionState>()(
         }
 
         const defaultServer = normalizeBaseUrl(
-          (import.meta.env.VITE_DEFAULT_SERVER_URL as string | undefined) || 'http://localhost:3000',
+          (import.meta.env.VITE_DEFAULT_SERVER_URL as string | undefined) ||
+            'http://localhost:3000',
         )
         if (defaultServer && defaultServer !== origin) {
           if ((await probeServer(defaultServer)) === 'ok') {

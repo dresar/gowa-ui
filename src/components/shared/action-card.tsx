@@ -17,13 +17,17 @@ export function ActionCard({
       <CardHeader className="pb-3">
         <div className="flex items-center gap-2.5">
           {Icon && (
-            <span className="flex size-7.5 shrink-0 items-center justify-center rounded-lg border border-primary/25 bg-primary/10 text-primary shadow-2xs">
+            <span className="border-primary/25 bg-primary/10 text-primary flex size-7.5 shrink-0 items-center justify-center rounded-lg border shadow-2xs">
               <Icon className="size-3.5" />
             </span>
           )}
           <div>
-            <CardTitle className="text-sm font-semibold text-foreground">{title}</CardTitle>
-            {description && <CardDescription className="text-xs text-muted-foreground">{description}</CardDescription>}
+            <CardTitle className="text-foreground text-sm font-semibold">{title}</CardTitle>
+            {description && (
+              <CardDescription className="text-muted-foreground text-xs">
+                {description}
+              </CardDescription>
+            )}
           </div>
         </div>
       </CardHeader>

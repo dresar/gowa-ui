@@ -12,7 +12,7 @@ function Card({
       data-slot="card"
       data-size={size}
       className={cn(
-        'group/card backdrop-blur-xl bg-card text-card-foreground border border-border/70 shadow-xs dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.05)] flex flex-col gap-(--card-spacing) overflow-hidden rounded-xl py-(--card-spacing) text-sm [--card-spacing:--spacing(4)] has-data-[slot=card-footer]:pb-0 has-[>img:first-child]:pt-0 data-[size=sm]:[--card-spacing:--spacing(3)] data-[size=sm]:has-data-[slot=card-footer]:pb-0 *:[img:first-child]:rounded-t-xl *:[img:last-child]:rounded-b-xl transition-all duration-200',
+        'group/card bg-card text-card-foreground border-border/70 flex flex-col gap-(--card-spacing) overflow-hidden rounded-xl border py-(--card-spacing) text-sm shadow-xs backdrop-blur-xl transition-all duration-200 [--card-spacing:--spacing(4)] has-data-[slot=card-footer]:pb-0 has-[>img:first-child]:pt-0 data-[size=sm]:[--card-spacing:--spacing(3)] data-[size=sm]:has-data-[slot=card-footer]:pb-0 dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.05)] *:[img:first-child]:rounded-t-xl *:[img:last-child]:rounded-b-xl',
         className,
       )}
       {...props}
@@ -38,7 +38,7 @@ function CardTitle({ className, ...props }: React.ComponentProps<'div'>) {
     <div
       data-slot="card-title"
       className={cn(
-        'font-heading text-base leading-snug font-semibold tracking-tight text-foreground group-data-[size=sm]/card:text-sm',
+        'font-heading text-foreground text-base leading-snug font-semibold tracking-tight group-data-[size=sm]/card:text-sm',
         className,
       )}
       {...props}
@@ -77,7 +77,7 @@ function CardFooter({ className, ...props }: React.ComponentProps<'div'>) {
     <div
       data-slot="card-footer"
       className={cn(
-        'bg-muted/40 backdrop-blur-md flex items-center rounded-b-xl border-t border-border/60 p-(--card-spacing)',
+        'bg-muted/40 border-border/60 flex items-center rounded-b-xl border-t p-(--card-spacing) backdrop-blur-md',
         className,
       )}
       {...props}

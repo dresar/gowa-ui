@@ -110,7 +110,11 @@ export function CreateDeviceDialog({
             />
           </div>
           <DialogFooter>
-            <Button type="submit" disabled={mutation.isPending} className="h-8 text-xs font-semibold">
+            <Button
+              type="submit"
+              disabled={mutation.isPending}
+              className="h-8 text-xs font-semibold"
+            >
               {mutation.isPending && <Loader2 className="size-3.5 animate-spin" />}
               <span>Add device</span>
             </Button>

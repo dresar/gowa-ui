@@ -94,39 +94,39 @@ export function DeviceCard({
   return (
     <Card
       className={cn(
-        'card-lift glass-card gap-3 rounded-xl border border-border/70 transition-all duration-200',
+        'card-lift glass-card border-border/70 gap-3 rounded-xl border transition-all duration-200',
         selected &&
-          'border-primary/50 bg-primary/[0.04] ring-1 ring-primary/30 shadow-md shadow-primary/5',
+          'border-red-500/50 bg-gradient-to-br from-red-500/[0.06] via-rose-500/[0.03] to-transparent shadow-md ring-1 shadow-red-500/10 ring-red-500/30',
       )}
     >
       <CardHeader className="flex flex-row items-start justify-between gap-2 p-3.5 pb-1">
         <div className="flex min-w-0 items-center gap-3">
           <div className="relative">
-            <Avatar className="size-10 border border-border/80 shadow-2xs">
+            <Avatar className="border-border/80 size-10 border shadow-2xs">
               {avatar.data?.url && (
                 <AvatarImage src={avatar.data.url} alt={device.display_name || device.id} />
               )}
               <AvatarFallback className="bg-muted/50">
-                <CircleUserRound className="size-5 text-muted-foreground" />
+                <CircleUserRound className="text-muted-foreground size-5" />
               </AvatarFallback>
             </Avatar>
             {device.state === 'logged_in' && (
-              <span className="absolute -bottom-0.5 -right-0.5 size-2.5 rounded-full border-2 border-background bg-emerald-500 shadow-xs shadow-emerald-500/50" />
+              <span className="border-background absolute -right-0.5 -bottom-0.5 size-2.5 rounded-full border-2 bg-emerald-500 shadow-xs shadow-emerald-500/50" />
             )}
           </div>
           <div className="min-w-0">
             <div className="flex items-center gap-1.5">
-              <p className="truncate text-xs font-semibold text-foreground">
+              <p className="text-foreground truncate text-xs font-semibold">
                 {device.display_name || device.id}
               </p>
               {selected && (
-                <span className="flex items-center gap-0.5 rounded border border-primary/30 bg-primary/10 px-1 py-0.2 text-[9px] font-semibold text-primary">
+                <span className="py-0.2 flex items-center gap-0.5 rounded border border-red-500/30 bg-gradient-to-r from-red-500/20 to-rose-500/10 px-1 text-[9px] font-semibold text-red-500 dark:text-red-400">
                   <CheckCircle className="size-2.5" />
                   Active
                 </span>
               )}
             </div>
-            <p className="truncate font-mono text-[10px] text-muted-foreground">
+            <p className="text-muted-foreground truncate font-mono text-[10px]">
               {device.phone_number || device.jid || 'Unpaired session'}
             </p>
           </div>
@@ -134,10 +134,10 @@ export function DeviceCard({
         <StateBadge state={device.state} />
       </CardHeader>
 
-      <CardContent className="space-y-1 p-3.5 pt-0 text-[11px] text-muted-foreground">
+      <CardContent className="text-muted-foreground space-y-1 p-3.5 pt-0 text-[11px]">
         <div className="flex items-center justify-between">
           <span className="text-muted-foreground/80">Slot ID:</span>
-          <span className="rounded bg-muted/60 px-1.5 py-0.5 font-mono text-[10px] text-foreground">
+          <span className="bg-muted/60 text-foreground rounded px-1.5 py-0.5 font-mono text-[10px]">
             {device.id}
           </span>
         </div>
@@ -147,7 +147,7 @@ export function DeviceCard({
         </div>
       </CardContent>
 
-      <CardFooter className="flex items-center justify-between gap-2 p-3.5 pt-2 border-t border-border/40">
+      <CardFooter className="border-border/40 flex items-center justify-between gap-2 border-t p-3.5 pt-2">
         <div className="flex flex-1 items-center gap-1.5">
           <Button
             variant={selected ? 'default' : 'outline'}
@@ -165,7 +165,7 @@ export function DeviceCard({
               variant="outline"
               size="sm"
               onClick={() => selectDevice(device.id)}
-              className="h-8 flex-1 gap-1 rounded-[6px] border-primary/30 bg-primary/10 text-xs font-semibold text-primary hover:bg-primary/20 active:scale-[0.98]"
+              className="border-primary/30 bg-primary/10 text-primary hover:bg-primary/20 h-8 flex-1 gap-1 rounded-[6px] text-xs font-semibold active:scale-[0.98]"
             >
               <Link to="/messaging">
                 <Send className="size-3" />
@@ -177,7 +177,7 @@ export function DeviceCard({
               variant="outline"
               size="sm"
               onClick={() => onLoginQr(device)}
-              className="h-8 flex-1 gap-1 rounded-[6px] border-primary/30 bg-primary/10 text-xs font-semibold text-primary hover:bg-primary/20 active:scale-[0.98]"
+              className="border-primary/30 bg-primary/10 text-primary hover:bg-primary/20 h-8 flex-1 gap-1 rounded-[6px] text-xs font-semibold active:scale-[0.98]"
             >
               <QrCode className="size-3.5" />
               <span>Pair QR</span>
@@ -198,7 +198,7 @@ export function DeviceCard({
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="text-xs">
             <DropdownMenuItem onClick={() => onLoginQr(device)}>
-              <QrCode className="size-3.5 text-primary" /> Login with QR
+              <QrCode className="text-primary size-3.5" /> Login with QR
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => onLoginCode(device)}>
               <KeyRound className="size-3.5" /> Login with Pairing Code
@@ -210,7 +210,7 @@ export function DeviceCard({
               <Unplug className="size-3.5" /> Logout Device
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => setWebhookOpen(true)}>
-              <Webhook className="size-3.5 text-primary" /> Webhook Setup
+              <Webhook className="text-primary size-3.5" /> Webhook Setup
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem
@@ -231,14 +231,15 @@ export function DeviceCard({
           <AlertDialogHeader>
             <AlertDialogTitle>Delete device {device.id}?</AlertDialogTitle>
             <AlertDialogDescription className="text-xs">
-              This will permanently revoke the device slot and clear its WhatsApp credentials from GOWA.
+              This will permanently revoke the device slot and clear its WhatsApp credentials from
+              GOWA.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel className="h-8 text-xs font-semibold">Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={() => remove.mutate()}
-              className="h-8 bg-destructive text-xs font-semibold text-white hover:bg-destructive/90"
+              className="bg-destructive hover:bg-destructive/90 h-8 text-xs font-semibold text-white"
             >
               Delete Slot
             </AlertDialogAction>

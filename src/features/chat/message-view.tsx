@@ -35,29 +35,34 @@ function MessageBubble({ message, deviceId }: { message: MessageInfo; deviceId: 
     <div className={cn('flex', message.is_from_me ? 'justify-end' : 'justify-start')}>
       <div
         className={cn(
-          'max-w-[82%] rounded-xl px-3 py-2 text-xs sm:text-[13px] shadow-2xs backdrop-blur-md transition-all',
+          'max-w-[82%] rounded-xl px-3 py-2 text-xs shadow-2xs backdrop-blur-md transition-all sm:text-[13px]',
           message.is_from_me
-            ? 'rounded-tr-xs border border-emerald-500/25 bg-emerald-500/15 text-foreground'
-            : 'rounded-tl-xs border border-border/80 bg-card/85 text-foreground',
+            ? 'text-foreground rounded-tr-xs border border-red-500/30 bg-gradient-to-br from-red-500/20 via-rose-500/15 to-red-500/10'
+            : 'border-border/80 bg-card/85 text-foreground rounded-tl-xs border',
         )}
       >
         {!message.is_from_me && (
-          <p className="mb-0.5 font-mono text-[10px] font-semibold text-primary">
+          <p className="text-primary mb-0.5 font-mono text-[10px] font-semibold">
             {senderDisplayName(message)}
           </p>
         )}
-        {message.content && <p className="break-words whitespace-pre-wrap leading-relaxed">{message.content}</p>}
+        {message.content && (
+          <p className="leading-relaxed break-words whitespace-pre-wrap">{message.content}</p>
+        )}
         {hasMedia && <MessageMedia message={message} deviceId={deviceId} />}
         {message.reactions && message.reactions.length > 0 && (
           <div className="mt-1 flex flex-wrap gap-1">
             {message.reactions.map((r) => (
-              <span key={r.emoji} className="rounded-md border border-border/60 bg-muted/60 px-1 py-0.2 text-[10px]">
+              <span
+                key={r.emoji}
+                className="border-border/60 bg-muted/60 py-0.2 rounded-md border px-1 text-[10px]"
+              >
                 {r.emoji}
               </span>
             ))}
           </div>
         )}
-        <p className="mt-1 text-right font-mono text-[9px] text-muted-foreground/80">
+        <p className="text-muted-foreground/80 mt-1 text-right font-mono text-[9px]">
           {formatDate(message.timestamp)}
         </p>
       </div>
@@ -127,12 +132,12 @@ export function MessageView({ chat, deviceId }: { chat: ChatInfo; deviceId: stri
   return (
     <div className="flex h-full flex-col gap-3">
       {/* Header bar for selected chat */}
-      <div className="flex items-center justify-between border-b border-border/60 pb-2.5">
+      <div className="border-border/60 flex items-center justify-between border-b pb-2.5">
         <div className="min-w-0">
-          <p className="truncate text-sm font-semibold text-foreground">
+          <p className="text-foreground truncate text-sm font-semibold">
             {chatDisplayName(resolvedChat)}
           </p>
-          <p className="truncate font-mono text-[10px] text-muted-foreground">{resolvedChat.jid}</p>
+          <p className="text-muted-foreground truncate font-mono text-[10px]">{resolvedChat.jid}</p>
         </div>
         <ChatControls chat={resolvedChat} />
       </div>
@@ -148,7 +153,7 @@ export function MessageView({ chat, deviceId }: { chat: ChatInfo; deviceId: stri
             setOffset(0)
           }}
         />
-        <label className="flex items-center gap-1.5 text-xs text-muted-foreground select-none">
+        <label className="text-muted-foreground flex items-center gap-1.5 text-xs select-none">
           <Switch
             checked={mediaOnly}
             onCheckedChange={(value) => {
@@ -162,14 +167,14 @@ export function MessageView({ chat, deviceId }: { chat: ChatInfo; deviceId: stri
 
       {/* Message stream */}
       <div ref={messageList} className="min-h-0 flex-1">
-        <ScrollArea className="size-full rounded-xl border border-border/60 bg-muted/20 p-3 backdrop-blur-xs">
+        <ScrollArea className="border-border/60 bg-muted/20 size-full rounded-xl border p-3 backdrop-blur-xs">
           {query.isLoading ? (
             <div className="flex justify-center p-6">
-              <Loader2 className="size-5 animate-spin text-primary" />
+              <Loader2 className="text-primary size-5 animate-spin" />
             </div>
           ) : messages.length === 0 ? (
-            <div className="flex flex-col gap-1 p-6 text-center text-xs text-muted-foreground">
-              <p className="font-medium text-foreground">No messages stored for this chat yet.</p>
+            <div className="text-muted-foreground flex flex-col gap-1 p-6 text-center text-xs">
+              <p className="text-foreground font-medium">No messages stored for this chat yet.</p>
               <p className="text-[11px]">
                 Messages will appear as sent/received or when history sync completes.
               </p>
@@ -183,7 +188,7 @@ export function MessageView({ chat, deviceId }: { chat: ChatInfo; deviceId: stri
                   <div key={message.id}>
                     {showDateSeparator && (
                       <div className="flex justify-center py-1">
-                        <span className="rounded-md border border-border/60 bg-card/85 px-2.5 py-0.5 font-mono text-[10px] text-muted-foreground shadow-2xs backdrop-blur-xs">
+                        <span className="border-border/60 bg-card/85 text-muted-foreground rounded-md border px-2.5 py-0.5 font-mono text-[10px] shadow-2xs backdrop-blur-xs">
                           {new Date(message.timestamp).toLocaleDateString(undefined, {
                             day: 'numeric',
                             month: 'short',
@@ -202,7 +207,7 @@ export function MessageView({ chat, deviceId }: { chat: ChatInfo; deviceId: stri
       </div>
 
       {/* Pagination toolbar */}
-      <div className="flex items-center justify-between text-[11px] text-muted-foreground">
+      <div className="text-muted-foreground flex items-center justify-between text-[11px]">
         <span>{total} messages stored</span>
         <div className="flex gap-1">
           <Button

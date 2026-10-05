@@ -1,12 +1,6 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import {
-  CircleUserRound,
-  LayoutDashboard,
-  Plus,
-  QrCode,
-  Smartphone,
-} from 'lucide-react'
+import { CircleUserRound, LayoutDashboard, Plus, QrCode, Smartphone } from 'lucide-react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -31,22 +25,22 @@ function GuardDeviceCard({
   const avatar = useDeviceAvatar(device)
 
   return (
-    <Card className="card-lift border-border/70 bg-card/70 backdrop-blur-xl shadow-xs transition-all">
+    <Card className="card-lift border-border/70 bg-card/70 shadow-xs backdrop-blur-xl transition-all">
       <CardHeader className="flex flex-row items-start justify-between gap-2 p-3.5 pb-2">
         <div className="flex min-w-0 items-center gap-3">
-          <Avatar className="size-10 border border-border/80 shadow-2xs">
+          <Avatar className="border-border/80 size-10 border shadow-2xs">
             {avatar.data?.url && (
               <AvatarImage src={avatar.data.url} alt={device.display_name || device.id} />
             )}
             <AvatarFallback className="bg-muted/50">
-              <CircleUserRound className="size-5 text-muted-foreground" />
+              <CircleUserRound className="text-muted-foreground size-5" />
             </AvatarFallback>
           </Avatar>
           <div className="min-w-0">
-            <p className="truncate text-xs font-semibold text-foreground">
+            <p className="text-foreground truncate text-xs font-semibold">
               {device.display_name || device.id}
             </p>
-            <p className="truncate font-mono text-[10px] text-muted-foreground">
+            <p className="text-muted-foreground truncate font-mono text-[10px]">
               {device.phone_number || device.jid || device.id}
             </p>
           </div>
@@ -67,7 +61,7 @@ function GuardDeviceCard({
               variant="outline"
               size="sm"
               onClick={() => onPair(device)}
-              className="h-8 gap-1 rounded-[6px] border-primary/30 bg-primary/10 text-xs font-semibold text-primary hover:bg-primary/20 active:scale-[0.98]"
+              className="border-primary/30 bg-primary/10 text-primary hover:bg-primary/20 h-8 gap-1 rounded-[6px] text-xs font-semibold active:scale-[0.98]"
             >
               <QrCode className="size-3.5" />
               <span>Pair QR</span>
@@ -77,7 +71,7 @@ function GuardDeviceCard({
               variant="outline"
               size="sm"
               onClick={() => onSelect(device.id)}
-              className="h-8 rounded-[6px] border-border/70 bg-muted/40 text-xs font-semibold text-foreground hover:bg-muted/60 active:scale-[0.98]"
+              className="border-border/70 bg-muted/40 text-foreground hover:bg-muted/60 h-8 rounded-[6px] text-xs font-semibold active:scale-[0.98]"
             >
               <span>Connect</span>
             </Button>
@@ -109,11 +103,11 @@ export function DeviceGuard() {
   if (devices && devices.length > 0) {
     return (
       <div className="flex flex-col gap-4">
-        <Card className="border-border/70 bg-card/60 backdrop-blur-xl shadow-xs">
+        <Card className="border-border/70 bg-card/60 shadow-xs backdrop-blur-xl">
           <CardHeader className="p-4 sm:p-5">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div className="flex items-center gap-3">
-                <div className="flex size-10 shrink-0 items-center justify-center rounded-lg border border-primary/20 bg-primary/10 text-primary shadow-2xs">
+                <div className="border-primary/20 bg-primary/10 text-primary flex size-10 shrink-0 items-center justify-center rounded-lg border shadow-2xs">
                   <Smartphone className="size-5" />
                 </div>
                 <div>
@@ -129,7 +123,7 @@ export function DeviceGuard() {
                 variant="outline"
                 size="sm"
                 onClick={() => setCreateOpen(true)}
-                className="h-8 gap-1.5 self-start rounded-lg border-primary/30 text-xs font-semibold text-primary hover:bg-primary/10 sm:self-auto"
+                className="border-primary/30 text-primary hover:bg-primary/10 h-8 gap-1.5 self-start rounded-lg text-xs font-semibold sm:self-auto"
               >
                 <Plus className="size-3.5" />
                 <span>New Device Slot</span>
@@ -157,50 +151,57 @@ export function DeviceGuard() {
 
   return (
     <div className="flex flex-col gap-4">
-      <Card className="border-border/70 bg-card/60 backdrop-blur-xl shadow-xs">
+      <Card className="border-border/70 bg-card/60 shadow-xs backdrop-blur-xl">
         <CardContent className="flex flex-col items-center gap-4 py-10 text-center sm:py-12">
-          <div className="relative flex size-14 items-center justify-center rounded-xl border border-primary/25 bg-primary/10 text-primary shadow-md">
+          <div className="border-primary/25 bg-primary/10 text-primary relative flex size-14 items-center justify-center rounded-xl border shadow-md">
             <Smartphone className="size-7" />
             <span className="absolute -top-1 -right-1 flex size-3">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75" />
-              <span className="relative inline-flex size-3 rounded-full bg-primary" />
+              <span className="bg-primary absolute inline-flex h-full w-full animate-ping rounded-full opacity-75" />
+              <span className="bg-primary relative inline-flex size-3 rounded-full" />
             </span>
           </div>
 
           <div className="flex max-w-md flex-col gap-1.5">
-            <h2 className="font-heading text-base font-bold tracking-tight text-foreground sm:text-lg">
+            <h2 className="font-heading text-foreground text-base font-bold tracking-tight sm:text-lg">
               No WhatsApp Devices Connected
             </h2>
-            <p className="text-xs leading-relaxed text-muted-foreground">
-              This section requires an active WhatsApp session to read contacts, profile identity, and message streams.
+            <p className="text-muted-foreground text-xs leading-relaxed">
+              This section requires an active WhatsApp session to read contacts, profile identity,
+              and message streams.
             </p>
           </div>
 
-          <div className="grid w-full max-w-xl gap-2.5 sm:grid-cols-3 text-left">
-            <div className="rounded-lg border border-border/60 bg-muted/30 p-3">
-              <div className="flex items-center gap-1.5 text-[11px] font-semibold text-foreground">
-                <span className="flex size-4 items-center justify-center rounded bg-primary/20 text-[10px] font-bold text-primary">1</span>
+          <div className="grid w-full max-w-xl gap-2.5 text-left sm:grid-cols-3">
+            <div className="border-border/60 bg-muted/30 rounded-lg border p-3">
+              <div className="text-foreground flex items-center gap-1.5 text-[11px] font-semibold">
+                <span className="bg-primary/20 text-primary flex size-4 items-center justify-center rounded text-[10px] font-bold">
+                  1
+                </span>
                 <span>Register Slot</span>
               </div>
-              <p className="mt-1 text-[10px] text-muted-foreground leading-normal">
+              <p className="text-muted-foreground mt-1 text-[10px] leading-normal">
                 Create a session slot on the Go backend server.
               </p>
             </div>
-            <div className="rounded-lg border border-border/60 bg-muted/30 p-3">
-              <div className="flex items-center gap-1.5 text-[11px] font-semibold text-foreground">
-                <span className="flex size-4 items-center justify-center rounded bg-primary/20 text-[10px] font-bold text-primary">2</span>
+            <div className="border-border/60 bg-muted/30 rounded-lg border p-3">
+              <div className="text-foreground flex items-center gap-1.5 text-[11px] font-semibold">
+                <span className="bg-primary/20 text-primary flex size-4 items-center justify-center rounded text-[10px] font-bold">
+                  2
+                </span>
                 <span>Pair Phone</span>
               </div>
-              <p className="mt-1 text-[10px] text-muted-foreground leading-normal">
+              <p className="text-muted-foreground mt-1 text-[10px] leading-normal">
                 Scan QR code or use WhatsApp pairing code.
               </p>
             </div>
-            <div className="rounded-lg border border-border/60 bg-muted/30 p-3">
-              <div className="flex items-center gap-1.5 text-[11px] font-semibold text-foreground">
-                <span className="flex size-4 items-center justify-center rounded bg-primary/20 text-[10px] font-bold text-primary">3</span>
+            <div className="border-border/60 bg-muted/30 rounded-lg border p-3">
+              <div className="text-foreground flex items-center gap-1.5 text-[11px] font-semibold">
+                <span className="bg-primary/20 text-primary flex size-4 items-center justify-center rounded text-[10px] font-bold">
+                  3
+                </span>
                 <span>Ready to Use</span>
               </div>
-              <p className="mt-1 text-[10px] text-muted-foreground leading-normal">
+              <p className="text-muted-foreground mt-1 text-[10px] leading-normal">
                 Broadcast messages, read chats, and edit identity.
               </p>
             </div>
@@ -217,7 +218,7 @@ export function DeviceGuard() {
             <Button
               asChild
               variant="outline"
-              className="h-8 gap-1.5 rounded-lg border-border/70 text-xs font-semibold"
+              className="border-border/70 h-8 gap-1.5 rounded-lg text-xs font-semibold"
             >
               <Link to="/">
                 <LayoutDashboard className="size-3.5" />

@@ -78,7 +78,7 @@ function LookupsPanel() {
   return (
     <div className="grid gap-3 sm:gap-4 lg:grid-cols-[210px_1fr]">
       <div className="glass-card hidden flex-col gap-1 rounded-xl p-2 backdrop-blur-xl lg:flex">
-        <p className="px-2.5 pb-1 text-[10px] font-semibold tracking-wider text-muted-foreground/70 uppercase">
+        <p className="text-muted-foreground/70 px-2.5 pb-1 text-[10px] font-semibold tracking-wider uppercase">
           Directory Query
         </p>
         {lookups.map(({ value, label, icon: Icon }) => (
@@ -90,7 +90,7 @@ function LookupsPanel() {
             className={cn(
               'flex items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-left text-xs font-medium transition-all duration-150',
               type === value
-                ? 'border border-primary/25 bg-primary/12 font-semibold text-primary shadow-2xs'
+                ? 'border-primary/25 bg-primary/12 text-primary border font-semibold shadow-2xs'
                 : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground',
             )}
           >
@@ -117,8 +117,11 @@ function LookupsPanel() {
       </div>
 
       <Card className="glass-card rounded-xl backdrop-blur-xl">
-        <div key={active.value} className="animate-in fade-in flex flex-col gap-3 p-4 sm:p-5 duration-200">
-          <CardHeader className="p-0 pb-3 border-b border-border/50">
+        <div
+          key={active.value}
+          className="animate-in fade-in flex flex-col gap-3 p-4 duration-200 sm:p-5"
+        >
+          <CardHeader className="border-border/50 border-b p-0 pb-3">
             <CardTitle className="text-sm font-semibold">{active.label}</CardTitle>
             <CardDescription className="text-xs">{active.description}</CardDescription>
           </CardHeader>
@@ -144,7 +147,7 @@ export default function AccountPage() {
         <>
           <RecipientBar />
           <Tabs defaultValue="profile" className="gap-3">
-            <TabsList className="h-9 rounded-lg border border-border/70 bg-card/60 p-1 backdrop-blur-md">
+            <TabsList className="border-border/70 bg-card/60 h-9 rounded-lg border p-1 backdrop-blur-md">
               <TabsTrigger value="profile" className="h-7 rounded-md text-xs font-medium">
                 My Profile
               </TabsTrigger>

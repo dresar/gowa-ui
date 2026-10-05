@@ -10,15 +10,15 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default:
-          'bg-primary text-primary-foreground shadow-xs shadow-primary/20 hover:bg-primary/90 hover:shadow-primary/30',
+          'bg-gradient-to-r from-red-600 via-rose-600 to-red-500 text-white font-medium shadow-xs shadow-red-600/30 border border-red-400/25 hover:from-red-500 hover:via-rose-500 hover:to-red-600 hover:shadow-sm hover:shadow-red-600/40 active:scale-[0.98]',
         outline:
-          'border-border/70 bg-card/60 backdrop-blur-md hover:bg-accent/50 hover:text-foreground hover:border-primary/40 aria-expanded:bg-accent/50 aria-expanded:text-foreground dark:border-border/80 dark:bg-card/40 dark:hover:bg-accent/40',
+          'border-border/70 bg-card/60 backdrop-blur-md hover:bg-red-500/10 hover:text-red-500 hover:border-red-500/35 aria-expanded:bg-red-500/10 aria-expanded:text-red-500 dark:border-border/80 dark:bg-card/40 dark:hover:bg-red-500/15',
         secondary:
           'bg-secondary/80 backdrop-blur-md text-secondary-foreground hover:bg-secondary aria-expanded:bg-secondary',
         ghost:
           'hover:bg-muted/60 hover:text-foreground aria-expanded:bg-muted/60 aria-expanded:text-foreground dark:hover:bg-muted/50',
         destructive:
-          'bg-destructive/12 text-destructive hover:bg-destructive/20 focus-visible:border-destructive/40 focus-visible:ring-destructive/20 dark:bg-destructive/20 dark:hover:bg-destructive/30',
+          'bg-destructive/15 text-destructive hover:bg-destructive/25 focus-visible:border-destructive/40 focus-visible:ring-destructive/20 dark:bg-destructive/20 dark:hover:bg-destructive/30',
         link: 'text-primary underline-offset-4 hover:underline active:scale-100',
         glass:
           'backdrop-blur-md bg-white/10 dark:bg-white/5 border border-white/15 text-foreground hover:bg-white/20 dark:hover:bg-white/10 shadow-xs',

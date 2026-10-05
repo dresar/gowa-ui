@@ -16,7 +16,7 @@ export function WsBadge() {
       <TooltipTrigger asChild>
         <div
           className={cn(
-            'flex h-7.5 items-center gap-1.5 rounded-lg border px-2 text-[11px] font-medium transition-all backdrop-blur-md select-none',
+            'flex h-7.5 items-center gap-1.5 rounded-lg border px-2 text-[11px] font-medium backdrop-blur-md transition-all select-none',
             status === 'connected' &&
               'border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400',
             status === 'connecting' &&

@@ -24,7 +24,9 @@ export default function ConnectPage() {
   const [url, setUrl] = useState(
     storedUrl ??
       (import.meta.env.VITE_DEFAULT_SERVER_URL as string | undefined) ??
-      (typeof window !== 'undefined' && window.location.origin ? window.location.origin : 'http://localhost:3000'),
+      (typeof window !== 'undefined' && window.location.origin
+        ? window.location.origin
+        : 'http://localhost:3000'),
   )
   const [username, setUsername] = useState(storedUser ?? '')
   const [password, setPassword] = useState('')
@@ -74,17 +76,22 @@ export default function ConnectPage() {
   }
 
   return (
-    <div className="ambient-glow relative flex min-h-svh items-center justify-center overflow-hidden bg-background p-4 sm:p-6">
+    <div className="ambient-glow bg-background relative flex min-h-svh items-center justify-center overflow-hidden p-4 sm:p-6">
+      {/* Background # straight transparent grid lines across all pages */}
+      <div
+        aria-hidden="true"
+        className="grid-pattern pointer-events-none fixed inset-0 z-0 opacity-90"
+      />
       <div
         aria-hidden
-        className="pointer-events-none absolute -top-40 left-1/2 -translate-x-1/2 h-96 w-full max-w-4xl bg-[radial-gradient(ellipse_at_center,oklch(0.72_0.18_155/15%),transparent_70%)] blur-2xl"
+        className="pointer-events-none absolute -top-40 left-1/2 z-0 h-96 w-full max-w-4xl -translate-x-1/2 bg-[radial-gradient(ellipse_at_center,oklch(0.64_0.25_25/20%),transparent_70%)] blur-2xl"
       />
 
-      <Card className="glass-card relative w-full max-w-md border-border/70 shadow-2xl backdrop-blur-2xl">
+      <Card className="glass-card border-border/70 relative z-10 w-full max-w-md shadow-2xl backdrop-blur-2xl">
         <CardHeader className="gap-2 pb-4">
           <div className="flex items-center justify-between">
             <Logo className="[&_img]:size-8" />
-            <div className="flex items-center gap-1 rounded-md border border-emerald-500/25 bg-emerald-500/10 px-2 py-0.5 text-[10px] font-medium text-emerald-600 dark:text-emerald-400">
+            <div className="flex items-center gap-1 rounded-md border border-red-500/30 bg-gradient-to-r from-red-500/15 to-rose-500/10 px-2 py-0.5 text-[10px] font-medium text-red-500 dark:text-red-400">
               <ShieldCheck className="size-3" />
               <span>TLS / LocalStorage</span>
             </div>
@@ -92,7 +99,8 @@ export default function ConnectPage() {
           <div>
             <CardTitle className="text-lg">Connect to GOWA Server</CardTitle>
             <CardDescription className="text-xs">
-              Direct connection to your WhatsApp API instance. Credentials stay strictly in your browser.
+              Direct connection to your WhatsApp API instance. Credentials stay strictly in your
+              browser.
             </CardDescription>
           </div>
         </CardHeader>
@@ -107,27 +115,27 @@ export default function ConnectPage() {
                   <button
                     type="button"
                     onClick={() => selectPreset('http://localhost:3000')}
-                    className="rounded bg-muted/60 px-1.5 py-0.5 text-[10px] font-mono text-muted-foreground hover:bg-primary/15 hover:text-primary transition-colors"
+                    className="bg-muted/60 text-muted-foreground rounded px-1.5 py-0.5 font-mono text-[10px] transition-colors hover:bg-red-500/15 hover:text-red-500"
                   >
                     :3000
                   </button>
                   <button
                     type="button"
                     onClick={() => selectPreset('http://localhost:5173/gowa')}
-                    className="rounded bg-muted/60 px-1.5 py-0.5 text-[10px] font-mono text-muted-foreground hover:bg-primary/15 hover:text-primary transition-colors"
+                    className="bg-muted/60 text-muted-foreground rounded px-1.5 py-0.5 font-mono text-[10px] transition-colors hover:bg-red-500/15 hover:text-red-500"
                   >
                     /gowa
                   </button>
                 </div>
               </div>
               <div className="relative flex items-center">
-                <Globe className="absolute left-2.5 size-3.5 text-muted-foreground" />
+                <Globe className="text-muted-foreground absolute left-2.5 size-3.5" />
                 <Input
                   id="server-url"
                   placeholder="http://localhost:3000"
                   value={url}
                   onChange={(event) => setUrl(event.target.value)}
-                  className="pl-8 text-xs font-mono"
+                  className="pl-8 font-mono text-xs"
                   required
                 />
               </div>
@@ -139,7 +147,7 @@ export default function ConnectPage() {
                   Username (optional)
                 </Label>
                 <div className="relative flex items-center">
-                  <User className="absolute left-2.5 size-3.5 text-muted-foreground" />
+                  <User className="text-muted-foreground absolute left-2.5 size-3.5" />
                   <Input
                     id="username"
                     autoComplete="username"
@@ -155,7 +163,7 @@ export default function ConnectPage() {
                   Password (optional)
                 </Label>
                 <div className="relative flex items-center">
-                  <KeyRound className="absolute left-2.5 size-3.5 text-muted-foreground" />
+                  <KeyRound className="text-muted-foreground absolute left-2.5 size-3.5" />
                   <Input
                     id="password"
                     type="password"
@@ -163,19 +171,19 @@ export default function ConnectPage() {
                     placeholder="••••••"
                     value={password}
                     onChange={(event) => setPassword(event.target.value)}
-                    className="pl-8 text-xs font-mono"
+                    className="pl-8 font-mono text-xs"
                   />
                 </div>
               </div>
             </div>
 
             {error && (
-              <div className="rounded-lg border border-destructive/30 bg-destructive/10 p-2.5 text-xs text-destructive">
+              <div className="border-destructive/30 bg-destructive/10 text-destructive rounded-lg border p-2.5 text-xs">
                 {error}
               </div>
             )}
             {status === 'unauthorized' && !error && (
-              <div className="rounded-lg border border-destructive/30 bg-destructive/10 p-2.5 text-xs text-destructive">
+              <div className="border-destructive/30 bg-destructive/10 text-destructive rounded-lg border p-2.5 text-xs">
                 The stored credentials were rejected — please enter them again.
               </div>
             )}
@@ -188,7 +196,7 @@ export default function ConnectPage() {
             <Button
               type="submit"
               disabled={submitting || !url.trim()}
-              className="mt-1 h-9 w-full gap-2 text-xs font-semibold shadow-md shadow-primary/20"
+              className="shadow-primary/20 mt-1 h-9 w-full gap-2 text-xs font-semibold shadow-md"
             >
               {submitting ? (
                 <>
@@ -203,8 +211,8 @@ export default function ConnectPage() {
               )}
             </Button>
 
-            <div className="flex items-center justify-center gap-1.5 pt-1 text-[11px] text-muted-foreground/80">
-              <Lock className="size-3 text-emerald-500" />
+            <div className="text-muted-foreground/80 flex items-center justify-center gap-1.5 pt-1 text-[11px]">
+              <Lock className="size-3 text-red-500" />
               <span>Token-based secure handshake</span>
             </div>
           </form>

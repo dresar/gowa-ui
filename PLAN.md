@@ -69,6 +69,7 @@ golangwaui/
 ## 3. UI/UX Page Breakdown & Endpoint Integrations
 
 ### Phase 1: Gateway & Authentication (`/connect`)
+
 - **Visual Design:** Centered card with glass backdrop, server URL input, username, and password fields.
 - **Interactions:**
   - Validates URL by probing `GET /health` and `GET /app/info`.
@@ -77,6 +78,7 @@ golangwaui/
   - Redirects to `/` immediately upon successful verification.
 
 ### Phase 2: Device Management & Overview (`/`)
+
 - **Visual Design:** Grid of compact device cards showing session state (`CONNECTED`, `PAIRING`, `DISCONNECTED`).
 - **Endpoints:**
   - `GET /devices`: Lists all active and inactive device sessions.
@@ -89,6 +91,7 @@ golangwaui/
   - `GET` & `PATCH /devices/:device_id/webhook`: Configures per-device webhook URL, secret, and event filters.
 
 ### Phase 3: Interactive Chat Workspace (`/chats`)
+
 - **Visual Design:** Split-pane interface: Left pane lists conversations with search and filter tabs; right pane displays the active message thread and message composer.
 - **Endpoints:**
   - `GET /chats`: Loads paginated chat list with search, archived, and media filters.
@@ -107,6 +110,7 @@ golangwaui/
   - `GET /message/:id/download`: Triggers browser download for decrypted media.
 
 ### Phase 4: Broadcast & Messaging Center (`/messaging`)
+
 - **Visual Design:** Shared recipient bar (phone/group JID) at top; tabbed form selector for all 12 message types below.
 - **Endpoints:**
   - `POST /send/message`: Plaintext message with optional reply JID.
@@ -124,6 +128,7 @@ golangwaui/
 - **Schedule Drawer:** Allows scheduling any send request with a future execution timestamp.
 
 ### Phase 5: Scheduled Send Manager (`/scheduled`)
+
 - **Visual Design:** Data table of queued broadcasts with status badges (`PENDING`, `COMPLETED`, `PAUSED`, `FAILED`).
 - **Endpoints:**
   - `GET /send/schedules`: Lists scheduled sends with status and message type filters.
@@ -133,6 +138,7 @@ golangwaui/
   - `POST /send/schedules/:id/cancel`: Cancels scheduled task.
 
 ### Phase 6: Group Command Center (`/groups`)
+
 - **Visual Design:** Master-detail group browser with participants table, admin role tags, and management action buttons.
 - **Endpoints:**
   - `POST /group`: Modal for creating new group with initial participants.
@@ -154,6 +160,7 @@ golangwaui/
   - `POST /group/leave`: Leaves group.
 
 ### Phase 7: Account, Contacts & Newsletters (`/account`, `/misc`)
+
 - **Visual Design:** Tabbed settings card with push name editor, avatar uploader, privacy matrix, contact directory, and channel browser.
 - **Endpoints:**
   - `POST /user/pushname`: Updates profile display name.
@@ -197,6 +204,7 @@ golangwaui/
 ```
 
 ### Steps to Run Single-Server Mode:
+
 1. Run `npm run build` in `golangwaui` to produce `dist/index.html`.
 2. Deploy the single Go binary `gowanew` to the VPS.
 3. Place `dist/index.html` at `storages/ui/index.html` in the Go working directory (or rely on `APP_UI_AUTO_UPDATE=true` to download it automatically from GitHub releases).

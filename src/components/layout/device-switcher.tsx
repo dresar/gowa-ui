@@ -46,7 +46,7 @@ export function DeviceSwitcher() {
           variant="outline"
           size="sm"
           onClick={() => setCreateOpen(true)}
-          className="h-8 gap-1.5 rounded-lg border-primary/30 bg-primary/10 text-xs font-semibold text-primary hover:bg-primary/20"
+          className="h-8 gap-1.5 rounded-lg border-red-500/30 bg-gradient-to-r from-red-500/15 to-rose-500/10 text-xs font-semibold text-red-500 hover:border-red-500/50 hover:from-red-500/25 hover:to-rose-500/15 dark:text-red-400"
         >
           <Plus className="size-3.5" />
           <span>Add Device</span>
@@ -64,21 +64,23 @@ export function DeviceSwitcher() {
         <SelectTrigger
           size="sm"
           className={cn(
-            'h-8 w-40 rounded-lg border-border/70 bg-card/70 text-xs backdrop-blur-md transition-all hover:border-primary/40 sm:w-48 md:w-56',
+            'border-border/70 bg-card/70 hover:border-primary/40 h-8 w-40 rounded-lg text-xs backdrop-blur-md transition-all sm:w-48 md:w-56',
             !selectedDeviceId && 'border-amber-500/50 text-amber-500',
           )}
         >
           <div className="flex min-w-0 items-center gap-2">
             {selectedDevice ? (
-              <span className={cn('size-2 shrink-0 rounded-full', stateDots[selectedDevice.state])} />
+              <span
+                className={cn('size-2 shrink-0 rounded-full', stateDots[selectedDevice.state])}
+              />
             ) : (
-              <Smartphone className="size-3.5 shrink-0 text-amber-500 animate-pulse" />
+              <Smartphone className="size-3.5 shrink-0 animate-pulse text-amber-500" />
             )}
             <SelectValue placeholder="Select device session">
               {selectedDevice ? (
                 <span className="truncate">{selectedDevice.display_name || selectedDevice.id}</span>
               ) : (
-                <span className="text-amber-500 font-semibold">Select Device</span>
+                <span className="font-semibold text-amber-500">Select Device</span>
               )}
             </SelectValue>
           </div>
@@ -89,7 +91,7 @@ export function DeviceSwitcher() {
               <span className={cn('size-2 shrink-0 rounded-full', stateDots[device.state])} />
               <div className="flex flex-col truncate">
                 <span className="truncate font-medium">{device.display_name || device.id}</span>
-                <span className="font-mono text-[10px] text-muted-foreground">
+                <span className="text-muted-foreground font-mono text-[10px]">
                   {device.phone_number || device.jid || device.id}
                 </span>
               </div>
@@ -101,7 +103,7 @@ export function DeviceSwitcher() {
               variant="ghost"
               size="sm"
               onClick={() => setCreateOpen(true)}
-              className="h-7 w-full justify-start gap-1.5 rounded-md px-2 text-xs font-semibold text-primary hover:bg-primary/10"
+              className="text-primary hover:bg-primary/10 h-7 w-full justify-start gap-1.5 rounded-md px-2 text-xs font-semibold"
             >
               <Plus className="size-3.5" />
               <span>Add Device Slot</span>

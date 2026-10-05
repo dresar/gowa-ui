@@ -48,7 +48,7 @@ export function ChatList({
     <div className="flex h-full flex-col gap-2.5">
       <div className="flex flex-col gap-2">
         <div className="relative">
-          <Search className="absolute left-2.5 top-2.5 size-3.5 text-muted-foreground" />
+          <Search className="text-muted-foreground absolute top-2.5 left-2.5 size-3.5" />
           <Input
             className="h-8 pl-8 text-xs font-medium"
             placeholder="Search conversations…"
@@ -59,7 +59,7 @@ export function ChatList({
             }}
           />
         </div>
-        <label className="flex items-center gap-2 text-xs text-muted-foreground select-none">
+        <label className="text-muted-foreground flex items-center gap-2 text-xs select-none">
           <Switch
             checked={hasMedia}
             onCheckedChange={(value) => {
@@ -71,15 +71,15 @@ export function ChatList({
         </label>
       </div>
 
-      <ScrollArea className="min-h-0 flex-1 rounded-lg border border-border/60 bg-card/40 backdrop-blur-md">
+      <ScrollArea className="border-border/60 bg-card/40 min-h-0 flex-1 rounded-lg border backdrop-blur-md">
         {query.isLoading ? (
           <div className="flex justify-center p-6">
-            <Loader2 className="size-5 animate-spin text-primary" />
+            <Loader2 className="text-primary size-5 animate-spin" />
           </div>
         ) : chats.length === 0 ? (
-          <p className="p-6 text-center text-xs text-muted-foreground">No conversations found</p>
+          <p className="text-muted-foreground p-6 text-center text-xs">No conversations found</p>
         ) : (
-          <ul className="divide-y divide-border/40">
+          <ul className="divide-border/40 divide-y">
             {chats.map((chat) => (
               <li key={chat.jid}>
                 <button
@@ -88,18 +88,18 @@ export function ChatList({
                   className={cn(
                     'group/item flex w-full items-center gap-2.5 px-3 py-2 text-left transition-all duration-150',
                     selectedJid === chat.jid
-                      ? 'border-l-2 border-primary bg-primary/12 font-medium text-foreground'
+                      ? 'text-foreground border-l-2 border-red-500 bg-gradient-to-r from-red-500/15 via-rose-500/10 to-transparent font-medium'
                       : 'hover:bg-muted/40 text-muted-foreground hover:text-foreground',
                   )}
                 >
-                  <span className="flex size-8 shrink-0 items-center justify-center rounded-lg border border-border/70 bg-card/80 font-heading text-xs font-bold text-foreground shadow-2xs">
+                  <span className="border-border/70 bg-card/80 font-heading text-foreground flex size-8 shrink-0 items-center justify-center rounded-lg border text-xs font-bold shadow-2xs">
                     {chatDisplayName(chat).slice(0, 1).toUpperCase()}
                   </span>
                   <span className="flex min-w-0 flex-col">
-                    <span className="truncate text-xs font-semibold text-foreground">
+                    <span className="text-foreground truncate text-xs font-semibold">
                       {chatDisplayName(chat)}
                     </span>
-                    <span className="truncate font-mono text-[10px] text-muted-foreground">
+                    <span className="text-muted-foreground truncate font-mono text-[10px]">
                       {isZeroTime(chat.last_message_time)
                         ? chat.jid
                         : formatDate(chat.last_message_time)}
@@ -112,7 +112,7 @@ export function ChatList({
         )}
       </ScrollArea>
 
-      <div className="flex items-center justify-between text-[11px] text-muted-foreground">
+      <div className="text-muted-foreground flex items-center justify-between text-[11px]">
         <span>{total} chats listed</span>
         <div className="flex gap-1">
           <Button

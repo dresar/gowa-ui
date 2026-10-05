@@ -64,7 +64,9 @@ interface ComposeType {
 const composeGroups: { label: string; items: ComposeType[] }[] = [
   {
     label: 'Standard',
-    items: [{ value: 'text', label: 'Text Message', icon: MessageSquareText, form: <SendTextForm /> }],
+    items: [
+      { value: 'text', label: 'Text Message', icon: MessageSquareText, form: <SendTextForm /> },
+    ],
   },
   {
     label: 'Media Assets',
@@ -111,7 +113,7 @@ function ComposePanel() {
       <div className="glass-card hidden flex-col gap-3 rounded-xl p-2.5 backdrop-blur-xl lg:flex">
         {composeGroups.map((group) => (
           <div key={group.label} className="flex flex-col gap-0.5">
-            <p className="px-2.5 pb-1 text-[10px] font-semibold tracking-wider text-muted-foreground/70 uppercase">
+            <p className="text-muted-foreground/70 px-2.5 pb-1 text-[10px] font-semibold tracking-wider uppercase">
               {group.label}
             </p>
             {group.items.map(({ value, label, icon: Icon }) => (
@@ -123,11 +125,16 @@ function ComposePanel() {
                 className={cn(
                   'flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-left text-xs font-medium transition-all duration-150',
                   type === value
-                    ? 'border border-primary/25 bg-primary/12 font-semibold text-primary shadow-2xs'
+                    ? 'border border-red-500/30 bg-gradient-to-r from-red-500/15 via-rose-500/10 to-transparent font-semibold text-red-500 shadow-2xs shadow-red-500/10 dark:text-red-400'
                     : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground',
                 )}
               >
-                <Icon className={cn('size-3.5 shrink-0', type === value ? 'text-primary' : 'text-muted-foreground')} />
+                <Icon
+                  className={cn(
+                    'size-3.5 shrink-0',
+                    type === value ? 'text-red-500 dark:text-red-400' : 'text-muted-foreground',
+                  )}
+                />
                 <span className="truncate">{label}</span>
               </button>
             ))}
@@ -159,18 +166,20 @@ function ComposePanel() {
 
       {/* Compose Form in Glass Card */}
       <Card className="glass-card rounded-xl backdrop-blur-xl">
-        <CardContent key={active.value} className="animate-in fade-in p-4 sm:p-5 duration-200">
-          <div className="mb-4 flex items-center justify-between border-b border-border/60 pb-3">
+        <CardContent key={active.value} className="animate-in fade-in p-4 duration-200 sm:p-5">
+          <div className="border-border/60 mb-4 flex items-center justify-between border-b pb-3">
             <div className="flex items-center gap-2">
-              <span className="flex size-7 items-center justify-center rounded-lg border border-primary/25 bg-primary/10 text-primary">
+              <span className="border-primary/25 bg-primary/10 text-primary flex size-7 items-center justify-center rounded-lg border">
                 <active.icon className="size-3.5" />
               </span>
               <div>
-                <h3 className="text-sm font-semibold text-foreground">{active.label}</h3>
-                <p className="text-[11px] text-muted-foreground">Payload form for WhatsApp dispatch</p>
+                <h3 className="text-foreground text-sm font-semibold">{active.label}</h3>
+                <p className="text-muted-foreground text-[11px]">
+                  Payload form for WhatsApp dispatch
+                </p>
               </div>
             </div>
-            <span className="rounded bg-muted/60 px-2 py-0.5 font-mono text-[10px] text-muted-foreground">
+            <span className="bg-muted/60 text-muted-foreground rounded px-2 py-0.5 font-mono text-[10px]">
               POST /send/{active.value}
             </span>
           </div>
@@ -182,8 +191,16 @@ function ComposePanel() {
 }
 
 const actions = [
-  { value: 'react', label: 'React with Emoji', render: (id: string) => <ReactForm messageId={id} /> },
-  { value: 'update', label: 'Edit Text Content', render: (id: string) => <UpdateForm messageId={id} /> },
+  {
+    value: 'react',
+    label: 'React with Emoji',
+    render: (id: string) => <ReactForm messageId={id} />,
+  },
+  {
+    value: 'update',
+    label: 'Edit Text Content',
+    render: (id: string) => <UpdateForm messageId={id} />,
+  },
   { value: 'read', label: 'Mark as Read', render: (id: string) => <ReadForm messageId={id} /> },
   { value: 'star', label: 'Star / Unstar', render: (id: string) => <StarForm messageId={id} /> },
   {
@@ -196,7 +213,11 @@ const actions = [
     label: 'Delete (For Me Only)',
     render: (id: string) => <DeleteForm messageId={id} />,
   },
-  { value: 'forward', label: 'Forward to Target', render: (id: string) => <ForwardForm messageId={id} /> },
+  {
+    value: 'forward',
+    label: 'Forward to Target',
+    render: (id: string) => <ForwardForm messageId={id} />,
+  },
 ]
 
 function ActPanel() {
@@ -259,7 +280,7 @@ export default function MessagingPage() {
         <>
           <RecipientBar />
           <Tabs defaultValue="compose" className="gap-3">
-            <TabsList className="h-9 rounded-lg border border-border/70 bg-card/60 p-1 backdrop-blur-md">
+            <TabsList className="border-border/70 bg-card/60 h-9 rounded-lg border p-1 backdrop-blur-md">
               <TabsTrigger value="compose" className="h-7 rounded-md text-xs font-medium">
                 <Send className="size-3.5" />
                 Compose Payload

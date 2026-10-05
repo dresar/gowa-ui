@@ -30,8 +30,7 @@ export function ContactsView() {
     const query = search.toLowerCase().trim()
     return contacts.filter(
       (c) =>
-        (c.name && c.name.toLowerCase().includes(query)) ||
-        c.jid.toLowerCase().includes(query),
+        (c.name && c.name.toLowerCase().includes(query)) || c.jid.toLowerCase().includes(query),
     )
   }, [contacts, search])
 
@@ -52,7 +51,7 @@ export function ContactsView() {
 
   if (error) {
     return (
-      <div className="rounded-lg border border-destructive/30 bg-destructive/10 p-3 text-xs text-destructive">
+      <div className="border-destructive/30 bg-destructive/10 text-destructive rounded-lg border p-3 text-xs">
         {toApiError(error).message}
       </div>
     )
@@ -60,12 +59,12 @@ export function ContactsView() {
 
   if (contacts.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center gap-2 rounded-xl border border-border/70 bg-card/60 p-8 text-center backdrop-blur-xl">
-        <div className="flex size-10 items-center justify-center rounded-lg border border-border/80 bg-muted/40 text-muted-foreground">
+      <div className="border-border/70 bg-card/60 flex flex-col items-center justify-center gap-2 rounded-xl border p-8 text-center backdrop-blur-xl">
+        <div className="border-border/80 bg-muted/40 text-muted-foreground flex size-10 items-center justify-center rounded-lg border">
           <Users className="size-5" />
         </div>
-        <p className="text-xs font-semibold text-foreground">No Synced Contacts</p>
-        <p className="max-w-xs text-[11px] text-muted-foreground">
+        <p className="text-foreground text-xs font-semibold">No Synced Contacts</p>
+        <p className="text-muted-foreground max-w-xs text-[11px]">
           This WhatsApp session does not have local contacts stored yet.
         </p>
       </div>
@@ -75,25 +74,25 @@ export function ContactsView() {
   return (
     <div className="flex flex-col gap-3">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-        <div className="relative flex-1 max-w-sm">
-          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground" />
+        <div className="relative max-w-sm flex-1">
+          <Search className="text-muted-foreground absolute top-1/2 left-2.5 size-3.5 -translate-y-1/2" />
           <Input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search by name or number…"
-            className="h-8.5 pl-8 text-xs rounded-lg"
+            className="h-8.5 rounded-lg pl-8 text-xs"
           />
         </div>
         <div className="flex items-center gap-2">
-          <span className="rounded-md border border-border/60 bg-muted/50 px-2 py-1 text-[11px] font-mono text-muted-foreground">
+          <span className="border-border/60 bg-muted/50 text-muted-foreground rounded-md border px-2 py-1 font-mono text-[11px]">
             {filtered.length} of {contacts.length} contacts
           </span>
         </div>
       </div>
 
-      <div className="max-h-96 divide-y divide-border/50 overflow-y-auto rounded-xl border border-border/70 bg-card/60 backdrop-blur-xl">
+      <div className="divide-border/50 border-border/70 bg-card/60 max-h-96 divide-y overflow-y-auto rounded-xl border backdrop-blur-xl">
         {filtered.length === 0 ? (
-          <div className="p-8 text-center text-xs text-muted-foreground">
+          <div className="text-muted-foreground p-8 text-center text-xs">
             No contacts match "{search}"
           </div>
         ) : (
@@ -103,21 +102,19 @@ export function ContactsView() {
             return (
               <div
                 key={contact.jid}
-                className="flex items-center justify-between gap-3 p-2.5 px-3.5 transition-colors hover:bg-muted/40"
+                className="hover:bg-muted/40 flex items-center justify-between gap-3 p-2.5 px-3.5 transition-colors"
               >
                 <div className="flex min-w-0 items-center gap-3">
-                  <Avatar className="size-8 border border-border/80">
-                    <AvatarFallback className="bg-primary/10 text-[10px] font-bold text-primary">
+                  <Avatar className="border-border/80 size-8 border">
+                    <AvatarFallback className="bg-primary/10 text-primary text-[10px] font-bold">
                       {initials}
                     </AvatarFallback>
                   </Avatar>
                   <div className="min-w-0">
-                    <p className="truncate text-xs font-semibold text-foreground">
+                    <p className="text-foreground truncate text-xs font-semibold">
                       {contact.name || 'Unnamed Contact'}
                     </p>
-                    <p className="truncate font-mono text-[10px] text-muted-foreground">
-                      {phone}
-                    </p>
+                    <p className="text-muted-foreground truncate font-mono text-[10px]">{phone}</p>
                   </div>
                 </div>
 
@@ -125,7 +122,7 @@ export function ContactsView() {
                   size="xs"
                   variant="outline"
                   onClick={() => onMessage(contact.jid)}
-                  className="h-7 gap-1 rounded-[6px] border-primary/30 text-[11px] font-semibold text-primary hover:bg-primary/10 active:scale-[0.98]"
+                  className="border-primary/30 text-primary hover:bg-primary/10 h-7 gap-1 rounded-[6px] text-[11px] font-semibold active:scale-[0.98]"
                 >
                   <Send className="size-3" />
                   <span>Message</span>

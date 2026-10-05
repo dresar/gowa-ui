@@ -23,7 +23,10 @@ export default function ChatsPage() {
   if (!device) {
     return (
       <div className="flex flex-col gap-4">
-        <PageHeader title="Chat History" description="Live stored WhatsApp conversations for this device." />
+        <PageHeader
+          title="Chat History"
+          description="Live stored WhatsApp conversations for this device."
+        />
         <DeviceGuard />
       </div>
     )
@@ -31,7 +34,10 @@ export default function ChatsPage() {
 
   return (
     <div className="flex flex-col gap-3 sm:gap-4 lg:h-[calc(100svh-8rem)]">
-      <PageHeader title="Chat History" description="Live stored WhatsApp conversations for this device." />
+      <PageHeader
+        title="Chat History"
+        description="Live stored WhatsApp conversations for this device."
+      />
       <div className="grid gap-3 sm:gap-4 lg:min-h-0 lg:flex-1 lg:grid-cols-[330px_1fr]">
         <Card className="glass-card h-[24rem] overflow-hidden rounded-xl p-3 backdrop-blur-xl lg:h-auto lg:min-h-0">
           <ChatList
@@ -48,12 +54,12 @@ export default function ChatsPage() {
           {selected ? (
             <MessageView key={`${device}:${selected.jid}`} chat={selected} deviceId={device} />
           ) : (
-            <div className="flex h-full flex-col items-center justify-center gap-2.5 text-muted-foreground">
-              <div className="flex size-12 items-center justify-center rounded-xl border border-border/80 bg-muted/40 text-primary shadow-2xs">
+            <div className="text-muted-foreground flex h-full flex-col items-center justify-center gap-2.5">
+              <div className="border-border/80 bg-muted/40 text-primary flex size-12 items-center justify-center rounded-xl border shadow-2xs">
                 <MessagesSquare className="size-6" />
               </div>
-              <p className="text-xs font-medium text-foreground">Select a conversation</p>
-              <p className="text-[11px] text-muted-foreground">
+              <p className="text-foreground text-xs font-medium">Select a conversation</p>
+              <p className="text-muted-foreground text-[11px]">
                 Click any chat from the left panel to stream stored messages
               </p>
             </div>
