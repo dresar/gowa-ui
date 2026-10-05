@@ -33,3 +33,14 @@ export function toApiError(error: unknown): ApiError {
 export function basicAuthHeader(username: string, password: string): string {
   return `Basic ${b64encode(`${username}:${password}`)}`
 }
+
+export function isDeviceNotFoundError(error: unknown): boolean {
+  if (!error) return false
+  const apiError = toApiError(error)
+  return (
+    apiError.code === 'DEVICE_NOT_FOUND' ||
+    apiError.code === 'DEVICE_ID_REQUIRED' ||
+    (typeof apiError.message === 'string' &&
+      apiError.message.toLowerCase().includes('device not found'))
+  )
+}

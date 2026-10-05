@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { CircleUserRound, LayoutDashboard, Plus, QrCode, Smartphone } from 'lucide-react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
@@ -235,5 +235,30 @@ export function DeviceGuard() {
 }
 
 export function useSelectedDevice(): string | null {
-  return useDeviceStore((state) => state.selectedDeviceId)
+  const selectedDeviceId = useDeviceStore((state) => state.selectedDeviceId)
+  const selectDevice = useDeviceStore((state) => state.selectDevice)
+  const { data: devices, isSuccess } = useDevices()
+
+  useEffect(() => {
+    if (!isSuccess || !devices) return
+
+    if (devices.length === 0) {
+      if (selectedDeviceId !== null) {
+        selectDevice(null)
+      }
+      return
+    }
+
+    const deviceExists = devices.some((d) => d.id === selectedDeviceId)
+    if (!deviceExists) {
+      selectDevice(devices[0].id)
+    }
+  }, [devices, isSuccess, selectedDeviceId, selectDevice])
+
+  if (!isSuccess || !devices || devices.length === 0) {
+    return null
+  }
+
+  const activeDevice = devices.find((d) => d.id === selectedDeviceId)
+  return activeDevice ? activeDevice.id : (devices[0]?.id ?? null)
 }

@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { ChevronRight, LogOut, RefreshCw, Search, Users } from 'lucide-react'
+import { ChevronRight, LogOut, Plus, RefreshCw, Search, Smartphone, Users } from 'lucide-react'
 import { toast } from 'sonner'
 import { leaveGroup, listMyGroups, type MyGroup } from '@/api/group'
 import { EmptyState } from '@/components/shared/empty-state'
@@ -19,8 +19,9 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Skeleton } from '@/components/ui/skeleton'
+import { CreateDeviceDialog } from '@/features/devices/create-device-dialog'
 import { useSelectedDevice } from '@/hooks/use-device-guard'
-import { toApiError } from '@/lib/api-error'
+import { isDeviceNotFoundError, toApiError } from '@/lib/api-error'
 import { formatDate } from '@/lib/format'
 
 /** Strip the @server suffix from a JID for compact display. */
@@ -33,6 +34,7 @@ export function GroupDirectory({ onSelect }: { onSelect: (group: MyGroup) => voi
   const queryClient = useQueryClient()
   const [search, setSearch] = useState('')
   const [leaveTarget, setLeaveTarget] = useState<MyGroup | null>(null)
+  const [createOpen, setCreateOpen] = useState(false)
 
   const {
     data: groups,
@@ -83,13 +85,29 @@ export function GroupDirectory({ onSelect }: { onSelect: (group: MyGroup) => voi
         </Button>
       </div>
 
-      {error && (
+      {error && isDeviceNotFoundError(error) ? (
+        <EmptyState
+          icon={Smartphone}
+          title="Device not found"
+          hint="The selected WhatsApp session is not available. Please select an active device or register a new one."
+          action={
+            <Button
+              size="sm"
+              onClick={() => setCreateOpen(true)}
+              className="h-8 gap-1.5 rounded-lg text-xs font-semibold shadow-xs"
+            >
+              <Plus className="size-3.5" />
+              <span>Add Device</span>
+            </Button>
+          }
+        />
+      ) : error ? (
         <Card className="border-destructive/50">
           <CardContent className="text-destructive py-4 text-sm">
             Failed to load groups: {toApiError(error).message}
           </CardContent>
         </Card>
-      )}
+      ) : null}
 
       {isLoading && (
         <div className="grid gap-3 sm:grid-cols-2">
@@ -175,6 +193,8 @@ export function GroupDirectory({ onSelect }: { onSelect: (group: MyGroup) => voi
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <CreateDeviceDialog open={createOpen} onOpenChange={setCreateOpen} />
     </div>
   )
 }

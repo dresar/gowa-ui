@@ -26,6 +26,17 @@ http.interceptors.response.use(
     if (apiError.status === 401) {
       useConnection.getState().markUnauthorized()
     }
+    if (
+      apiError.code === 'DEVICE_NOT_FOUND' ||
+      (apiError.status === 404 &&
+        typeof apiError.message === 'string' &&
+        apiError.message.toLowerCase().includes('device not found'))
+    ) {
+      const current = useDeviceStore.getState().selectedDeviceId
+      if (current) {
+        useDeviceStore.getState().selectDevice(null)
+      }
+    }
     return Promise.reject(apiError)
   },
 )

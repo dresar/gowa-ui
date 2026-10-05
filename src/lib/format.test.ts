@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { formatBytes, formatDay, formatDeviceLabel, isZeroTime } from './format'
+import { formatBytes, formatDay, formatDeviceLabel, formatNextRun, isZeroTime } from './format'
 
 describe('isZeroTime', () => {
   it('treats Go zero time, epoch 0, empty, and garbage as zero', () => {
@@ -60,3 +60,37 @@ describe('formatDeviceLabel', () => {
     expect(formatDeviceLabel({ id: 'device-1' })).toBe('device-1')
   })
 })
+
+describe('formatNextRun', () => {
+  const baseNow = new Date('2026-10-05T12:00:00.000Z')
+
+  it('handles null, undefined, and zero dates', () => {
+    expect(formatNextRun(null, baseNow).relative).toBe('No next run')
+    expect(formatNextRun(undefined, baseNow).relative).toBe('No next run')
+    expect(formatNextRun('0001-01-01T00:00:00Z', baseNow).relative).toBe('No next run')
+  })
+
+  it('formats in 15m for 15 minutes away', () => {
+    const in15m = new Date(baseNow.getTime() + 15 * 60_000).toISOString()
+    expect(formatNextRun(in15m, baseNow).relative).toBe('in 15m')
+  })
+
+  it('formats due now for less than 1 minute', () => {
+    const in30s = new Date(baseNow.getTime() + 30_000).toISOString()
+    expect(formatNextRun(in30s, baseNow).relative).toBe('due now')
+  })
+
+  it('formats overdue for past times', () => {
+    const past10m = new Date(baseNow.getTime() - 10 * 60_000).toISOString()
+    expect(formatNextRun(past10m, baseNow).relative).toBe('10m overdue')
+  })
+
+  it('formats tomorrow for next day', () => {
+    const tomorrow = new Date(baseNow)
+    tomorrow.setDate(baseNow.getDate() + 1)
+    tomorrow.setHours(9, 0, 0, 0)
+    const result = formatNextRun(tomorrow.toISOString(), baseNow)
+    expect(result.relative).toMatch(/tomorrow at 09:00|tomorrow at 9:00/)
+  })
+})
+

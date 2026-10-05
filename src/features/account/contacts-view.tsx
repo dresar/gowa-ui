@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useSelectedDevice } from '@/hooks/use-device-guard'
-import { toApiError } from '@/lib/api-error'
+import { isDeviceNotFoundError, toApiError } from '@/lib/api-error'
 import { useRecipientStore } from '@/stores/recipient'
 
 export function ContactsView() {
@@ -50,6 +50,16 @@ export function ContactsView() {
   }
 
   if (error) {
+    if (isDeviceNotFoundError(error)) {
+      return (
+        <div className="border-border/70 bg-card/60 flex flex-col items-center justify-center gap-2 rounded-xl border p-8 text-center backdrop-blur-xl">
+          <p className="text-foreground text-xs font-semibold">Device not found</p>
+          <p className="text-muted-foreground max-w-xs text-[11px]">
+            Please pair or select an active WhatsApp device to view contacts.
+          </p>
+        </div>
+      )
+    }
     return (
       <div className="border-destructive/30 bg-destructive/10 text-destructive rounded-lg border p-3 text-xs">
         {toApiError(error).message}

@@ -49,3 +49,64 @@ export function formatDeviceLabel(
   }
   return id
 }
+
+export function formatNextRun(
+  iso: string | null | undefined,
+  baseNow?: Date,
+): { relative: string; absolute: string } {
+  if (!iso || isZeroTime(iso)) {
+    return { relative: 'No next run', absolute: '' }
+  }
+  const target = new Date(iso)
+  if (Number.isNaN(target.getTime())) {
+    return { relative: 'Invalid date', absolute: iso }
+  }
+  const now = baseNow ?? new Date()
+  const diffMs = target.getTime() - now.getTime()
+  const diffSec = Math.round(diffMs / 1000)
+  const diffMin = Math.round(diffSec / 60)
+  const diffHours = Math.round(diffMin / 60)
+
+  const hours = String(target.getHours()).padStart(2, '0')
+  const minutes = String(target.getMinutes()).padStart(2, '0')
+  const timeStr = `${hours}:${minutes}`
+
+  const isToday =
+    target.getDate() === now.getDate() &&
+    target.getMonth() === now.getMonth() &&
+    target.getFullYear() === now.getFullYear()
+
+  const tomorrow = new Date(now)
+  tomorrow.setDate(now.getDate() + 1)
+  const isTomorrow =
+    target.getDate() === tomorrow.getDate() &&
+    target.getMonth() === tomorrow.getMonth() &&
+    target.getFullYear() === tomorrow.getFullYear()
+
+  let relative = ''
+  if (diffMs < -60_000) {
+    const pastMin = Math.abs(diffMin)
+    relative = pastMin < 60 ? `${pastMin}m overdue` : `${Math.abs(diffHours)}h overdue`
+  } else if (diffMs < 60_000) {
+    relative = 'due now'
+  } else if (diffMin < 60) {
+    relative = `in ${diffMin}m`
+  } else if (isToday) {
+    relative = `today at ${timeStr}`
+  } else if (isTomorrow) {
+    relative = `tomorrow at ${timeStr}`
+  } else {
+    const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24))
+    if (diffDays <= 6) {
+      const weekday = new Intl.DateTimeFormat(undefined, { weekday: 'short' }).format(target)
+      relative = `${weekday} at ${timeStr}`
+    } else {
+      relative = `in ${diffDays}d`
+    }
+  }
+
+  return {
+    relative,
+    absolute: formatDate(iso),
+  }
+}

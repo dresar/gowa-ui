@@ -1,6 +1,6 @@
 import { AxiosError, type AxiosResponse } from 'axios'
 import { describe, expect, it } from 'vitest'
-import { isApiError, toApiError } from './api-error'
+import { isApiError, isDeviceNotFoundError, toApiError } from './api-error'
 
 function axiosErrorWithResponse(status: number, data: unknown): AxiosError {
   return new AxiosError('Request failed', 'ERR_BAD_REQUEST', undefined, undefined, {
@@ -37,5 +37,31 @@ describe('toApiError', () => {
     expect(toApiError(passthrough)).toBe(passthrough)
     expect(isApiError(toApiError(new Error('boom')))).toBe(true)
     expect(toApiError(new Error('boom')).message).toBe('boom')
+  })
+})
+
+describe('isDeviceNotFoundError', () => {
+  it('returns true for DEVICE_NOT_FOUND code', () => {
+    const error = { status: 404, code: 'DEVICE_NOT_FOUND', message: 'device not found' }
+    expect(isDeviceNotFoundError(error)).toBe(true)
+  })
+
+  it('returns true for DEVICE_ID_REQUIRED code', () => {
+    const error = { status: 400, code: 'DEVICE_ID_REQUIRED', message: 'device_id is required' }
+    expect(isDeviceNotFoundError(error)).toBe(true)
+  })
+
+  it('returns true when message mentions device not found', () => {
+    const error = new Error('Device not found; create a device first')
+    expect(isDeviceNotFoundError(error)).toBe(true)
+  })
+
+  it('returns false for unrelated errors or nil', () => {
+    expect(isDeviceNotFoundError(null)).toBe(false)
+    expect(isDeviceNotFoundError(undefined)).toBe(false)
+    expect(isDeviceNotFoundError(new Error('Network error'))).toBe(false)
+    expect(isDeviceNotFoundError({ status: 500, code: 'INTERNAL_ERROR', message: 'crash' })).toBe(
+      false,
+    )
   })
 })

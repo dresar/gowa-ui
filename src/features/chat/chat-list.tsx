@@ -1,13 +1,15 @@
 import { useState } from 'react'
 import { keepPreviousData, useQuery } from '@tanstack/react-query'
-import { Loader2, Search } from 'lucide-react'
+import { Loader2, Plus, Search, Smartphone } from 'lucide-react'
 import { listChats, type ChatInfo } from '@/api/chat'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Switch } from '@/components/ui/switch'
+import { CreateDeviceDialog } from '@/features/devices/create-device-dialog'
 import { chatListQueryKey } from '@/features/chat/device-scope'
 import { chatDisplayName } from '@/features/chat/display-name'
+import { isDeviceNotFoundError, toApiError } from '@/lib/api-error'
 import { formatDate, isZeroTime } from '@/lib/format'
 import { cn } from '@/lib/utils'
 
@@ -25,6 +27,7 @@ export function ChatList({
   const [search, setSearch] = useState('')
   const [hasMedia, setHasMedia] = useState(false)
   const [offset, setOffset] = useState(0)
+  const [createOpen, setCreateOpen] = useState(false)
 
   const query = useQuery({
     queryKey: chatListQueryKey(deviceId, { search, hasMedia, offset }),
@@ -76,6 +79,31 @@ export function ChatList({
           <div className="flex justify-center p-6">
             <Loader2 className="text-primary size-5 animate-spin" />
           </div>
+        ) : query.error && isDeviceNotFoundError(query.error) ? (
+          <div className="flex flex-col items-center justify-center gap-2.5 p-6 text-center">
+            <div className="flex size-10 items-center justify-center rounded-lg border border-red-500/30 bg-gradient-to-br from-red-500/20 to-rose-500/10 text-red-500 shadow-2xs">
+              <Smartphone className="size-5" />
+            </div>
+            <div className="flex flex-col gap-1">
+              <p className="font-heading text-foreground text-xs font-semibold">Device not found</p>
+              <p className="text-muted-foreground text-[11px] max-w-[200px]">
+                Please pair or select an active device to view conversations.
+              </p>
+            </div>
+            <Button
+              size="xs"
+              variant="outline"
+              onClick={() => setCreateOpen(true)}
+              className="mt-1 h-7 gap-1 rounded-md text-xs font-semibold"
+            >
+              <Plus className="size-3" />
+              <span>Add Device</span>
+            </Button>
+          </div>
+        ) : query.error ? (
+          <p className="text-destructive p-6 text-center text-xs">
+            {toApiError(query.error).message}
+          </p>
         ) : chats.length === 0 ? (
           <p className="text-muted-foreground p-6 text-center text-xs">No conversations found</p>
         ) : (
@@ -142,6 +170,7 @@ export function ChatList({
           </Button>
         </div>
       </div>
+      <CreateDeviceDialog open={createOpen} onOpenChange={setCreateOpen} />
     </div>
   )
 }

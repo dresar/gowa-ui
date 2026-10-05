@@ -2,10 +2,13 @@ import { useState, type ComponentType } from 'react'
 import { keepPreviousData, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
   CalendarClock,
+  CheckCircle2,
   ChevronLeft,
   ChevronRight,
+  Loader2,
   Pause,
   Play,
+  Plus,
   Search,
   XCircle,
 } from 'lucide-react'
@@ -41,10 +44,11 @@ import {
 } from '@/components/ui/table'
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
+import { CreateDeviceDialog } from '@/features/devices/create-device-dialog'
 import { DeviceGuard, useSelectedDevice } from '@/hooks/use-device-guard'
 import { useActionMutation } from '@/hooks/use-action-mutation'
-import { toApiError } from '@/lib/api-error'
-import { formatDate } from '@/lib/format'
+import { isDeviceNotFoundError, toApiError } from '@/lib/api-error'
+import { formatDate, formatNextRun } from '@/lib/format'
 
 const PAGE_SIZE = 25
 
@@ -74,11 +78,56 @@ const MESSAGE_TYPES: { value: string; label: string }[] = [
 
 type ScheduleAction = 'pause' | 'resume' | 'cancel'
 
-function statusVariant(status: ScheduledSend['status']) {
-  if (status === 'failed') return 'destructive' as const
-  if (status === 'active' || status === 'running') return 'ruby' as const
-  if (status === 'completed') return 'emerald' as const
-  return 'secondary' as const
+function ScheduleStatusBadge({ status }: { status: ScheduledSend['status'] }) {
+  switch (status) {
+    case 'active':
+      return (
+        <Badge variant="emerald" className="gap-1.5 font-semibold">
+          <span className="size-1.5 rounded-full bg-emerald-500 shadow-xs shadow-emerald-500/80 animate-pulse" />
+          <span>Active</span>
+        </Badge>
+      )
+    case 'running':
+      return (
+        <Badge variant="ruby" className="gap-1.5 font-semibold">
+          <Loader2 className="size-3 animate-spin text-red-500" />
+          <span>Running</span>
+        </Badge>
+      )
+    case 'paused':
+      return (
+        <Badge
+          variant="outline"
+          className="border-amber-500/40 bg-amber-500/10 text-amber-600 dark:text-amber-400 gap-1.5 font-semibold"
+        >
+          <span className="size-1.5 rounded-full bg-amber-500" />
+          <span>Paused</span>
+        </Badge>
+      )
+    case 'completed':
+      return (
+        <Badge variant="secondary" className="gap-1.5 font-semibold">
+          <CheckCircle2 className="size-3 text-emerald-600 dark:text-emerald-400" />
+          <span>Completed</span>
+        </Badge>
+      )
+    case 'failed':
+      return (
+        <Badge variant="destructive" className="gap-1.5 font-semibold">
+          <XCircle className="size-3" />
+          <span>Failed</span>
+        </Badge>
+      )
+    case 'cancelled':
+      return (
+        <Badge variant="outline" className="text-muted-foreground gap-1.5">
+          <span className="size-1.5 rounded-full bg-muted-foreground/40" />
+          <span>Cancelled</span>
+        </Badge>
+      )
+    default:
+      return <Badge variant="secondary">{status}</Badge>
+  }
 }
 
 function IconAction({
@@ -140,10 +189,21 @@ function ScheduleRow({
         )}
       </TableCell>
       <TableCell>
-        <Badge variant={statusVariant(item.status)}>{item.status}</Badge>
+        <ScheduleStatusBadge status={item.status} />
       </TableCell>
-      <TableCell className="text-muted-foreground hidden sm:table-cell">
-        {item.next_run_at ? formatDate(item.next_run_at) : 'No next run'}
+      <TableCell className="hidden sm:table-cell">
+        {item.next_run_at ? (
+          <div className="flex flex-col" title={formatDate(item.next_run_at)}>
+            <span className="text-foreground text-xs font-semibold">
+              {formatNextRun(item.next_run_at).relative}
+            </span>
+            <span className="text-muted-foreground font-mono text-[10px]">
+              {formatDate(item.next_run_at)}
+            </span>
+          </div>
+        ) : (
+          <span className="text-muted-foreground text-xs">No next run</span>
+        )}
       </TableCell>
       <TableCell className="text-muted-foreground hidden lg:table-cell">
         <div>{item.recurrence}</div>
@@ -196,6 +256,7 @@ function ScheduleTable({ device }: { device: string }) {
   const [search, setSearch] = useState('')
   const [messageType, setMessageType] = useState('all')
   const [offset, setOffset] = useState(0)
+  const [createOpen, setCreateOpen] = useState(false)
   const query = useQuery({
     queryKey: ['schedules', device, status, search, messageType, offset],
     queryFn: () =>
@@ -293,13 +354,29 @@ function ScheduleTable({ device }: { device: string }) {
           </SelectContent>
         </Select>
       </div>
-      {query.error && (
+      {query.error && isDeviceNotFoundError(query.error) ? (
+        <EmptyState
+          icon={CalendarClock}
+          title="Device not found"
+          hint="The selected WhatsApp session is not available. Please register or select an active WhatsApp device."
+          action={
+            <Button
+              size="sm"
+              onClick={() => setCreateOpen(true)}
+              className="h-8 gap-1.5 rounded-lg text-xs font-semibold shadow-xs"
+            >
+              <Plus className="size-3.5" />
+              <span>Add Device</span>
+            </Button>
+          }
+        />
+      ) : query.error ? (
         <Card className="border-destructive/50">
           <CardContent className="text-destructive py-4 text-sm">
             {toApiError(query.error).message}
           </CardContent>
         </Card>
-      )}
+      ) : null}
       {query.isLoading && (
         <div className="flex flex-col gap-2 rounded-lg border p-2">
           {Array.from({ length: 6 }, (_, index) => (
@@ -368,6 +445,7 @@ function ScheduleTable({ device }: { device: string }) {
           </div>
         </div>
       )}
+      <CreateDeviceDialog open={createOpen} onOpenChange={setCreateOpen} />
     </div>
   )
 }

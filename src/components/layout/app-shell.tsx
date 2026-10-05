@@ -2,17 +2,14 @@ import { useState } from 'react'
 import {
   Bot,
   CalendarClock,
-  CircleUserRound,
   LayoutDashboard,
   Loader2,
   Menu,
   MessagesSquare,
-  Plus,
   ScrollText,
   Send,
   Settings,
   ShieldCheck,
-  Smartphone,
   Sparkles,
   UserRound,
   Users,
@@ -23,19 +20,14 @@ import { DeviceSwitcher } from '@/components/layout/device-switcher'
 import { Logo } from '@/components/layout/logo'
 import { ThemeToggle } from '@/components/layout/theme-toggle'
 import { WsBadge } from '@/components/layout/ws-badge'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet'
-import { CreateDeviceDialog } from '@/features/devices/create-device-dialog'
 import { PasskeyDialog } from '@/features/session/passkey-dialog'
 import { useAppInfo } from '@/hooks/use-app-info'
-import { useDeviceAvatar } from '@/hooks/use-device-avatar'
 import { useDevices } from '@/hooks/use-devices'
-import { formatDeviceLabel } from '@/lib/format'
 import { cn } from '@/lib/utils'
 import { useConnection } from '@/stores/connection'
-import { useDeviceStore } from '@/stores/device'
 
 const navGroups = [
   {
@@ -89,80 +81,6 @@ const routeTitles: Record<string, { label: string; icon: typeof LayoutDashboard 
   '/account': { label: 'Account', icon: UserRound },
   '/misc': { label: 'Channels', icon: Wrench },
   '/settings': { label: 'Settings', icon: Settings },
-}
-
-function SidebarActiveSession() {
-  const selectedDeviceId = useDeviceStore((state) => state.selectedDeviceId)
-  const { data: devices } = useDevices()
-  const [createOpen, setCreateOpen] = useState(false)
-
-  const activeDevice = devices?.find((d) => d.id === selectedDeviceId)
-  const avatar = useDeviceAvatar(activeDevice)
-
-  if (activeDevice) {
-    return (
-      <Link
-        to="/account"
-        className="group mx-2.5 my-2 flex items-center gap-2.5 rounded-lg border border-red-500/35 bg-gradient-to-r from-red-500/15 via-rose-500/10 to-transparent p-2 shadow-xs shadow-red-500/10 transition-all hover:border-red-500/60 hover:from-red-500/22 hover:via-rose-500/14"
-      >
-        <div className="relative">
-          <Avatar className="size-8 border border-red-500/40 shadow-xs shadow-red-500/20">
-            {avatar.data?.url && (
-              <AvatarImage
-                src={avatar.data.url}
-                alt={activeDevice.display_name || activeDevice.id}
-              />
-            )}
-            <AvatarFallback className="bg-red-500/10">
-              <CircleUserRound className="size-4 text-red-500" />
-            </AvatarFallback>
-          </Avatar>
-          <span className="border-background absolute -right-0.5 -bottom-0.5 size-2 rounded-full border bg-emerald-500" />
-        </div>
-        <div className="min-w-0 flex-1">
-          <div className="flex items-center justify-between">
-            <span className="text-foreground truncate text-[11px] font-semibold">
-              {activeDevice.display_name || formatDeviceLabel(activeDevice)}
-            </span>
-            <span className="rounded bg-gradient-to-r from-red-600 via-rose-600 to-red-500 px-1.5 py-0.5 font-mono text-[9px] font-bold text-white shadow-xs shadow-red-600/30">
-              Active
-            </span>
-          </div>
-          <span className="text-muted-foreground block truncate font-mono text-[10px]">
-            {activeDevice.phone_number ||
-              activeDevice.jid ||
-              (activeDevice.display_name ? formatDeviceLabel(activeDevice) : 'Active Session')}
-          </span>
-        </div>
-      </Link>
-    )
-  }
-
-  return (
-    <>
-      <div className="mx-2.5 my-2 flex shrink-0 items-center justify-between gap-2 rounded-lg border border-amber-500/30 bg-amber-500/10 p-2">
-        <div className="flex min-w-0 items-center gap-2">
-          <Smartphone className="size-4 shrink-0 animate-pulse text-amber-500" />
-          <div className="flex min-w-0 flex-col">
-            <span className="truncate text-[11px] font-semibold text-amber-600 dark:text-amber-400">
-              No Session
-            </span>
-            <span className="text-muted-foreground truncate text-[10px]">Pair device</span>
-          </div>
-        </div>
-        <Button
-          size="xs"
-          variant="outline"
-          onClick={() => setCreateOpen(true)}
-          className="h-6 shrink-0 gap-1 rounded-[5px] border-amber-500/40 text-[10px] font-semibold text-amber-600 hover:bg-amber-500/20 dark:text-amber-400"
-        >
-          <Plus className="size-2.5" />
-          <span>Add</span>
-        </Button>
-      </div>
-      <CreateDeviceDialog open={createOpen} onOpenChange={setCreateOpen} />
-    </>
-  )
 }
 
 function NavContent({ onNavigate }: { onNavigate?: () => void }) {
@@ -260,9 +178,7 @@ export function AppShell() {
           <Logo />
         </div>
 
-        <SidebarActiveSession />
-
-        <ScrollArea className="flex-1 px-2.5 py-2">
+        <ScrollArea className="flex-1 px-2.5 py-3">
           <NavContent />
         </ScrollArea>
 
@@ -289,10 +205,7 @@ export function AppShell() {
               </div>
             </SheetTitle>
           </SheetHeader>
-          <div className="p-2">
-            <SidebarActiveSession />
-          </div>
-          <ScrollArea className="flex-1 px-3 py-2">
+          <ScrollArea className="flex-1 px-3 py-3">
             <NavContent onNavigate={() => setMobileNavOpen(false)} />
           </ScrollArea>
         </SheetContent>
