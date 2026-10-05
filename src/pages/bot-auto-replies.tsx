@@ -148,8 +148,8 @@ export default function BotAutoRepliesPage() {
   return (
     <div className="flex flex-col gap-6 p-4 sm:p-6">
       <PageHeader
-        title="Auto Responder"
-        description="Automated message responder rules"
+        title="Auto Replies"
+        description="Keyword triggers"
         actions={
           <div className="flex items-center gap-2">
             <Button

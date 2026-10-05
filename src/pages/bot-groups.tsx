@@ -114,8 +114,8 @@ export default function BotGroupsPage() {
   return (
     <div className="flex flex-col gap-6 p-4 sm:p-6">
       <PageHeader
-        title="Group Moderation"
-        description="Group rules and greetings management"
+        title="Group Bot"
+        description="Moderation"
         actions={
           <div className="flex items-center gap-2">
             <Button

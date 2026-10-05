@@ -209,11 +209,11 @@ export default function BotAIPage() {
     <div className="flex flex-col gap-6 p-4 sm:p-6">
       <PageHeader
         title="AI Assistant"
-        description="Autonomous AI models and tools runner"
+        description="Models and tools"
         actions={
           <Badge variant="outline" className="border-red-500/30 bg-red-500/10 text-red-500 text-xs gap-1.5 py-1">
             <Sparkles className="size-3.5" />
-            <span>Autonomous Active</span>
+            <span>Autonomous</span>
           </Badge>
         }
       />
@@ -238,7 +238,7 @@ export default function BotAIPage() {
           <Card className="border-border/60 bg-card/40 backdrop-blur-sm">
             <CardHeader className="flex flex-row items-center justify-between pb-3">
               <div className="flex items-center gap-2">
-                <CardTitle className="text-sm font-semibold">Interactive Console</CardTitle>
+                <CardTitle className="text-sm font-semibold">Console</CardTitle>
                 {lastUsage && (
                   <Badge variant="secondary" className="text-[11px] font-mono">
                     {lastUsage.latency_ms}ms · {lastUsage.total_tokens || 0} tokens
@@ -264,7 +264,7 @@ export default function BotAIPage() {
                 {chatMessages.length === 0 ? (
                   <div className="flex h-full min-h-[300px] flex-col items-center justify-center gap-2 text-center text-muted-foreground">
                     <Bot className="size-8 text-red-500/40" />
-                    <p className="text-xs">Type a prompt to test your AI model</p>
+                    <p className="text-xs">No messages</p>
                   </div>
                 ) : (
                   <div className="flex flex-col gap-3">
@@ -433,7 +433,7 @@ export default function BotAIPage() {
                 <div className="flex flex-col gap-0.5">
                   <Label className="text-xs font-semibold">Auto Reply</Label>
                   <span className="text-[11px] text-muted-foreground">
-                    Respond automatically to all incoming messages
+                    Auto reply to messages
                   </span>
                 </div>
                 <Switch
@@ -460,7 +460,7 @@ export default function BotAIPage() {
         <TabsContent value="tools" className="mt-4">
           <Card className="border-border/60 bg-card/40 backdrop-blur-sm">
             <CardHeader className="flex flex-row items-center justify-between pb-3">
-              <CardTitle className="text-sm font-semibold">Autonomous AI Tools</CardTitle>
+              <CardTitle className="text-sm font-semibold">Tools</CardTitle>
               {toolLatency !== null && (
                 <Badge variant="outline" className="border-green-500/30 bg-green-500/10 text-green-500 text-[11px] font-mono">
                   {toolLatency}ms
@@ -493,7 +493,7 @@ export default function BotAIPage() {
               </div>
 
               <div className="flex flex-col gap-1.5">
-                <Label className="text-xs font-medium">Parameters (JSON)</Label>
+                <Label className="text-xs font-medium">Parameters</Label>
                 <Textarea
                   value={toolParamsJson}
                   onChange={(e) => setToolParamsJson(e.target.value)}

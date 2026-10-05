@@ -104,8 +104,8 @@ export default function BotLogsPage() {
   return (
     <div className="flex flex-col gap-6 p-4 sm:p-6">
       <PageHeader
-        title="Bot Activity Logs"
-        description="Event dispatch history and latency metrics"
+        title="Bot Logs"
+        description="History"
         actions={
           <div className="flex items-center gap-2">
             <Button
