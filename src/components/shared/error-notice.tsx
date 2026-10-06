@@ -4,7 +4,7 @@ import { toApiError } from '@/lib/api-error'
 import { cn } from '@/lib/utils'
 
 export function ErrorNotice({
-  title = 'An error occurred',
+  title = 'Terjadi kesalahan',
   error,
   onRetry,
   className,
@@ -45,7 +45,7 @@ export function ErrorNotice({
               className="border-destructive/30 bg-destructive/15 text-destructive hover:bg-destructive/25 hover:text-destructive h-7 gap-1.5 rounded-md text-xs font-medium"
             >
               <RefreshCw className="size-3" />
-              <span>Try Again</span>
+              <span>Coba Lagi</span>
             </Button>
           </div>
         )}

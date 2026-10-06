@@ -27,7 +27,7 @@ export function FileOrUrlInput({
   return (
     <div className="flex flex-col gap-3">
       <div className="flex flex-col gap-2">
-        <Label>{label} — upload</Label>
+        <Label>{label} — unggah</Label>
         <Input
           ref={fileInput}
           type="file"
@@ -37,7 +37,7 @@ export function FileOrUrlInput({
         {value.file && <p className="text-muted-foreground text-xs">{value.file.name}</p>}
       </div>
       <div className="flex flex-col gap-2">
-        <Label>…or {label.toLowerCase()} URL</Label>
+        <Label>atau URL {label.toLowerCase()}</Label>
         <Input
           placeholder="https://example.com/media"
           value={value.url}

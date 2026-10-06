@@ -11,7 +11,7 @@ export interface SendResult {
 export type ScheduleFields = {
   scheduled_at?: string
   timezone?: string
-  recurrence?: 'once' | 'daily' | 'weekly' | 'monthly'
+  recurrence?: 'once' | 'hourly' | 'every_2_hours' | 'daily' | 'weekly' | 'monthly'
   weekdays?: number[]
   day_of_month?: number
   end_at?: string

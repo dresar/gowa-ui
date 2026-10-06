@@ -85,13 +85,15 @@ export default function BotAIPage() {
   const [showKey, setShowKey] = useState(false)
 
   const [provider, setProvider] = useState('openai')
-  const [baseUrl, setBaseUrl] = useState('https://api.openai.com/v1')
-  const [apiKey, setApiKey] = useState('')
-  const [model, setModel] = useState('gpt-4o-mini')
-  const [systemPrompt, setSystemPrompt] = useState('')
+  const [baseUrl, setBaseUrl] = useState('https://router.bynara.id/v1')
+  const [apiKey, setApiKey] = useState('sk-nry-mED4wjbjt8y8kczAjJ2DiXXsgWANbMUSjZuBxkEOvrc')
+  const [model, setModel] = useState('step-5-preview')
+  const [systemPrompt, setSystemPrompt] = useState(
+    'Kamu adalah asisten pribadi yang membalas chat WhatsApp atas nama pemilik nomor. Gaya bicara santai, ramah, natural bahasa sehari-hari orang Indonesia. Tidak boleh kaku seperti AI, hindari basa-basi berlebihan, jawab singkat dan tepat sasaran.'
+  )
   const [temperature, setTemperature] = useState(0.7)
-  const [triggerPrefix, setTriggerPrefix] = useState('!ai')
-  const [autoReplyEnabled, setAutoReplyEnabled] = useState(false)
+  const [triggerPrefix, setTriggerPrefix] = useState('')
+  const [autoReplyEnabled, setAutoReplyEnabled] = useState(true)
   const [isConfigLoaded, setIsConfigLoaded] = useState(false)
 
   const [chatMessages, setChatMessages] = useState<AIChatMessage[]>([])
@@ -142,11 +144,11 @@ export default function BotAIPage() {
         auto_reply_enabled: autoReplyEnabled,
       }),
     onSuccess: () => {
-      toast.success('Configuration saved')
+      toast.success('Konfigurasi tersimpan')
       void queryClient.invalidateQueries({ queryKey: ['bot-ai-config'] })
     },
     onError: (err: Error) => {
-      toast.error(err.message || 'Save failed')
+      toast.error(err.message || 'Gagal menyimpan')
     },
   })
 
@@ -171,7 +173,7 @@ export default function BotAIPage() {
       })
     },
     onError: (err: Error) => {
-      toast.error(err.message || 'AI chat failed')
+      toast.error(err.message || 'Chat AI gagal')
     },
   })
 
@@ -181,7 +183,7 @@ export default function BotAIPage() {
       try {
         params = JSON.parse(toolParamsJson)
       } catch {
-        throw new Error('Invalid JSON parameters')
+        throw new Error('Parameter JSON tidak valid')
       }
       return executeTool({
         tool: selectedTool,
@@ -191,10 +193,10 @@ export default function BotAIPage() {
     onSuccess: (res) => {
       setToolOutput(JSON.stringify(res.output, null, 2))
       setToolLatency(res.latency_ms)
-      toast.success('Tool executed')
+      toast.success('Tool dijalankan')
     },
     onError: (err: Error) => {
-      toast.error(err.message || 'Tool execution failed')
+      toast.error(err.message || 'Tool gagal dijalankan')
     },
   })
 
@@ -206,14 +208,14 @@ export default function BotAIPage() {
   }
 
   return (
-    <div className="flex flex-col gap-6 p-4 sm:p-6">
+    <div className="w-full flex flex-col gap-4">
       <PageHeader
-        title="AI Assistant"
-        description="Models and tools"
+        title="Asisten AI"
+        description="Model dan tools"
         actions={
           <Badge variant="outline" className="border-red-500/30 bg-red-500/10 text-red-500 text-xs gap-1.5 py-1">
             <Sparkles className="size-3.5" />
-            <span>Autonomous</span>
+            <span>Otonom</span>
           </Badge>
         }
       />
@@ -226,7 +228,7 @@ export default function BotAIPage() {
           </TabsTrigger>
           <TabsTrigger value="config" className="gap-1.5 text-xs">
             <Sparkles className="size-3.5" />
-            <span>Config</span>
+            <span>Konfigurasi</span>
           </TabsTrigger>
           <TabsTrigger value="tools" className="gap-1.5 text-xs">
             <Wrench className="size-3.5" />
@@ -238,7 +240,7 @@ export default function BotAIPage() {
           <Card className="border-border/60 bg-card/40 backdrop-blur-sm">
             <CardHeader className="flex flex-row items-center justify-between pb-3">
               <div className="flex items-center gap-2">
-                <CardTitle className="text-sm font-semibold">Console</CardTitle>
+                <CardTitle className="text-sm font-semibold">Konsol</CardTitle>
                 {lastUsage && (
                   <Badge variant="secondary" className="text-[11px] font-mono">
                     {lastUsage.latency_ms}ms · {lastUsage.total_tokens || 0} tokens
@@ -255,7 +257,7 @@ export default function BotAIPage() {
                 className="h-7 text-xs rounded-[5px] gap-1"
               >
                 <RotateCcw className="size-3" />
-                <span>Clear</span>
+                <span>Bersih</span>
               </Button>
             </CardHeader>
 
@@ -264,7 +266,7 @@ export default function BotAIPage() {
                 {chatMessages.length === 0 ? (
                   <div className="flex h-full min-h-[300px] flex-col items-center justify-center gap-2 text-center text-muted-foreground">
                     <Bot className="size-8 text-red-500/40" />
-                    <p className="text-xs">No messages</p>
+                    <p className="text-xs">Belum ada pesan</p>
                   </div>
                 ) : (
                   <div className="flex flex-col gap-3">
@@ -303,7 +305,7 @@ export default function BotAIPage() {
                 <Input
                   value={chatTemp}
                   onChange={(e) => setChatTemp(e.target.value)}
-                  placeholder="Temperature"
+                  placeholder="Suhu"
                   className="h-8 text-xs rounded-[6px] font-mono"
                 />
               </div>
@@ -318,7 +320,7 @@ export default function BotAIPage() {
                       chatMutation.mutate()
                     }
                   }}
-                  placeholder="Message"
+                  placeholder="Pesan"
                   className="h-9 text-xs rounded-[6px]"
                 />
                 <Button
@@ -328,7 +330,7 @@ export default function BotAIPage() {
                   className="h-9 gap-1.5 rounded-[6px] bg-red-600 px-4 text-xs text-white hover:bg-red-700 shadow-xs"
                 >
                   <Send className="size-3.5" />
-                  <span>Send</span>
+                  <span>Kirim</span>
                 </Button>
               </div>
             </CardContent>
@@ -338,7 +340,7 @@ export default function BotAIPage() {
         <TabsContent value="config" className="mt-4">
           <Card className="border-border/60 bg-card/40 backdrop-blur-sm">
             <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-semibold">AI Settings</CardTitle>
+              <CardTitle className="text-sm font-semibold">Pengaturan AI</CardTitle>
             </CardHeader>
             <CardContent className="flex flex-col gap-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -396,7 +398,7 @@ export default function BotAIPage() {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="flex flex-col gap-1.5">
-                  <Label className="text-xs font-medium">Trigger Prefix</Label>
+                  <Label className="text-xs font-medium">Prefix Pemicu</Label>
                   <Input
                     value={triggerPrefix}
                     onChange={(e) => setTriggerPrefix(e.target.value)}
@@ -405,7 +407,7 @@ export default function BotAIPage() {
                   />
                 </div>
                 <div className="flex flex-col gap-1.5">
-                  <Label className="text-xs font-medium">Temperature</Label>
+                  <Label className="text-xs font-medium">Suhu</Label>
                   <Input
                     type="number"
                     step="0.1"
@@ -420,7 +422,7 @@ export default function BotAIPage() {
               </div>
 
               <div className="flex flex-col gap-1.5">
-                <Label className="text-xs font-medium">System Prompt</Label>
+                <Label className="text-xs font-medium">Prompt Sistem</Label>
                 <Textarea
                   value={systemPrompt}
                   onChange={(e) => setSystemPrompt(e.target.value)}
@@ -431,9 +433,9 @@ export default function BotAIPage() {
 
               <div className="flex items-center justify-between rounded-lg border border-border/50 p-3 bg-muted/20">
                 <div className="flex flex-col gap-0.5">
-                  <Label className="text-xs font-semibold">Auto Reply</Label>
+                  <Label className="text-xs font-semibold">Balasan Otomatis</Label>
                   <span className="text-[11px] text-muted-foreground">
-                    Auto reply to messages
+                    Balas pesan otomatis
                   </span>
                 </div>
                 <Switch
@@ -450,7 +452,7 @@ export default function BotAIPage() {
                   disabled={saveConfigMutation.isPending}
                   className="h-8 rounded-[6px] bg-red-600 text-xs text-white hover:bg-red-700 shadow-xs px-6"
                 >
-                  Save
+                  Simpan
                 </Button>
               </div>
             </CardContent>
@@ -493,7 +495,7 @@ export default function BotAIPage() {
               </div>
 
               <div className="flex flex-col gap-1.5">
-                <Label className="text-xs font-medium">Parameters</Label>
+                <Label className="text-xs font-medium">Parameter</Label>
                 <Textarea
                   value={toolParamsJson}
                   onChange={(e) => setToolParamsJson(e.target.value)}
@@ -510,13 +512,13 @@ export default function BotAIPage() {
                   className="h-8 gap-1.5 rounded-[6px] bg-red-600 text-xs text-white hover:bg-red-700 shadow-xs"
                 >
                   <Play className="size-3" />
-                  <span>Execute</span>
+                  <span>Jalankan</span>
                 </Button>
               </div>
 
               {toolOutput && (
                 <div className="flex flex-col gap-1.5 pt-2">
-                  <Label className="text-xs font-medium">Output</Label>
+                  <Label className="text-xs font-medium">Keluaran</Label>
                   <pre className="max-h-[200px] overflow-auto rounded-lg border border-border/50 bg-background/80 p-3 font-mono text-xs text-foreground">
                     {toolOutput}
                   </pre>

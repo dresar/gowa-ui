@@ -45,7 +45,7 @@ export function nextMinute(date: Date) {
 }
 
 function emptyDraft(): ScheduleFields {
-  return { timezone: browserTimezone(), recurrence: 'once' }
+  return { timezone: 'Asia/Jakarta', recurrence: 'once' }
 }
 
 export function useScheduleDraft() {

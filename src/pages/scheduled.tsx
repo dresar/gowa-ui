@@ -26,6 +26,16 @@ import { PageHeader } from '@/components/shared/page-header'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
 import {
   Select,
   SelectContent,
@@ -49,31 +59,34 @@ import { DeviceGuard, useSelectedDevice } from '@/hooks/use-device-guard'
 import { useActionMutation } from '@/hooks/use-action-mutation'
 import { isDeviceNotFoundError } from '@/lib/api-error'
 import { formatDate, formatNextRun } from '@/lib/format'
+import { sendText } from '@/api/send'
+import { ScheduleFields } from '@/features/send/schedule-fields'
+import { useScheduleDraft } from '@/features/send/use-schedule-draft'
 
 const PAGE_SIZE = 25
 
 const STATUS_FILTERS: { value: ScheduleStatus | 'all'; label: string }[] = [
-  { value: 'all', label: 'All' },
-  { value: 'active', label: 'Active' },
-  { value: 'running', label: 'Running' },
-  { value: 'paused', label: 'Paused' },
-  { value: 'completed', label: 'Completed' },
-  { value: 'failed', label: 'Failed' },
-  { value: 'cancelled', label: 'Cancelled' },
+  { value: 'all', label: 'Semua' },
+  { value: 'active', label: 'Aktif' },
+  { value: 'running', label: 'Berjalan' },
+  { value: 'paused', label: 'Dijeda' },
+  { value: 'completed', label: 'Selesai' },
+  { value: 'failed', label: 'Gagal' },
+  { value: 'cancelled', label: 'Dibatalkan' },
 ]
 
 const MESSAGE_TYPES: { value: string; label: string }[] = [
-  { value: 'text', label: 'Text' },
-  { value: 'image', label: 'Image' },
+  { value: 'text', label: 'Teks' },
+  { value: 'image', label: 'Gambar' },
   { value: 'video', label: 'Video' },
   { value: 'audio', label: 'Audio' },
-  { value: 'file', label: 'File' },
-  { value: 'sticker', label: 'Sticker' },
-  { value: 'contact', label: 'Contact' },
-  { value: 'link', label: 'Link' },
-  { value: 'location', label: 'Location' },
-  { value: 'poll', label: 'Poll' },
-  { value: 'forward', label: 'Forward' },
+  { value: 'file', label: 'Dokumen' },
+  { value: 'sticker', label: 'Stiker' },
+  { value: 'contact', label: 'Kontak' },
+  { value: 'link', label: 'Tautan' },
+  { value: 'location', label: 'Lokasi' },
+  { value: 'poll', label: 'Polling' },
+  { value: 'forward', label: 'Teruskan' },
 ]
 
 type ScheduleAction = 'pause' | 'resume' | 'cancel'
@@ -84,14 +97,14 @@ function ScheduleStatusBadge({ status }: { status: ScheduledSend['status'] }) {
       return (
         <Badge variant="emerald" className="gap-1.5 font-semibold">
           <span className="size-1.5 rounded-full bg-emerald-500 shadow-xs shadow-emerald-500/80 animate-pulse" />
-          <span>Active</span>
+          <span>Aktif</span>
         </Badge>
       )
     case 'running':
       return (
         <Badge variant="ruby" className="gap-1.5 font-semibold">
           <Loader2 className="size-3 animate-spin text-red-500" />
-          <span>Running</span>
+          <span>Berjalan</span>
         </Badge>
       )
     case 'paused':
@@ -101,28 +114,28 @@ function ScheduleStatusBadge({ status }: { status: ScheduledSend['status'] }) {
           className="border-amber-500/40 bg-amber-500/10 text-amber-600 dark:text-amber-400 gap-1.5 font-semibold"
         >
           <span className="size-1.5 rounded-full bg-amber-500" />
-          <span>Paused</span>
+          <span>Dijeda</span>
         </Badge>
       )
     case 'completed':
       return (
         <Badge variant="secondary" className="gap-1.5 font-semibold">
           <CheckCircle2 className="size-3 text-emerald-600 dark:text-emerald-400" />
-          <span>Completed</span>
+          <span>Selesai</span>
         </Badge>
       )
     case 'failed':
       return (
         <Badge variant="destructive" className="gap-1.5 font-semibold">
           <XCircle className="size-3" />
-          <span>Failed</span>
+          <span>Gagal</span>
         </Badge>
       )
     case 'cancelled':
       return (
         <Badge variant="outline" className="text-muted-foreground gap-1.5">
           <span className="size-1.5 rounded-full bg-muted-foreground/40" />
-          <span>Cancelled</span>
+          <span>Dibatalkan</span>
         </Badge>
       )
     default:
@@ -304,30 +317,42 @@ function ScheduleTable({ device }: { device: string }) {
   const rows = query.data?.data ?? []
   const total = query.data?.pagination.total ?? 0
 
+  const [newScheduleOpen, setNewScheduleOpen] = useState(false)
+
   return (
     <div className="flex flex-col gap-4">
       <PageHeader
-        title="Scheduled"
-        description="Delayed and recurring messages."
+        title="Terjadwal"
+        description="Pesan tertunda dan berulang."
         actions={
-          <ToggleGroup
-            type="single"
-            variant="outline"
-            size="sm"
-            className="flex-wrap"
-            value={status}
-            onValueChange={(value) => {
-              if (!value) return
-              setStatus(value as ScheduleStatus | 'all')
-              setOffset(0)
-            }}
-          >
-            {STATUS_FILTERS.map((filter) => (
-              <ToggleGroupItem key={filter.value} value={filter.value}>
-                {filter.label}
-              </ToggleGroupItem>
-            ))}
-          </ToggleGroup>
+          <div className="flex flex-wrap items-center gap-2">
+            <Button
+              size="sm"
+              onClick={() => setNewScheduleOpen(true)}
+              className="h-8 gap-1.5 rounded-lg text-xs font-semibold shadow-xs"
+            >
+              <Plus className="size-3.5" />
+              <span>Jadwalkan</span>
+            </Button>
+            <ToggleGroup
+              type="single"
+              variant="outline"
+              size="sm"
+              className="flex-wrap"
+              value={status}
+              onValueChange={(value) => {
+                if (!value) return
+                setStatus(value as ScheduleStatus | 'all')
+                setOffset(0)
+              }}
+            >
+              {STATUS_FILTERS.map((filter) => (
+                <ToggleGroupItem key={filter.value} value={filter.value}>
+                  {filter.label}
+                </ToggleGroupItem>
+              ))}
+            </ToggleGroup>
+          </div>
         }
       />
       <div className="flex flex-wrap items-center gap-2">
@@ -335,7 +360,7 @@ function ScheduleTable({ device }: { device: string }) {
           <Search className="text-muted-foreground absolute top-2.5 left-2 size-4" />
           <Input
             className="pl-8"
-            placeholder="Search"
+            placeholder="Cari"
             value={search}
             onChange={(event) => {
               setSearch(event.target.value)
@@ -350,11 +375,11 @@ function ScheduleTable({ device }: { device: string }) {
             setOffset(0)
           }}
         >
-          <SelectTrigger className="w-44" aria-label="Message type">
+          <SelectTrigger className="w-44" aria-label="Tipe pesan">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All types</SelectItem>
+            <SelectItem value="all">Semua tipe</SelectItem>
             {MESSAGE_TYPES.map((type) => (
               <SelectItem key={type.value} value={type.value}>
                 {type.label}
@@ -366,8 +391,8 @@ function ScheduleTable({ device }: { device: string }) {
       {query.error && isDeviceNotFoundError(query.error) ? (
         <EmptyState
           icon={CalendarClock}
-          title="Device not found"
-          hint="The selected WhatsApp session is not available. Please register or select an active WhatsApp device."
+          title="Perangkat tidak ditemukan"
+          hint="Sesi WhatsApp yang dipilih tidak tersedia. Silakan daftar atau pilih perangkat aktif."
           action={
             <Button
               size="sm"
@@ -375,13 +400,13 @@ function ScheduleTable({ device }: { device: string }) {
               className="h-8 gap-1.5 rounded-lg text-xs font-semibold shadow-xs"
             >
               <Plus className="size-3.5" />
-              <span>Add Device</span>
+              <span>Tambah</span>
             </Button>
           }
         />
       ) : query.error ? (
         <ErrorNotice
-          title="Failed to load schedules"
+          title="Gagal memuat jadwal"
           error={query.error}
           onRetry={() => void query.refetch()}
         />
@@ -396,11 +421,21 @@ function ScheduleTable({ device }: { device: string }) {
       {query.data && rows.length === 0 && (
         <EmptyState
           icon={CalendarClock}
-          title="No schedules"
+          title="Belum ada jadwal"
           hint={
             status === 'all' && messageType === 'all' && !search
-              ? 'Use Send later from a message form to create one.'
-              : 'Nothing matches these filters. Widen the search, status, or type.'
+              ? 'Mulai jadwalkan pesan otomatis Anda sekarang.'
+              : 'Tidak ada yang cocok dengan filter ini.'
+          }
+          action={
+            <Button
+              size="sm"
+              onClick={() => setNewScheduleOpen(true)}
+              className="h-8 gap-1.5 rounded-lg text-xs font-semibold shadow-xs"
+            >
+              <Plus className="size-3.5" />
+              <span>Jadwalkan</span>
+            </Button>
           }
         />
       )}
@@ -409,13 +444,13 @@ function ScheduleTable({ device }: { device: string }) {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>To</TableHead>
-                <TableHead>Message</TableHead>
+                <TableHead>Tujuan</TableHead>
+                <TableHead>Pesan</TableHead>
                 <TableHead>Status</TableHead>
-                <TableHead className="hidden sm:table-cell">Next run</TableHead>
-                <TableHead className="hidden lg:table-cell">Repeats</TableHead>
-                <TableHead className="hidden md:table-cell">Sent</TableHead>
-                <TableHead className="sr-only">Actions</TableHead>
+                <TableHead className="hidden sm:table-cell">Jadwal kirim</TableHead>
+                <TableHead className="hidden lg:table-cell">Pengulangan</TableHead>
+                <TableHead className="hidden md:table-cell">Terkirim</TableHead>
+                <TableHead className="sr-only">Aksi</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -430,7 +465,7 @@ function ScheduleTable({ device }: { device: string }) {
       {(total > PAGE_SIZE || offset > 0) && (
         <div className="flex items-center justify-between gap-2">
           <p className="text-muted-foreground text-sm">
-            {offset + 1}–{offset + rows.length} of {total}
+            {offset + 1}–{offset + rows.length} dari {total}
           </p>
           <div className="flex gap-2">
             <Button
@@ -440,7 +475,7 @@ function ScheduleTable({ device }: { device: string }) {
               onClick={() => setOffset(Math.max(0, offset - PAGE_SIZE))}
             >
               <ChevronLeft data-icon="inline-start" />
-              Previous
+              Sebelum
             </Button>
             <Button
               variant="outline"
@@ -448,14 +483,117 @@ function ScheduleTable({ device }: { device: string }) {
               disabled={offset + PAGE_SIZE >= total}
               onClick={() => setOffset(offset + PAGE_SIZE)}
             >
-              Next
+              Berikut
               <ChevronRight data-icon="inline-end" />
             </Button>
           </div>
         </div>
       )}
       <CreateDeviceDialog open={createOpen} onOpenChange={setCreateOpen} />
+      <CreateScheduleDialog
+        device={device}
+        open={newScheduleOpen}
+        onOpenChange={setNewScheduleOpen}
+        onSuccess={refresh}
+      />
     </div>
+  )
+}
+
+function CreateScheduleDialog({
+  open,
+  onOpenChange,
+  onSuccess,
+}: {
+  device?: string
+  open: boolean
+  onOpenChange: (open: boolean) => void
+  onSuccess: () => void
+}) {
+  const [phone, setPhone] = useState('')
+  const [message, setMessage] = useState('')
+  const { draft, patch, reset: resetSchedule } = useScheduleDraft()
+
+  const mutation = useActionMutation(
+    (payload: Parameters<typeof sendText>[0]) => sendText(payload),
+    {
+      successMessage: 'Pesan berhasil dijadwalkan!',
+      onSuccess: () => {
+        setPhone('')
+        setMessage('')
+        resetSchedule()
+        onOpenChange(false)
+        onSuccess()
+      },
+    },
+  )
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!phone || !message) return
+    mutation.mutate({
+      phone: phone.trim(),
+      message: message.trim(),
+      ...draft,
+    })
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-xl max-h-[90vh] overflow-y-auto">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          <DialogHeader>
+            <DialogTitle>Jadwalkan Pesan</DialogTitle>
+            <DialogDescription>
+              Kirim pesan otomatis pada waktu yang ditentukan.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="sched-phone">Nomor Tujuan</Label>
+            <Input
+              id="sched-phone"
+              placeholder="Nomor"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              required
+            />
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="sched-msg">Pesan</Label>
+            <Textarea
+              id="sched-msg"
+              placeholder="Pesan"
+              rows={3}
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              required
+            />
+          </div>
+
+          <div className="rounded-lg border p-3 bg-muted/20">
+            <ScheduleFields draft={draft} patch={patch} />
+          </div>
+
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => onOpenChange(false)}
+            >
+              Batal
+            </Button>
+            <Button
+              type="submit"
+              disabled={mutation.isPending || !phone || !message}
+            >
+              {mutation.isPending ? 'Menyimpan...' : 'Simpan'}
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
   )
 }
 
@@ -465,8 +603,8 @@ export default function ScheduledPage() {
     return (
       <div className="flex flex-col gap-4">
         <PageHeader
-          title="Scheduled"
-          description="Delayed and recurring messages."
+          title="Terjadwal"
+          description="Pesan tertunda dan berulang."
         />
         <DeviceGuard />
       </div>

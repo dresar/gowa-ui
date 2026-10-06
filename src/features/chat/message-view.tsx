@@ -135,9 +135,9 @@ export function MessageView({ chat, deviceId }: { chat: ChatInfo; deviceId: stri
   }
 
   return (
-    <div className="flex h-full flex-col gap-3">
+    <div className="flex h-full min-h-0 flex-1 flex-col gap-2">
       {/* Header bar for selected chat */}
-      <div className="border-border/60 flex items-center justify-between border-b pb-2.5">
+      <div className="border-border/60 flex items-center justify-between border-b pb-2">
         <div className="min-w-0">
           <p className="text-foreground truncate text-sm font-semibold">
             {chatDisplayName(resolvedChat)}
@@ -151,7 +151,7 @@ export function MessageView({ chat, deviceId }: { chat: ChatInfo; deviceId: stri
       <div className="flex items-center justify-between gap-2">
         <Input
           className="h-7.5 max-w-xs text-xs"
-          placeholder="Search"
+          placeholder="Cari pesan…"
           value={search}
           onChange={(event) => {
             setSearch(event.target.value)
@@ -166,7 +166,7 @@ export function MessageView({ chat, deviceId }: { chat: ChatInfo; deviceId: stri
               setOffset(0)
             }}
           />
-          <span className="hidden sm:inline">Media only</span>
+          <span className="hidden sm:inline">Hanya media</span>
         </label>
       </div>
 
@@ -179,9 +179,9 @@ export function MessageView({ chat, deviceId }: { chat: ChatInfo; deviceId: stri
             </div>
           ) : messages.length === 0 ? (
             <div className="text-muted-foreground flex flex-col gap-1 p-6 text-center text-xs">
-              <p className="text-foreground font-medium">No messages stored for this chat yet.</p>
+              <p className="text-foreground font-medium">Belum ada pesan tersimpan untuk obrolan ini.</p>
               <p className="text-[11px]">
-                Messages will appear as sent/received or when history sync completes.
+                Pesan akan muncul saat dikirim/diterima atau sinkronisasi riwayat selesai.
               </p>
             </div>
           ) : (
@@ -194,7 +194,7 @@ export function MessageView({ chat, deviceId }: { chat: ChatInfo; deviceId: stri
                     {showDateSeparator && (
                       <div className="flex justify-center py-1">
                         <span className="border-border/60 bg-card/85 text-muted-foreground rounded-md border px-2.5 py-0.5 font-mono text-[10px] shadow-2xs backdrop-blur-xs">
-                          {new Date(message.timestamp).toLocaleDateString(undefined, {
+                          {new Date(message.timestamp).toLocaleDateString('id-ID', {
                             day: 'numeric',
                             month: 'short',
                             year: 'numeric',
@@ -213,7 +213,7 @@ export function MessageView({ chat, deviceId }: { chat: ChatInfo; deviceId: stri
 
       {/* Pagination toolbar */}
       <div className="text-muted-foreground flex items-center justify-between text-[11px]">
-        <span>{total} messages stored</span>
+        <span>{total} pesan tersimpan</span>
         <div className="flex gap-1">
           <Button
             variant="outline"
@@ -222,7 +222,7 @@ export function MessageView({ chat, deviceId }: { chat: ChatInfo; deviceId: stri
             onClick={() => setOffset(Math.max(0, offset - PAGE_SIZE))}
             className="h-6.5 text-[11px]"
           >
-            Newer
+            Lebih baru
           </Button>
           <Button
             variant="outline"
@@ -231,17 +231,17 @@ export function MessageView({ chat, deviceId }: { chat: ChatInfo; deviceId: stri
             onClick={() => setOffset(offset + PAGE_SIZE)}
             className="h-6.5 text-[11px]"
           >
-            Older
+            Lebih lama
           </Button>
         </div>
       </div>
 
       {/* Interactive composer */}
-      <form className="flex flex-col gap-2" onSubmit={onSend}>
+      <form className="flex flex-col gap-1.5" onSubmit={onSend}>
         <ScheduleFields draft={scheduleDraft} patch={patchSchedule} />
         <div className="flex gap-2">
           <Input
-            placeholder="Message"
+            placeholder="Tulis pesan…"
             value={draft}
             onChange={(event) => setDraft(event.target.value)}
             className="h-8.5 text-xs"
@@ -256,7 +256,7 @@ export function MessageView({ chat, deviceId }: { chat: ChatInfo; deviceId: stri
             ) : (
               <Send className="size-3.5" />
             )}
-            Send
+            Kirim
           </Button>
         </div>
       </form>

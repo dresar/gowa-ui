@@ -11,8 +11,8 @@ export default function MiscPage() {
   return (
     <div className="flex flex-col gap-4 sm:gap-5">
       <PageHeader
-        title="Channels"
-        description="Channel subscriptions and call routing."
+        title="Saluran & Panggilan"
+        description="Langganan saluran dan perutean panggilan."
       />
 
       {!device ? (
@@ -21,15 +21,15 @@ export default function MiscPage() {
         <div className="grid items-start gap-4 lg:grid-cols-2">
           <ActionCard
             icon={BellRing}
-            title="Channel Broadcasts"
-            description="Newsletters and public updates followed by this WhatsApp device."
+            title="Siaran Saluran"
+            description="Newsletter dan pembaruan publik yang diikuti perangkat ini."
           >
             <NewsletterList />
           </ActionCard>
           <ActionCard
             icon={PhoneOff}
-            title="Reject Incoming Call"
-            description="Reject a voice/video call using caller JID and Call ID payload from webhooks."
+            title="Tolak Panggilan Masuk"
+            description="Tolak panggilan suara atau video menggunakan JID pemanggil dan Call ID dari webhook."
           >
             <CallRejectForm />
           </ActionCard>

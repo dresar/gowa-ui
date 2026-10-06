@@ -63,37 +63,37 @@ interface ComposeType {
 
 const composeGroups: { label: string; items: ComposeType[] }[] = [
   {
-    label: 'Standard',
+    label: 'Standar',
     items: [
-      { value: 'text', label: 'Text Message', icon: MessageSquareText, form: <SendTextForm /> },
+      { value: 'text', label: 'Teks', icon: MessageSquareText, form: <SendTextForm /> },
     ],
   },
   {
-    label: 'Media Assets',
+    label: 'Media',
     items: [
-      { value: 'image', label: 'Image', icon: Image, form: <SendImageForm /> },
+      { value: 'image', label: 'Gambar', icon: Image, form: <SendImageForm /> },
       { value: 'video', label: 'Video', icon: Video, form: <SendVideoForm /> },
-      { value: 'file', label: 'Document / File', icon: FileUp, form: <SendFileForm /> },
-      { value: 'audio', label: 'Voice / Audio', icon: Mic, form: <SendAudioForm /> },
-      { value: 'sticker', label: 'Sticker', icon: Sticker, form: <SendStickerForm /> },
+      { value: 'file', label: 'Dokumen', icon: FileUp, form: <SendFileForm /> },
+      { value: 'audio', label: 'Audio', icon: Mic, form: <SendAudioForm /> },
+      { value: 'sticker', label: 'Stiker', icon: Sticker, form: <SendStickerForm /> },
     ],
   },
   {
-    label: 'Interactive & Rich',
+    label: 'Konten',
     items: [
-      { value: 'contact', label: 'vCard Contact', icon: UserRound, form: <SendContactForm /> },
-      { value: 'location', label: 'Geo Location', icon: MapPin, form: <SendLocationForm /> },
-      { value: 'link', label: 'Rich Link Card', icon: Link2, form: <SendLinkForm /> },
-      { value: 'poll', label: 'Interactive Poll', icon: BarChart3, form: <SendPollForm /> },
+      { value: 'contact', label: 'Kontak', icon: UserRound, form: <SendContactForm /> },
+      { value: 'location', label: 'Lokasi', icon: MapPin, form: <SendLocationForm /> },
+      { value: 'link', label: 'Tautan', icon: Link2, form: <SendLinkForm /> },
+      { value: 'poll', label: 'Polling', icon: BarChart3, form: <SendPollForm /> },
     ],
   },
   {
-    label: 'Telemetry Presence',
+    label: 'Status',
     items: [
-      { value: 'presence', label: 'Device Presence', icon: Radio, form: <SendPresenceForm /> },
+      { value: 'presence', label: 'Kehadiran', icon: Radio, form: <SendPresenceForm /> },
       {
         value: 'chat-presence',
-        label: 'Chat Typing State',
+        label: 'Status Mengetik',
         icon: Keyboard,
         form: <SendChatPresenceForm />,
       },
@@ -144,7 +144,7 @@ function ComposePanel() {
 
       {/* Type picker: dropdown on mobile */}
       <div className="flex flex-col gap-1.5 lg:hidden">
-        <Label className="text-xs">Message Type</Label>
+        <Label className="text-xs">Tipe Pesan</Label>
         <Select value={type} onValueChange={setType}>
           <SelectTrigger className="h-8.5 text-xs">
             <SelectValue />
@@ -175,7 +175,7 @@ function ComposePanel() {
               <div>
                 <h3 className="text-foreground text-sm font-semibold">{active.label}</h3>
                 <p className="text-muted-foreground text-[11px]">
-                  Payload form for WhatsApp dispatch
+                  Kirim pesan WhatsApp
                 </p>
               </div>
             </div>
@@ -193,29 +193,29 @@ function ComposePanel() {
 const actions = [
   {
     value: 'react',
-    label: 'React with Emoji',
+    label: 'Beri Emoji',
     render: (id: string) => <ReactForm messageId={id} />,
   },
   {
     value: 'update',
-    label: 'Edit Text Content',
+    label: 'Edit Pesan',
     render: (id: string) => <UpdateForm messageId={id} />,
   },
-  { value: 'read', label: 'Mark as Read', render: (id: string) => <ReadForm messageId={id} /> },
-  { value: 'star', label: 'Star / Unstar', render: (id: string) => <StarForm messageId={id} /> },
+  { value: 'read', label: 'Tandai Dibaca', render: (id: string) => <ReadForm messageId={id} /> },
+  { value: 'star', label: 'Bintang', render: (id: string) => <StarForm messageId={id} /> },
   {
     value: 'revoke',
-    label: 'Revoke (Delete for Everyone)',
+    label: 'Tarik Pesan',
     render: (id: string) => <RevokeForm messageId={id} />,
   },
   {
     value: 'delete',
-    label: 'Delete (For Me Only)',
+    label: 'Hapus Pesan',
     render: (id: string) => <DeleteForm messageId={id} />,
   },
   {
     value: 'forward',
-    label: 'Forward to Target',
+    label: 'Teruskan Pesan',
     render: (id: string) => <ForwardForm messageId={id} />,
   },
 ]
@@ -231,7 +231,7 @@ function ActPanel() {
         <div className="grid gap-3 sm:grid-cols-2">
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="act-message-id" className="text-xs font-medium">
-              Target Message ID / Key
+              ID Pesan
             </Label>
             <Input
               id="act-message-id"
@@ -242,7 +242,7 @@ function ActPanel() {
             />
           </div>
           <div className="flex flex-col gap-1.5">
-            <Label className="text-xs font-medium">Action Mutation</Label>
+            <Label className="text-xs font-medium">Aksi</Label>
             <Select value={action} onValueChange={setAction}>
               <SelectTrigger className="h-8.5 text-xs">
                 <SelectValue />
@@ -271,8 +271,8 @@ export default function MessagingPage() {
   return (
     <div className="flex flex-col gap-4 sm:gap-5">
       <PageHeader
-        title="Messaging"
-        description="Dispatch payloads and manage messages."
+        title="Kirim Pesan"
+        description="Kirim dan kelola pesan."
       />
       {device === null ? (
         <DeviceGuard />
@@ -283,11 +283,11 @@ export default function MessagingPage() {
             <TabsList className="border-border/70 bg-card/60 h-9 rounded-lg border p-1 backdrop-blur-md">
               <TabsTrigger value="compose" className="h-7 rounded-md text-xs font-medium">
                 <Send className="size-3.5" />
-                Compose Payload
+                Buat Pesan
               </TabsTrigger>
               <TabsTrigger value="act" className="h-7 rounded-md text-xs font-medium">
                 <ListChecks className="size-3.5" />
-                Message Operations
+                Aksi Pesan
               </TabsTrigger>
             </TabsList>
             <TabsContent value="compose" className="pt-1">

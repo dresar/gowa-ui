@@ -4,6 +4,7 @@ export interface BotRule {
   id: number
   trigger_type: 'exact' | 'contains' | 'starts_with' | 'regex'
   trigger_value: string
+  recipient_jid?: string
   scope: 'all' | 'private' | 'group'
   response_type: 'text' | 'media'
   response_content: string
@@ -16,6 +17,7 @@ export interface BotRule {
 export interface CreateRulePayload {
   trigger_type: 'exact' | 'contains' | 'starts_with' | 'regex'
   trigger_value: string
+  recipient_jid?: string
   scope: 'all' | 'private' | 'group'
   response_type: 'text' | 'media'
   response_content: string
@@ -26,6 +28,7 @@ export interface CreateRulePayload {
 export interface UpdateRulePayload {
   trigger_type?: 'exact' | 'contains' | 'starts_with' | 'regex'
   trigger_value?: string
+  recipient_jid?: string
   scope?: 'all' | 'private' | 'group'
   response_type?: 'text' | 'media'
   response_content?: string
@@ -144,6 +147,7 @@ const enc = encodeURIComponent
 export async function listRules(params?: {
   active?: boolean | string
   scope?: string
+  recipient_jid?: string
   search?: string
   limit?: number
   offset?: number
@@ -151,8 +155,18 @@ export async function listRules(params?: {
   return (await results<BotRule[]>(http.get('/bot/rules', { params }))) ?? []
 }
 
+export async function autoTagPacarRules(): Promise<{ updated: number }> {
+  return results(http.post('/bot/rules/auto-tag-pacar'))
+}
+
 export async function createRule(payload: CreateRulePayload): Promise<BotRule> {
   return results(http.post('/bot/rules', payload))
+}
+
+export async function importRules(
+  payload: CreateRulePayload[],
+): Promise<{ total: number; imported: number }> {
+  return results(http.post('/bot/rules/import', payload))
 }
 
 export async function getRule(id: number): Promise<BotRule> {

@@ -44,8 +44,8 @@ describe('formatBytes', () => {
 
 describe('formatDeviceLabel', () => {
   it('returns Device when device is null or undefined', () => {
-    expect(formatDeviceLabel(null)).toBe('Device')
-    expect(formatDeviceLabel(undefined)).toBe('Device')
+    expect(formatDeviceLabel(null)).toBe('Perangkat')
+    expect(formatDeviceLabel(undefined)).toBe('Perangkat')
   })
 
   it('uses display_name if available', () => {
@@ -65,30 +65,30 @@ describe('formatNextRun', () => {
   const baseNow = new Date('2026-10-05T12:00:00.000Z')
 
   it('handles null, undefined, and zero dates', () => {
-    expect(formatNextRun(null, baseNow).relative).toBe('No next run')
-    expect(formatNextRun(undefined, baseNow).relative).toBe('No next run')
-    expect(formatNextRun('0001-01-01T00:00:00Z', baseNow).relative).toBe('No next run')
+    expect(formatNextRun(null, baseNow).relative).toBe('Tidak ada jadwal')
+    expect(formatNextRun(undefined, baseNow).relative).toBe('Tidak ada jadwal')
+    expect(formatNextRun('0001-01-01T00:00:00Z', baseNow).relative).toBe('Tidak ada jadwal')
   })
 
   it('formats in 15m for 15 minutes away', () => {
     const in15m = new Date(baseNow.getTime() + 15 * 60_000).toISOString()
-    expect(formatNextRun(in15m, baseNow).relative).toBe('in 15m')
+    expect(formatNextRun(in15m, baseNow).relative).toBe('15m lagi')
   })
 
   it('formats due now for less than 1 minute', () => {
     const in30s = new Date(baseNow.getTime() + 30_000).toISOString()
-    expect(formatNextRun(in30s, baseNow).relative).toBe('due now')
+    expect(formatNextRun(in30s, baseNow).relative).toBe('segera')
   })
 
   it('formats overdue for past times', () => {
     const past10m = new Date(baseNow.getTime() - 10 * 60_000).toISOString()
-    expect(formatNextRun(past10m, baseNow).relative).toBe('10m overdue')
+    expect(formatNextRun(past10m, baseNow).relative).toBe('10m terlambat')
 
     const past2h = new Date(baseNow.getTime() - 2 * 3600_000).toISOString()
-    expect(formatNextRun(past2h, baseNow).relative).toBe('2h overdue')
+    expect(formatNextRun(past2h, baseNow).relative).toBe('2j terlambat')
 
     const past3d = new Date(baseNow.getTime() - 72 * 3600_000).toISOString()
-    expect(formatNextRun(past3d, baseNow).relative).toBe('3d overdue')
+    expect(formatNextRun(past3d, baseNow).relative).toBe('3h terlambat')
   })
 
   it('formats tomorrow for next day', () => {
@@ -96,7 +96,7 @@ describe('formatNextRun', () => {
     tomorrow.setDate(baseNow.getDate() + 1)
     tomorrow.setHours(9, 0, 0, 0)
     const result = formatNextRun(tomorrow.toISOString(), baseNow)
-    expect(result.relative).toMatch(/tomorrow at 09:00|tomorrow at 9:00/)
+    expect(result.relative).toMatch(/besok pukul 09:00|besok pukul 9:00/)
   })
 })
 

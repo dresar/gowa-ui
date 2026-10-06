@@ -18,7 +18,7 @@ function renderForm(form: React.ReactNode) {
 describe('media quality controls', () => {
   it('labels and describes image quality for assistive technology', () => {
     const html = renderForm(<SendImageForm />)
-    const labelTarget = html.match(/for="([^"]+)"[^>]*>Media quality<\/label>/)?.[1]
+    const labelTarget = html.match(/for="([^"]+)"[^>]*>Kualitas media<\/label>/)?.[1]
     const descriptionTarget = html.match(/aria-describedby="([^"]+)"/)?.[1]
 
     expect(labelTarget).toBeTruthy()
@@ -28,6 +28,6 @@ describe('media quality controls', () => {
   })
 
   it('offers media quality when sending a video', () => {
-    expect(renderForm(<SendVideoForm />)).toContain('Media quality')
+    expect(renderForm(<SendVideoForm />)).toContain('Kualitas media')
   })
 })

@@ -54,7 +54,7 @@ function GuardDeviceCard({
             onClick={() => onSelect(device.id)}
             className="h-8 rounded-[6px] text-xs font-semibold active:scale-[0.98]"
           >
-            <span>Use Device</span>
+            <span>Pilih</span>
           </Button>
           {device.state !== 'logged_in' ? (
             <Button
@@ -64,7 +64,7 @@ function GuardDeviceCard({
               className="border-primary/30 bg-primary/10 text-primary hover:bg-primary/20 h-8 gap-1 rounded-[6px] text-xs font-semibold active:scale-[0.98]"
             >
               <QrCode className="size-3.5" />
-              <span>Pair QR</span>
+              <span>Pindai QR</span>
             </Button>
           ) : (
             <Button
@@ -73,7 +73,7 @@ function GuardDeviceCard({
               onClick={() => onSelect(device.id)}
               className="border-border/70 bg-muted/40 text-foreground hover:bg-muted/60 h-8 rounded-[6px] text-xs font-semibold active:scale-[0.98]"
             >
-              <span>Connect</span>
+              <span>Hubungkan</span>
             </Button>
           )}
         </div>
@@ -112,10 +112,10 @@ export function DeviceGuard() {
                 </div>
                 <div>
                   <CardTitle className="text-sm font-semibold sm:text-base">
-                    Select Session
+                    Pilih Sesi
                   </CardTitle>
                   <CardDescription className="text-xs">
-                    Choose a device for this page.
+                    Pilih perangkat untuk halaman ini.
                   </CardDescription>
                 </div>
               </div>
@@ -126,7 +126,7 @@ export function DeviceGuard() {
                 className="h-8 gap-1.5 self-start rounded-lg border-red-500/30 text-xs font-semibold text-red-500 hover:border-red-500/50 hover:bg-red-500/10 sm:self-auto dark:text-red-400"
               >
                 <Plus className="size-3.5" />
-                <span>Add Device</span>
+                <span>Tambah</span>
               </Button>
             </div>
           </CardHeader>
@@ -163,11 +163,11 @@ export function DeviceGuard() {
 
           <div className="flex max-w-md flex-col gap-1.5">
             <h2 className="font-heading text-foreground text-base font-bold tracking-tight sm:text-lg">
-              No WhatsApp Devices Connected
+              Belum Ada Perangkat Terhubung
             </h2>
             <p className="text-muted-foreground text-xs leading-relaxed">
-              This section requires an active WhatsApp session to read contacts, profile identity,
-              and message streams.
+              Bagian ini memerlukan sesi WhatsApp aktif untuk membaca kontak, profil,
+              dan aliran pesan.
             </p>
           </div>
 
@@ -177,10 +177,10 @@ export function DeviceGuard() {
                 <span className="flex size-4 items-center justify-center rounded bg-gradient-to-r from-red-600 to-rose-600 text-[10px] font-bold text-white shadow-2xs">
                   1
                 </span>
-                <span>Register Slot</span>
+                <span>Daftar Slot</span>
               </div>
               <p className="text-muted-foreground mt-1 text-[10px] leading-normal">
-                Create a session slot on the Go backend server.
+                Buat slot sesi di server backend Go.
               </p>
             </div>
             <div className="border-border/60 bg-muted/30 rounded-lg border p-3">
@@ -188,10 +188,10 @@ export function DeviceGuard() {
                 <span className="flex size-4 items-center justify-center rounded bg-gradient-to-r from-red-600 to-rose-600 text-[10px] font-bold text-white shadow-2xs">
                   2
                 </span>
-                <span>Pair Phone</span>
+                <span>Pasangkan HP</span>
               </div>
               <p className="text-muted-foreground mt-1 text-[10px] leading-normal">
-                Scan QR code or use WhatsApp pairing code.
+                Pindai QR atau gunakan kode pairing WhatsApp.
               </p>
             </div>
             <div className="border-border/60 bg-muted/30 rounded-lg border p-3">
@@ -199,10 +199,10 @@ export function DeviceGuard() {
                 <span className="flex size-4 items-center justify-center rounded bg-gradient-to-r from-red-600 to-rose-600 text-[10px] font-bold text-white shadow-2xs">
                   3
                 </span>
-                <span>Ready to Use</span>
+                <span>Siap Digunakan</span>
               </div>
               <p className="text-muted-foreground mt-1 text-[10px] leading-normal">
-                Broadcast messages, read chats, and edit identity.
+                Kirim pesan, baca chat, dan kelola profil.
               </p>
             </div>
           </div>
@@ -213,7 +213,7 @@ export function DeviceGuard() {
               className="h-8 gap-1.5 rounded-lg text-xs font-semibold shadow-xs"
             >
               <Plus className="size-3.5" />
-              <span>Register Slot</span>
+              <span>Daftar Slot</span>
             </Button>
             <Button
               asChild
@@ -222,7 +222,7 @@ export function DeviceGuard() {
             >
               <Link to="/">
                 <LayoutDashboard className="size-3.5" />
-                <span>View Devices</span>
+                <span>Lihat Perangkat</span>
               </Link>
             </Button>
           </div>

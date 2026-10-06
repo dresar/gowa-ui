@@ -9,9 +9,9 @@ import { Label } from '@/components/ui/label'
 import { useConnection, type TestResult } from '@/stores/connection'
 
 const errorMessages: Record<Exclude<TestResult, 'ok'>, string> = {
-  unauthorized: 'Credentials rejected (401 Unauthorized).',
-  'not-gowa': 'Not an active GOWA server.',
-  unreachable: 'Server unreachable. Verify backend is running.',
+  unauthorized: 'Kredensial ditolak (401 Unauthorized).',
+  'not-gowa': 'Bukan server GOWA aktif.',
+  unreachable: 'Server tidak terjangkau. Verifikasi backend berjalan.',
 }
 
 export default function ConnectPage() {
@@ -95,10 +95,9 @@ export default function ConnectPage() {
             </div>
           </div>
           <div>
-            <CardTitle className="text-lg">Connect to GOWA Server</CardTitle>
+            <CardTitle className="text-lg">Hubungkan ke GOWA</CardTitle>
             <CardDescription className="text-xs">
-              Direct connection to your WhatsApp API instance. Credentials stay strictly in your
-              browser.
+              Kredensial tersimpan di browser Anda.
             </CardDescription>
           </div>
         </CardHeader>
@@ -107,7 +106,7 @@ export default function ConnectPage() {
             <div className="flex flex-col gap-1.5">
               <div className="flex items-center justify-between">
                 <Label htmlFor="server-url" className="text-xs font-medium">
-                  Server Endpoint URL
+                  URL Server
                 </Label>
                 <div className="flex gap-1">
                   <button
@@ -142,7 +141,7 @@ export default function ConnectPage() {
             <div className="grid grid-cols-2 gap-3">
               <div className="flex flex-col gap-1.5">
                 <Label htmlFor="username" className="text-xs font-medium">
-                  Username (optional)
+                  Nama Pengguna (opsional)
                 </Label>
                 <div className="relative flex items-center">
                   <User className="text-muted-foreground absolute left-2.5 size-3.5" />
@@ -158,7 +157,7 @@ export default function ConnectPage() {
               </div>
               <div className="flex flex-col gap-1.5">
                 <Label htmlFor="password" className="text-xs font-medium">
-                  Password (optional)
+                  Kata Sandi (opsional)
                 </Label>
                 <div className="relative flex items-center">
                   <KeyRound className="text-muted-foreground absolute left-2.5 size-3.5" />
@@ -182,12 +181,12 @@ export default function ConnectPage() {
             )}
             {status === 'unauthorized' && !error && (
               <div className="border-destructive/30 bg-destructive/10 text-destructive rounded-lg border p-2.5 text-xs">
-                Credentials rejected. Re-enter credentials.
+                Kredensial ditolak. Masukkan ulang.
               </div>
             )}
             {status === 'unreachable' && !error && (
               <div className="rounded-lg border border-amber-500/30 bg-amber-500/10 p-2.5 text-xs text-amber-600 dark:text-amber-400">
-                Server unreachable — verify GOWA backend is started on that port.
+                Server tidak terjangkau — pastikan backend GOWA berjalan.
               </div>
             )}
 
@@ -199,19 +198,19 @@ export default function ConnectPage() {
               {submitting ? (
                 <>
                   <Loader2 className="size-3.5 animate-spin" />
-                  <span>Connecting…</span>
+                  <span>Menghubungkan…</span>
                 </>
               ) : (
                 <>
                   <CheckCircle2 className="size-3.5" />
-                  <span>Connect</span>
+                  <span>Hubungkan</span>
                 </>
               )}
             </Button>
 
             <div className="text-muted-foreground/80 flex items-center justify-center gap-1.5 pt-1 text-[11px]">
               <Lock className="size-3 text-red-500" />
-              <span>Token-based secure handshake</span>
+              <span>Koneksi aman berbasis token</span>
             </div>
           </form>
         </CardContent>

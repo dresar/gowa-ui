@@ -11,6 +11,7 @@ import {
   Settings,
   ShieldCheck,
   Sparkles,
+  Terminal,
   UserRound,
   Users,
   Wrench,
@@ -24,67 +25,67 @@ import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet'
 import { PasskeyDialog } from '@/features/session/passkey-dialog'
-import { useAppInfo } from '@/hooks/use-app-info'
 import { useDevices } from '@/hooks/use-devices'
 import { cn } from '@/lib/utils'
 import { useConnection } from '@/stores/connection'
 
 const navGroups = [
   {
-    label: 'Overview',
-    items: [{ to: '/', label: 'Devices', icon: LayoutDashboard }],
+    label: 'Ringkasan',
+    items: [{ to: '/', label: 'Perangkat', icon: LayoutDashboard }],
   },
   {
-    label: 'Messaging',
+    label: 'Pesan',
     items: [
-      { to: '/messaging', label: 'Messaging', icon: Send },
-      { to: '/scheduled', label: 'Scheduled', icon: CalendarClock },
-      { to: '/chats', label: 'Chats', icon: MessagesSquare },
+      { to: '/messaging', label: 'Kirim Pesan', icon: Send },
+      { to: '/scheduled', label: 'Terjadwal', icon: CalendarClock },
+      { to: '/chats', label: 'Obrolan', icon: MessagesSquare },
     ],
   },
   {
-    label: 'Automation & Bot',
+    label: 'Otomasi & Bot',
     items: [
-      { to: '/bot/auto-replies', label: 'Auto Replies', icon: Bot },
-      { to: '/bot/ai', label: 'AI Assistant', icon: Sparkles },
-      { to: '/bot/groups', label: 'Group Bot', icon: ShieldCheck },
-      { to: '/bot/logs', label: 'Bot Logs', icon: ScrollText },
+      { to: '/bot/auto-replies', label: 'Balasan Otomatis', icon: Bot },
+      { to: '/bot/menu', label: 'Menu Perintah', icon: Terminal },
+      { to: '/bot/ai', label: 'Asisten AI', icon: Sparkles },
+      { to: '/bot/groups', label: 'Bot Grup', icon: ShieldCheck },
+      { to: '/bot/logs', label: 'Log Bot', icon: ScrollText },
     ],
   },
   {
-    label: 'Directory',
+    label: 'Direktori',
     items: [
-      { to: '/groups', label: 'Groups', icon: Users },
-      { to: '/account', label: 'Account', icon: UserRound },
+      { to: '/groups', label: 'Grup', icon: Users },
+      { to: '/account', label: 'Akun', icon: UserRound },
     ],
   },
   {
-    label: 'System',
+    label: 'Sistem',
     items: [
-      { to: '/misc', label: 'Channels & Calls', icon: Wrench },
-      { to: '/settings', label: 'Settings', icon: Settings },
+      { to: '/misc', label: 'Saluran & Panggilan', icon: Wrench },
+      { to: '/settings', label: 'Pengaturan', icon: Settings },
     ],
   },
 ]
 
 const routeTitles: Record<string, { label: string; icon: typeof LayoutDashboard }> = {
-  '/': { label: 'Devices', icon: LayoutDashboard },
-  '/messaging': { label: 'Messaging', icon: Send },
-  '/scheduled': { label: 'Scheduled', icon: CalendarClock },
-  '/chats': { label: 'Chats', icon: MessagesSquare },
-  '/bot/auto-replies': { label: 'Auto Replies', icon: Bot },
-  '/bot/rules': { label: 'Auto Replies', icon: Bot },
-  '/bot/ai': { label: 'AI Assistant', icon: Sparkles },
-  '/bot/groups': { label: 'Group Bot', icon: ShieldCheck },
-  '/bot/logs': { label: 'Bot Logs', icon: ScrollText },
-  '/groups': { label: 'Groups', icon: Users },
-  '/account': { label: 'Account', icon: UserRound },
-  '/misc': { label: 'Channels', icon: Wrench },
-  '/settings': { label: 'Settings', icon: Settings },
+  '/': { label: 'Perangkat', icon: LayoutDashboard },
+  '/messaging': { label: 'Kirim Pesan', icon: Send },
+  '/scheduled': { label: 'Terjadwal', icon: CalendarClock },
+  '/chats': { label: 'Obrolan', icon: MessagesSquare },
+  '/bot/auto-replies': { label: 'Balasan Otomatis', icon: Bot },
+  '/bot/rules': { label: 'Balasan Otomatis', icon: Bot },
+  '/bot/menu': { label: 'Menu Perintah', icon: Terminal },
+  '/bot/ai': { label: 'Asisten AI', icon: Sparkles },
+  '/bot/groups': { label: 'Bot Grup', icon: ShieldCheck },
+  '/bot/logs': { label: 'Log Bot', icon: ScrollText },
+  '/groups': { label: 'Grup', icon: Users },
+  '/account': { label: 'Akun', icon: UserRound },
+  '/misc': { label: 'Saluran', icon: Wrench },
+  '/settings': { label: 'Pengaturan', icon: Settings },
 }
 
 function NavContent({ onNavigate }: { onNavigate?: () => void }) {
-  const { data: info } = useAppInfo()
   const { data: devices } = useDevices()
   const totalDevices = devices?.length ?? 0
 
@@ -96,7 +97,6 @@ function NavContent({ onNavigate }: { onNavigate?: () => void }) {
             {group.label}
           </p>
           {group.items
-            .filter(({ to }) => to !== '/scheduled' || info?.scheduled_sends)
             .map(({ to, label, icon: Icon }) => (
               <NavLink
                 key={to}
@@ -147,7 +147,7 @@ export function AppShell() {
   const [mobileNavOpen, setMobileNavOpen] = useState(false)
 
   const currentRoute = routeTitles[location.pathname] ?? {
-    label: 'Dashboard',
+    label: 'Dasbor',
     icon: LayoutDashboard,
   }
   const CurrentIcon = currentRoute.icon
@@ -158,11 +158,12 @@ export function AppShell() {
         <div aria-hidden="true" className="grid-pattern pointer-events-none fixed inset-0 z-0" />
         <div className="relative z-10 flex flex-col items-center gap-3">
           <Loader2 className="size-6 animate-spin text-red-500" />
-          <p className="text-muted-foreground text-xs font-medium">Connecting to GOWA session…</p>
+          <p className="text-muted-foreground text-xs font-medium">Menghubungkan ke GOWA…</p>
         </div>
       </div>
     )
   }
+
 
   if (status !== 'connected') {
     return <Navigate to="/connect" replace />
@@ -243,7 +244,7 @@ export function AppShell() {
             >
               <Link to="/messaging">
                 <Send className="size-3" />
-                <span>Compose</span>
+                <span>Kirim</span>
               </Link>
             </Button>
             <WsBadge />
@@ -251,10 +252,20 @@ export function AppShell() {
           </div>
         </header>
 
-        <main className="flex-1 min-h-0 overflow-y-auto p-3.5 pb-20 sm:p-5 md:p-6 md:pb-6">
+        <main className={cn(
+          'flex-1 min-h-0 overflow-y-auto pb-20 md:pb-6',
+          location.pathname === '/chats'
+            ? 'p-2 sm:p-3 overflow-hidden flex flex-col md:pb-0'
+            : 'p-3 sm:p-4 md:p-6'
+        )}>
           <div
             key={location.pathname}
-            className="stagger mx-auto flex max-w-5xl flex-col gap-4 sm:gap-5"
+            className={cn(
+              'stagger flex flex-col',
+              location.pathname === '/chats'
+                ? 'w-full h-full flex-1 max-w-none'
+                : 'w-full max-w-[1600px] mx-auto gap-3.5 sm:gap-4'
+            )}
           >
             <Outlet />
           </div>
@@ -273,7 +284,7 @@ export function AppShell() {
             }
           >
             <LayoutDashboard className="size-4" />
-            <span>Devices</span>
+            <span>Perangkat</span>
           </NavLink>
           <NavLink
             to="/messaging"
@@ -285,7 +296,7 @@ export function AppShell() {
             }
           >
             <Send className="size-4" />
-            <span>Compose</span>
+            <span>Kirim</span>
           </NavLink>
           <NavLink
             to="/chats"
@@ -297,7 +308,7 @@ export function AppShell() {
             }
           >
             <MessagesSquare className="size-4" />
-            <span>Chats</span>
+            <span>Obrolan</span>
           </NavLink>
           <NavLink
             to="/account"
@@ -309,7 +320,7 @@ export function AppShell() {
             }
           >
             <UserRound className="size-4" />
-            <span>Account</span>
+            <span>Akun</span>
           </NavLink>
           <button
             type="button"

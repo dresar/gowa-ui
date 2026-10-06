@@ -52,8 +52,8 @@ export default function DashboardPage() {
   return (
     <div className="flex flex-col gap-4 sm:gap-5">
       <PageHeader
-        title="Devices"
-        description="Multi-device session orchestration."
+        title="Perangkat"
+        description="Manajemen sesi multi-perangkat."
         actions={
           <Button
             size="sm"
@@ -61,7 +61,7 @@ export default function DashboardPage() {
             className="h-8 gap-1.5 rounded-lg text-xs font-semibold shadow-xs"
           >
             <Plus className="size-3.5" />
-            <span>Add Device</span>
+            <span>Tambah</span>
           </Button>
         }
       />
@@ -80,7 +80,7 @@ export default function DashboardPage() {
             <Smartphone className="size-4" />
           </div>
           <div className="min-w-0">
-            <p className="text-muted-foreground text-[11px] font-medium">Total Slots</p>
+            <p className="text-muted-foreground text-[11px] font-medium">Total</p>
             <p className="font-heading text-foreground text-lg font-bold tracking-tight">{total}</p>
           </div>
         </button>
@@ -97,7 +97,7 @@ export default function DashboardPage() {
             <CheckCircle2 className="size-4" />
           </div>
           <div className="min-w-0">
-            <p className="text-muted-foreground text-[11px] font-medium">Logged In</p>
+            <p className="text-muted-foreground text-[11px] font-medium">Aktif</p>
             <p className="font-heading text-lg font-bold tracking-tight text-emerald-500">
               {loggedIn}
             </p>
@@ -116,7 +116,7 @@ export default function DashboardPage() {
             <Radio className="size-4 animate-pulse" />
           </div>
           <div className="min-w-0">
-            <p className="text-muted-foreground text-[11px] font-medium">Connecting</p>
+            <p className="text-muted-foreground text-[11px] font-medium">Menyambung</p>
             <p className="font-heading text-lg font-bold tracking-tight text-amber-500">
               {connecting}
             </p>
@@ -151,7 +151,7 @@ export default function DashboardPage() {
             <Input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search"
+              placeholder="Cari"
               className="h-8.5 rounded-lg pl-8 text-xs"
             />
           </div>
@@ -166,7 +166,7 @@ export default function DashboardPage() {
                   : 'bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground',
               )}
             >
-              All ({total})
+              Semua ({total})
             </button>
             <button
               type="button"
@@ -190,7 +190,7 @@ export default function DashboardPage() {
                   : 'bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground',
               )}
             >
-              Syncing ({connecting})
+              Sinkron ({connecting})
             </button>
             <button
               type="button"
@@ -211,7 +211,7 @@ export default function DashboardPage() {
       {error && (
         <Card className="border-destructive/40 bg-destructive/10">
           <CardContent className="text-destructive py-3 text-xs">
-            Failed to load devices: {toApiError(error).message}
+            Gagal memuat perangkat: {toApiError(error).message}
           </CardContent>
         </Card>
       )}
@@ -237,11 +237,10 @@ export default function DashboardPage() {
 
             <div className="flex max-w-md flex-col gap-1.5">
               <h2 className="font-heading text-foreground text-base font-bold tracking-tight sm:text-lg">
-                No WhatsApp Devices Registered
+                Belum Ada Perangkat
               </h2>
               <p className="text-muted-foreground text-xs leading-relaxed">
-                Provision a session slot to begin pairing physical phones, automating broadcasts,
-                and synchronizing contacts.
+                Daftarkan slot sesi untuk mulai menghubungkan nomor.
               </p>
             </div>
 
@@ -251,10 +250,10 @@ export default function DashboardPage() {
                   <span className="bg-primary/20 text-primary flex size-4 items-center justify-center rounded text-[10px] font-bold">
                     1
                   </span>
-                  <span>Register Slot</span>
+                  <span>Daftar Slot</span>
                 </div>
                 <p className="text-muted-foreground mt-1 text-[10px] leading-normal">
-                  Allocate an isolated WhatsApp Multi-Device session container.
+                  Alokasikan slot sesi WhatsApp Multi-Device.
                 </p>
               </div>
               <div className="border-border/60 bg-muted/30 rounded-lg border p-3">
@@ -262,10 +261,10 @@ export default function DashboardPage() {
                   <span className="bg-primary/20 text-primary flex size-4 items-center justify-center rounded text-[10px] font-bold">
                     2
                   </span>
-                  <span>Pair Phone</span>
+                  <span>Pasangkan HP</span>
                 </div>
                 <p className="text-muted-foreground mt-1 text-[10px] leading-normal">
-                  Scan dynamic QR code or use WhatsApp pairing code.
+                  Pindai QR atau gunakan kode pemasangan WhatsApp.
                 </p>
               </div>
               <div className="border-border/60 bg-muted/30 rounded-lg border p-3">
@@ -273,10 +272,10 @@ export default function DashboardPage() {
                   <span className="bg-primary/20 text-primary flex size-4 items-center justify-center rounded text-[10px] font-bold">
                     3
                   </span>
-                  <span>Broadcast & Stream</span>
+                  <span>Kirim & Pantau</span>
                 </div>
                 <p className="text-muted-foreground mt-1 text-[10px] leading-normal">
-                  Dispatch messages, receive webhooks, and manage groups.
+                  Kirim pesan, terima webhook, kelola grup.
                 </p>
               </div>
             </div>
@@ -286,7 +285,7 @@ export default function DashboardPage() {
               className="mt-1 h-8 gap-1.5 rounded-lg text-xs font-semibold shadow-xs"
             >
               <Plus className="size-3.5" />
-              <span>Register Device</span>
+              <span>Daftar</span>
             </Button>
           </CardContent>
         </Card>
@@ -294,9 +293,9 @@ export default function DashboardPage() {
 
       {devices && devices.length > 0 && filteredDevices.length === 0 && (
         <div className="border-border/70 bg-card/60 flex flex-col items-center justify-center gap-2 rounded-xl border p-10 text-center backdrop-blur-xl">
-          <p className="text-foreground text-xs font-semibold">No matching devices</p>
+          <p className="text-foreground text-xs font-semibold">Tidak ditemukan</p>
           <p className="text-muted-foreground text-[11px]">
-            Try clearing your search query or status filter.
+            Hapus filter atau kata kunci.
           </p>
           <Button
             size="xs"
@@ -307,7 +306,7 @@ export default function DashboardPage() {
             }}
             className="mt-1 h-7 rounded-[6px] text-xs font-medium"
           >
-            Reset Filters
+            Reset
           </Button>
         </div>
       )}

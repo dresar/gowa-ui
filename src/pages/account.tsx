@@ -43,29 +43,29 @@ interface LookupType {
 const lookups: LookupType[] = [
   {
     value: 'info',
-    label: 'User info',
-    description: "Look up a user's public info by phone or LID.",
+    label: 'Info pengguna',
+    description: 'Cari info publik pengguna lewat nomor atau LID.',
     icon: UserRoundSearch,
     form: <UserInfoForm />,
   },
   {
     value: 'check',
-    label: 'User check',
-    description: 'Check whether a number is on WhatsApp.',
+    label: 'Cek nomor',
+    description: 'Periksa apakah nomor terdaftar di WhatsApp.',
     icon: UserRoundCheck,
     form: <UserCheckForm />,
   },
   {
     value: 'avatar',
-    label: 'Avatar',
-    description: "Fetch a user's profile picture by phone or LID.",
+    label: 'Foto profil',
+    description: 'Ambil foto profil pengguna lewat nomor atau LID.',
     icon: Image,
     form: <AvatarForm />,
   },
   {
     value: 'business',
-    label: 'Business profile',
-    description: "Look up a business user's profile, catalog, and category.",
+    label: 'Profil bisnis',
+    description: 'Cari profil bisnis, katalog, dan kategori.',
     icon: Store,
     form: <BusinessProfileForm />,
   },
@@ -79,7 +79,7 @@ function LookupsPanel() {
     <div className="grid gap-3 sm:gap-4 lg:grid-cols-[210px_1fr]">
       <div className="glass-card hidden flex-col gap-1 rounded-xl p-2 backdrop-blur-xl lg:flex">
         <p className="text-muted-foreground/70 px-2.5 pb-1 text-[10px] font-semibold tracking-wider uppercase">
-          Directory Query
+          Pencarian Direktori
         </p>
         {lookups.map(({ value, label, icon: Icon }) => (
           <button
@@ -101,7 +101,7 @@ function LookupsPanel() {
       </div>
 
       <div className="flex flex-col gap-1.5 lg:hidden">
-        <Label className="text-xs">Lookup Query Type</Label>
+        <Label className="text-xs">Tipe Pencarian</Label>
         <Select value={type} onValueChange={setType}>
           <SelectTrigger className="h-8.5 text-xs">
             <SelectValue />
@@ -138,8 +138,8 @@ export default function AccountPage() {
   return (
     <div className="flex flex-col gap-4 sm:gap-5">
       <PageHeader
-        title="Account"
-        description="Profile, contacts, and privacy configuration."
+        title="Akun"
+        description="Profil, kontak, dan privasi akun."
       />
       {device === null ? (
         <DeviceGuard />
@@ -149,17 +149,17 @@ export default function AccountPage() {
           <Tabs defaultValue="profile" className="gap-3">
             <TabsList className="border-border/70 bg-card/60 h-9 rounded-lg border p-1 backdrop-blur-md">
               <TabsTrigger value="profile" className="h-7 rounded-md text-xs font-medium">
-                Profile
+                Profil
               </TabsTrigger>
               <TabsTrigger value="lookups" className="h-7 rounded-md text-xs font-medium">
                 <ScanSearch className="size-3.5" />
-                Lookups
+                Pencarian
               </TabsTrigger>
               <TabsTrigger value="contacts" className="h-7 rounded-md text-xs font-medium">
-                Contacts
+                Kontak
               </TabsTrigger>
               <TabsTrigger value="privacy" className="h-7 rounded-md text-xs font-medium">
-                Privacy
+                Privasi
               </TabsTrigger>
             </TabsList>
             <TabsContent value="profile" className="flex flex-col gap-4 pt-1">
@@ -167,15 +167,15 @@ export default function AccountPage() {
               <div className="grid gap-3 sm:grid-cols-2">
                 <ActionCard
                   icon={CircleUserRound}
-                  title="Push Name"
-                  description="The display name other WhatsApp users see for you."
+                  title="Nama Tampilan"
+                  description="Nama tampilan WhatsApp yang dilihat pengguna lain."
                 >
                   <PushnameForm />
                 </ActionCard>
                 <ActionCard
                   icon={Image}
-                  title="Profile Picture"
-                  description="Upload a new avatar or remove your current one."
+                  title="Foto Profil"
+                  description="Unggah foto profil baru atau hapus yang ada."
                 >
                   <ChangeAvatarForm />
                 </ActionCard>

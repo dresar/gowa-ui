@@ -64,24 +64,24 @@ export default function BotGroupsPage() {
       return upsertGroupRule(payload)
     },
     onSuccess: () => {
-      toast.success('Policy saved')
+      toast.success('Kebijakan tersimpan')
       setDialogOpen(false)
       resetForm()
       void queryClient.invalidateQueries({ queryKey: ['bot-group-rules'] })
     },
     onError: (err: Error) => {
-      toast.error(err.message || 'Save failed')
+      toast.error(err.message || 'Gagal menyimpan')
     },
   })
 
   const deleteMutation = useMutation({
     mutationFn: deleteGroupRule,
     onSuccess: () => {
-      toast.success('Policy deleted')
+      toast.success('Kebijakan dihapus')
       void queryClient.invalidateQueries({ queryKey: ['bot-group-rules'] })
     },
     onError: (err: Error) => {
-      toast.error(err.message || 'Delete failed')
+      toast.error(err.message || 'Gagal menghapus')
     },
   })
 
@@ -112,10 +112,10 @@ export default function BotGroupsPage() {
   }
 
   return (
-    <div className="flex flex-col gap-6 p-4 sm:p-6">
+    <div className="w-full flex flex-col gap-4">
       <PageHeader
-        title="Group Bot"
-        description="Moderation"
+        title="Bot Grup"
+        description="Moderasi"
         actions={
           <div className="flex items-center gap-2">
             <Button
@@ -125,7 +125,7 @@ export default function BotGroupsPage() {
               className="h-8 gap-1.5 rounded-[6px] text-xs"
             >
               <RefreshCw className="size-3.5" />
-              <span>Refresh</span>
+              <span>Perbarui</span>
             </Button>
             <Button
               size="sm"
@@ -133,7 +133,7 @@ export default function BotGroupsPage() {
               className="h-8 gap-1.5 rounded-[6px] bg-red-600 text-xs text-white hover:bg-red-700 shadow-xs shadow-red-500/30"
             >
               <Plus className="size-3.5" />
-              <span>Add Group</span>
+              <span>Tambah Grup</span>
             </Button>
           </div>
         }
@@ -142,8 +142,8 @@ export default function BotGroupsPage() {
       {groupRules.length === 0 && !isLoading ? (
         <EmptyState
           icon={Users}
-          title="No Group Policies"
-          hint="Add a group policy to configure anti-link moderation, welcome messages, and farewells."
+          title="Belum Ada Kebijakan"
+          hint="Tambah kebijakan grup untuk moderasi anti-link, pesan sambutan, dan perpisahan."
           action={
             <Button
               size="sm"
@@ -151,7 +151,7 @@ export default function BotGroupsPage() {
               className="h-8 gap-1.5 rounded-[6px] bg-red-600 text-xs text-white hover:bg-red-700 shadow-xs"
             >
               <Plus className="size-3.5" />
-              <span>Add Group</span>
+              <span>Tambah Grup</span>
             </Button>
           }
         />
@@ -162,9 +162,9 @@ export default function BotGroupsPage() {
               <TableRow>
                 <TableHead className="text-xs font-semibold">Group JID</TableHead>
                 <TableHead className="w-[120px] text-xs font-semibold">Anti-Link</TableHead>
-                <TableHead className="text-xs font-semibold">Welcome</TableHead>
-                <TableHead className="text-xs font-semibold">Farewell</TableHead>
-                <TableHead className="w-[90px] text-right text-xs font-semibold">Actions</TableHead>
+                <TableHead className="text-xs font-semibold">Sambutan</TableHead>
+                <TableHead className="text-xs font-semibold">Perpisahan</TableHead>
+                <TableHead className="w-[90px] text-right text-xs font-semibold">Aksi</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -177,19 +177,19 @@ export default function BotGroupsPage() {
                     {rule.anti_link_enabled ? (
                       <Badge variant="outline" className="border-red-500/30 bg-red-500/10 text-red-500 text-[11px] gap-1">
                         <ShieldAlert className="size-3" />
-                        <span>Enabled</span>
+                        <span>Aktif</span>
                       </Badge>
                     ) : (
                       <Badge variant="secondary" className="text-[11px] text-muted-foreground">
-                        Disabled
+                        Nonaktif
                       </Badge>
                     )}
                   </TableCell>
                   <TableCell className="max-w-[200px] truncate text-xs text-muted-foreground">
-                    {rule.welcome_enabled ? rule.welcome_template || 'Enabled' : 'Disabled'}
+                    {rule.welcome_enabled ? rule.welcome_template || 'Aktif' : 'Nonaktif'}
                   </TableCell>
                   <TableCell className="max-w-[200px] truncate text-xs text-muted-foreground">
-                    {rule.farewell_enabled ? rule.farewell_template || 'Enabled' : 'Disabled'}
+                    {rule.farewell_enabled ? rule.farewell_template || 'Aktif' : 'Nonaktif'}
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex items-center justify-end gap-1">
@@ -206,7 +206,7 @@ export default function BotGroupsPage() {
                         size="icon"
                         className="size-7 rounded-[5px] text-destructive hover:bg-destructive/10"
                         onClick={() => {
-                          if (confirm('Delete policy?')) {
+                          if (confirm('Hapus kebijakan ini?')) {
                             deleteMutation.mutate(rule.group_jid)
                           }
                         }}
@@ -226,7 +226,7 @@ export default function BotGroupsPage() {
         <DialogContent className="max-w-md border-border/80 bg-card/95 backdrop-blur-xl sm:rounded-lg">
           <DialogHeader>
             <DialogTitle className="text-base font-bold tracking-tight">
-              {editingGroup ? 'Edit Group Policy' : 'Add Group Policy'}
+              {editingGroup ? 'Edit Kebijakan' : 'Tambah Kebijakan'}
             </DialogTitle>
           </DialogHeader>
 
@@ -246,7 +246,7 @@ export default function BotGroupsPage() {
               <div className="flex flex-col gap-0.5">
                 <Label className="text-xs font-semibold">Anti-Link</Label>
                 <span className="text-[11px] text-muted-foreground">
-                  Auto revoke link messages in group
+                  Cabut otomatis pesan link di grup
                 </span>
               </div>
               <Switch
@@ -258,7 +258,7 @@ export default function BotGroupsPage() {
 
             <div className="flex flex-col gap-2 rounded-lg border border-border/50 p-3 bg-muted/20">
               <div className="flex items-center justify-between">
-                <Label className="text-xs font-semibold">Welcome</Label>
+                <Label className="text-xs font-semibold">Sambutan</Label>
                 <Switch
                   checked={welcomeEnabled}
                   onCheckedChange={setWelcomeEnabled}
@@ -277,7 +277,7 @@ export default function BotGroupsPage() {
 
             <div className="flex flex-col gap-2 rounded-lg border border-border/50 p-3 bg-muted/20">
               <div className="flex items-center justify-between">
-                <Label className="text-xs font-semibold">Farewell</Label>
+                <Label className="text-xs font-semibold">Perpisahan</Label>
                 <Switch
                   checked={farewellEnabled}
                   onCheckedChange={setFarewellEnabled}
@@ -302,7 +302,7 @@ export default function BotGroupsPage() {
               onClick={() => setDialogOpen(false)}
               className="h-8 text-xs rounded-[6px]"
             >
-              Cancel
+              Batal
             </Button>
             <Button
               size="sm"
@@ -310,7 +310,7 @@ export default function BotGroupsPage() {
               disabled={saveMutation.isPending || !groupJid.trim()}
               className="h-8 rounded-[6px] bg-red-600 text-xs text-white hover:bg-red-700 shadow-xs"
             >
-              Save
+              Simpan
             </Button>
           </DialogFooter>
         </DialogContent>

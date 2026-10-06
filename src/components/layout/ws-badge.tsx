@@ -3,8 +3,8 @@ import { useWsStore, type WsStatus } from '@/lib/ws'
 import { cn } from '@/lib/utils'
 
 const labels: Record<WsStatus, string> = {
-  connected: 'WebSocket Connected (Realtime updates active)',
-  connecting: 'WebSocket Reconnecting…',
+  connected: 'WebSocket Terhubung (Pembaruan realtime aktif)',
+  connecting: 'WebSocket Menyambung…',
   disconnected: 'WebSocket Offline',
 }
 
@@ -39,7 +39,7 @@ export function WsBadge() {
             />
           </span>
           <span className="hidden sm:inline">
-            {status === 'connected' ? 'Live' : status === 'connecting' ? 'Connecting' : 'Offline'}
+            {status === 'connected' ? 'Aktif' : status === 'connecting' ? 'Menyambung' : 'Offline'}
           </span>
         </div>
       </TooltipTrigger>

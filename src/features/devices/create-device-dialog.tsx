@@ -43,7 +43,7 @@ export function CreateDeviceDialog({
   const mutation = useMutation({
     mutationFn: addDevice,
     onSuccess: (device) => {
-      toast.success(`Device ${device.id} added`)
+      toast.success(`Perangkat ${device.id} ditambahkan`)
       void queryClient.invalidateQueries({ queryKey: ['devices'] })
       selectDevice(device.id)
       setIsOpen(false)
@@ -71,29 +71,29 @@ export function CreateDeviceDialog({
         <DialogTrigger asChild>
           <Button size="sm" className="h-8 gap-1.5 rounded-lg text-xs font-semibold">
             <Plus className="size-3.5" />
-            <span>Add device</span>
+            <span>Tambah</span>
           </Button>
         </DialogTrigger>
       ) : null}
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Add device</DialogTitle>
+          <DialogTitle>Tambah Perangkat</DialogTitle>
           <DialogDescription>
-            Registers a device slot. Pair it with a phone afterwards via QR or pairing code.
+            Daftarkan slot perangkat. Pasangkan HP lewat QR atau kode.
           </DialogDescription>
         </DialogHeader>
         <form className="flex flex-col gap-4" onSubmit={onSubmit}>
           <div className="flex flex-col gap-2">
-            <Label htmlFor="device-id">Device ID (optional)</Label>
+            <Label htmlFor="device-id">ID Perangkat (opsional)</Label>
             <Input
               id="device-id"
-              placeholder="Auto"
+              placeholder="Otomatis"
               value={deviceId}
               onChange={(event) => setDeviceId(event.target.value)}
             />
           </div>
           <div className="flex flex-col gap-2">
-            <Label htmlFor="webhook-url">Webhook URL (optional)</Label>
+            <Label htmlFor="webhook-url">URL Webhook (opsional)</Label>
             <Input
               id="webhook-url"
               placeholder="https://example.com/webhook"
@@ -102,7 +102,7 @@ export function CreateDeviceDialog({
             />
           </div>
           <div className="flex flex-col gap-2">
-            <Label htmlFor="webhook-secret">Webhook secret (optional)</Label>
+            <Label htmlFor="webhook-secret">Rahasia Webhook (opsional)</Label>
             <Input
               id="webhook-secret"
               value={webhookSecret}
@@ -116,7 +116,7 @@ export function CreateDeviceDialog({
               className="h-8 text-xs font-semibold"
             >
               {mutation.isPending && <Loader2 className="size-3.5 animate-spin" />}
-              <span>Add device</span>
+              <span>Tambah</span>
             </Button>
           </DialogFooter>
         </form>

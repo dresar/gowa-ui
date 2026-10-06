@@ -3,7 +3,6 @@ import { MessagesSquare } from 'lucide-react'
 import { ChatList } from '@/features/chat/chat-list'
 import { MessageView } from '@/features/chat/message-view'
 import { Card } from '@/components/ui/card'
-import { PageHeader } from '@/components/shared/page-header'
 import { selectedChatForDevice, type ChatSelection } from '@/features/chat/device-scope'
 import { DeviceGuard, useSelectedDevice } from '@/hooks/use-device-guard'
 import type { ChatInfo } from '@/api/chat'
@@ -23,23 +22,15 @@ export default function ChatsPage() {
   if (!device) {
     return (
       <div className="flex flex-col gap-4">
-        <PageHeader
-          title="Chats"
-          description="Stored conversations."
-        />
         <DeviceGuard />
       </div>
     )
   }
 
   return (
-    <div className="flex flex-col gap-3 sm:gap-4 lg:h-[calc(100svh-8rem)]">
-      <PageHeader
-        title="Chats"
-        description="Stored conversations."
-      />
-      <div className="grid gap-3 sm:gap-4 lg:min-h-0 lg:flex-1 lg:grid-cols-[330px_1fr]">
-        <Card className="glass-card h-[24rem] overflow-hidden rounded-xl p-3 backdrop-blur-xl lg:h-auto lg:min-h-0">
+    <div className="flex h-full w-full min-h-0 flex-1 flex-col">
+      <div className="grid h-full min-h-0 flex-1 gap-2.5 sm:gap-3 lg:grid-cols-[340px_1fr] xl:grid-cols-[380px_1fr]">
+        <Card className="glass-card flex h-full min-h-0 flex-col overflow-hidden rounded-xl p-2.5 backdrop-blur-xl sm:p-3">
           <ChatList
             key={device}
             deviceId={device}
@@ -49,7 +40,7 @@ export default function ChatsPage() {
         </Card>
         <Card
           ref={messagePane}
-          className="glass-card h-[calc(100svh-9rem)] min-h-[26rem] overflow-hidden rounded-xl p-3 backdrop-blur-xl lg:h-auto lg:min-h-0"
+          className="glass-card flex h-full min-h-0 flex-col overflow-hidden rounded-xl p-2.5 backdrop-blur-xl sm:p-3"
         >
           {selected ? (
             <MessageView key={`${device}:${selected.jid}`} chat={selected} deviceId={device} />
@@ -58,9 +49,9 @@ export default function ChatsPage() {
               <div className="border-border/80 bg-muted/40 text-primary flex size-12 items-center justify-center rounded-xl border shadow-2xs">
                 <MessagesSquare className="size-6" />
               </div>
-              <p className="text-foreground text-xs font-medium">Select a conversation</p>
+              <p className="text-foreground text-xs font-medium">Pilih percakapan</p>
               <p className="text-muted-foreground text-[11px]">
-                Click any chat from the left panel to stream stored messages
+                Klik obrolan dari panel kiri untuk melihat pesan
               </p>
             </div>
           )}

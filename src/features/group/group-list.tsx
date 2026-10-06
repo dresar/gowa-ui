@@ -75,22 +75,22 @@ export function GroupDirectory({ onSelect }: { onSelect: (group: MyGroup) => voi
           <Search className="text-muted-foreground absolute top-2.5 left-2.5 size-4" />
           <Input
             className="pl-8"
-            placeholder="Search"
+            placeholder="Cari"
             value={search}
             onChange={(event) => setSearch(event.target.value)}
           />
         </div>
         <Button variant="outline" size="sm" onClick={() => refetch()} disabled={isFetching}>
           <RefreshCw className={isFetching ? 'size-4 animate-spin' : 'size-4'} />
-          Refresh
+          Perbarui
         </Button>
       </div>
 
       {error && isDeviceNotFoundError(error) ? (
         <EmptyState
           icon={Smartphone}
-          title="Device not found"
-          hint="The selected WhatsApp session is not available. Please select an active device or register a new one."
+          title="Perangkat tidak ditemukan"
+          hint="Sesi WhatsApp yang dipilih tidak tersedia. Silakan pilih perangkat aktif atau daftarkan baru."
           action={
             <Button
               size="sm"
@@ -98,13 +98,13 @@ export function GroupDirectory({ onSelect }: { onSelect: (group: MyGroup) => voi
               className="h-8 gap-1.5 rounded-lg text-xs font-semibold shadow-xs"
             >
               <Plus className="size-3.5" />
-              <span>Add Device</span>
+              <span>Tambah</span>
             </Button>
           }
         />
       ) : error ? (
         <ErrorNotice
-          title="Failed to load groups"
+          title="Gagal memuat grup"
           error={error}
           onRetry={() => refetch()}
         />
@@ -120,13 +120,13 @@ export function GroupDirectory({ onSelect }: { onSelect: (group: MyGroup) => voi
       {groups && groups.length === 0 && (
         <EmptyState
           icon={Users}
-          title="No groups yet"
-          hint="Create a group or join one with an invite link."
+          title="Belum ada grup"
+          hint="Buat grup atau gabung melalui tautan undangan."
         />
       )}
 
       {groups && groups.length > 0 && filtered.length === 0 && (
-        <EmptyState icon={Search} title="No matches" hint={`Nothing matches "${search}".`} />
+        <EmptyState icon={Search} title="Tidak ditemukan" hint={`Tidak ada yang cocok dengan "${search}".`} />
       )}
 
       {filtered.length > 0 && (
@@ -152,14 +152,14 @@ export function GroupDirectory({ onSelect }: { onSelect: (group: MyGroup) => voi
                   <p className="truncate font-medium">{group.Name || shortId(group.JID)}</p>
                   <IdText value={shortId(group.JID)} />
                   <p className="text-muted-foreground text-xs">
-                    {group.Participants?.length ?? group.ParticipantCount ?? 0} participants ·{' '}
+                    {group.Participants?.length ?? group.ParticipantCount ?? 0} anggota ·{' '}
                     {formatDate(group.GroupCreated)}
                   </p>
                 </div>
                 <Button
                   variant="ghost"
                   size="icon"
-                  aria-label={`Leave ${group.Name || 'group'}`}
+                  aria-label={`Keluar dari ${group.Name || 'grup'}`}
                   className="text-muted-foreground hover:text-destructive"
                   onClick={(event) => {
                     event.stopPropagation()
@@ -178,18 +178,18 @@ export function GroupDirectory({ onSelect }: { onSelect: (group: MyGroup) => voi
       <AlertDialog open={!!leaveTarget} onOpenChange={(open) => !open && setLeaveTarget(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Leave {leaveTarget?.Name || 'this group'}?</AlertDialogTitle>
+            <AlertDialogTitle>Keluar dari {leaveTarget?.Name || 'grup ini'}?</AlertDialogTitle>
             <AlertDialogDescription>
-              You will be removed from the group. To rejoin you will need a new invite.
+              Anda akan dikeluarkan dari grup. Untuk bergabung kembali memerlukan undangan baru.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>Batal</AlertDialogCancel>
             <AlertDialogAction
               onClick={() => leaveTarget && leave.mutate({ group_id: leaveTarget.JID })}
               className="bg-destructive hover:bg-destructive/90 text-white"
             >
-              Leave
+              Keluar
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

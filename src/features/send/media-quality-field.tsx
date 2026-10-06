@@ -27,7 +27,7 @@ export function MediaQualityField({
 
   return (
     <div className="flex flex-col gap-2">
-      <Label htmlFor={controlId}>Media quality</Label>
+      <Label htmlFor={controlId}>Kualitas media</Label>
       <Select value={value} onValueChange={(next) => onChange(next as MediaQuality)}>
         <SelectTrigger id={controlId} aria-describedby={descriptionId} className="w-full">
           <SelectValue />

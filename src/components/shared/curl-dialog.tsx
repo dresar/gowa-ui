@@ -43,7 +43,7 @@ function CurlDialog({
   const copy = async () => {
     await navigator.clipboard.writeText(toCurl(request, { ...options, revealSecrets: true }))
     setCopied(true)
-    toast.success('cURL copied')
+    toast.success('Disalin!')
     window.setTimeout(() => setCopied(false), 2_000)
   }
 
@@ -52,10 +52,10 @@ function CurlDialog({
       <DialogContent className="sm:max-w-2xl">
         <DialogHeader>
           <DialogTitle>
-            cURL for {request.method} {request.path}
+            cURL — {request.method} {request.path}
           </DialogTitle>
           <DialogDescription>
-            The same request this form sends. Run it anywhere curl is installed.
+            Perintah curl dari form ini.
           </DialogDescription>
         </DialogHeader>
         <pre className="bg-muted/50 max-h-80 overflow-auto rounded-lg border p-3 font-mono text-xs">
@@ -63,14 +63,14 @@ function CurlDialog({
         </pre>
         {(secret || hasFileField(request)) && (
           <ul className="text-muted-foreground flex flex-col gap-1 text-xs">
-            {secret && <li>Your password is hidden here — the copied command contains it.</li>}
-            {hasFileField(request) && <li>Replace the filename after @ with the path on disk.</li>}
+            {secret && <li>Kata sandi disembunyikan di sini — tersalin di perintah.</li>}
+            {hasFileField(request) && <li>Ganti nama file setelah @ dengan path lokal.</li>}
           </ul>
         )}
         <DialogFooter showCloseButton>
           <Button onClick={copy}>
             {copied ? <Check className="size-4" /> : <Copy className="size-4" />}
-            {copied ? 'Copied' : 'Copy'}
+            {copied ? 'Disalin' : 'Salin'}
           </Button>
         </DialogFooter>
       </DialogContent>

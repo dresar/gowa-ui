@@ -50,7 +50,7 @@ export function DeviceSwitcher() {
           className="h-8 shrink-0 gap-1.5 rounded-lg border-red-500/30 bg-gradient-to-r from-red-500/15 to-rose-500/10 text-xs font-semibold text-red-500 hover:border-red-500/50 hover:from-red-500/25 hover:to-rose-500/15 dark:text-red-400"
         >
           <Plus className="size-3.5" />
-          <span>Add Device</span>
+          <span>Tambah</span>
         </Button>
         <CreateDeviceDialog open={createOpen} onOpenChange={setCreateOpen} />
       </>
@@ -77,7 +77,7 @@ export function DeviceSwitcher() {
             ) : (
               <Smartphone className="size-3.5 shrink-0 animate-pulse text-amber-500" />
             )}
-            <SelectValue placeholder="Device" className="min-w-0 flex-1 truncate block">
+            <SelectValue placeholder="Perangkat" className="min-w-0 flex-1 truncate block">
               {selectedDevice ? (
                 <span
                   className="truncate block font-mono text-[11px]"
@@ -90,7 +90,7 @@ export function DeviceSwitcher() {
                   {formatDeviceLabel(selectedDevice)}
                 </span>
               ) : (
-                <span className="truncate block font-semibold text-amber-500">Device</span>
+                <span className="truncate block font-semibold text-amber-500">Perangkat</span>
               )}
             </SelectValue>
           </div>
@@ -118,7 +118,7 @@ export function DeviceSwitcher() {
               className="text-primary hover:bg-primary/10 h-7 w-full justify-start gap-1.5 rounded-md px-2 text-xs font-semibold"
             >
               <Plus className="size-3.5" />
-              <span>Add Device</span>
+              <span>Tambah</span>
             </Button>
           </div>
         </SelectContent>

@@ -55,7 +55,7 @@ export function ChatList({
           <Search className="text-muted-foreground absolute top-2.5 left-2.5 size-3.5" />
           <Input
             className="h-8 pl-8 text-xs font-medium"
-            placeholder="Search"
+            placeholder="Cari obrolan…"
             value={search}
             onChange={(event) => {
               setSearch(event.target.value)
@@ -71,7 +71,7 @@ export function ChatList({
               setOffset(0)
             }}
           />
-          <span>Media only</span>
+          <span>Hanya media</span>
         </label>
       </div>
 
@@ -86,9 +86,9 @@ export function ChatList({
               <Smartphone className="size-5" />
             </div>
             <div className="flex flex-col gap-1">
-              <p className="font-heading text-foreground text-xs font-semibold">Device not found</p>
+              <p className="font-heading text-foreground text-xs font-semibold">Perangkat tidak ditemukan</p>
               <p className="text-muted-foreground text-[11px] max-w-[200px]">
-                Please pair or select an active device to view conversations.
+                Pasangkan atau pilih perangkat aktif untuk melihat obrolan.
               </p>
             </div>
             <Button
@@ -98,19 +98,19 @@ export function ChatList({
               className="mt-1 h-7 gap-1 rounded-md text-xs font-semibold"
             >
               <Plus className="size-3" />
-              <span>Add Device</span>
+              <span>Tambah Perangkat</span>
             </Button>
           </div>
         ) : query.error ? (
           <div className="p-3">
             <ErrorNotice
-              title="Failed to load chats"
+              title="Gagal memuat obrolan"
               error={query.error}
               onRetry={() => void query.refetch()}
             />
           </div>
         ) : chats.length === 0 ? (
-          <p className="text-muted-foreground p-6 text-center text-xs">No conversations found</p>
+          <p className="text-muted-foreground p-6 text-center text-xs">Tidak ada percakapan</p>
         ) : (
           <ul className="divide-border/40 divide-y">
             {chats.map((chat) => (
@@ -153,7 +153,7 @@ export function ChatList({
       </ScrollArea>
 
       <div className="text-muted-foreground flex items-center justify-between text-[11px]">
-        <span>{total} chats listed</span>
+        <span>{total} obrolan</span>
         <div className="flex gap-1">
           <Button
             variant="outline"
@@ -162,7 +162,7 @@ export function ChatList({
             onClick={() => setOffset(Math.max(0, offset - PAGE_SIZE))}
             className="h-6.5 text-[11px]"
           >
-            Prev
+            Sebelumnya
           </Button>
           <Button
             variant="outline"
@@ -171,7 +171,7 @@ export function ChatList({
             onClick={() => setOffset(offset + PAGE_SIZE)}
             className="h-6.5 text-[11px]"
           >
-            Next
+            Berikutnya
           </Button>
         </div>
       </div>

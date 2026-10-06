@@ -1,19 +1,11 @@
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import { TZDate } from '@date-fns/tz'
-import { CalendarIcon, ChevronsUpDownIcon, InfoIcon, XIcon } from 'lucide-react'
+import { CalendarIcon, InfoIcon, Timer, XIcon } from 'lucide-react'
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Calendar } from '@/components/ui/calendar'
 import { Checkbox } from '@/components/ui/checkbox'
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from '@/components/ui/command'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import {
   Select,
@@ -24,49 +16,27 @@ import {
 } from '@/components/ui/select'
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
-import type { ScheduleFields } from '@/api/send'
+import type { ScheduleFields as ScheduleFieldsType } from '@/api/send'
 import {
   atTime,
-  browserTimezone,
   nextMinute,
   parseIso,
-  rezone,
 } from '@/features/send/use-schedule-draft'
 import { useAppInfo } from '@/hooks/use-app-info'
 
-export type ScheduleDraft = ScheduleFields
+export type ScheduleDraft = ScheduleFieldsType
 
-const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+const WEEKDAYS = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab']
 const ALL_WEEKDAYS = WEEKDAYS.map((_, day) => day)
 
-/** How far ahead the year dropdown reaches; react-day-picker stops at the current year without it. */
 const SCHEDULE_YEARS_AHEAD = 5
+const PERMANENT_TIMEZONE = 'Asia/Jakarta'
 
-/** `HH:mm` of a zoned date, matching what the date button shows. */
-function toTimeInput(date: TZDate | undefined) {
-  if (!date) return ''
-  const hours = String(date.getHours()).padStart(2, '0')
-  const minutes = String(date.getMinutes()).padStart(2, '0')
-  return `${hours}:${minutes}`
-}
+const HOURS_24 = Array.from({ length: 24 }, (_, i) => String(i).padStart(2, '0'))
+const MINUTES_60 = Array.from({ length: 60 }, (_, i) => String(i).padStart(2, '0'))
 
-function isSameDay(a: TZDate, b: TZDate) {
-  return (
-    a.getFullYear() === b.getFullYear() &&
-    a.getMonth() === b.getMonth() &&
-    a.getDate() === b.getDate()
-  )
-}
-
-/** `end` unless it is no longer after `first`; the server rejects such an end, so drop it. */
 function endAfter(end: string | undefined, first: string | undefined) {
   return end && first && new Date(end) <= new Date(first) ? undefined : end
-}
-
-function timezoneOptions(current: string) {
-  const zones =
-    typeof Intl.supportedValuesOf === 'function' ? Intl.supportedValuesOf('timeZone') : []
-  return zones.includes(current) ? zones : [current, ...zones]
 }
 
 function DateTimeField({
@@ -75,17 +45,15 @@ function DateTimeField({
   value,
   onChange,
   min,
-  timeZone,
+  timeZone = PERMANENT_TIMEZONE,
   required,
 }: {
   id: string
   label: string
   value: string | undefined
   onChange: (iso: string | undefined) => void
-  /** Earliest allowed instant; a schedule can never point into the past. */
   min: Date
-  /** The IANA zone the date and time are read and written in. */
-  timeZone: string
+  timeZone?: string
   required?: boolean
 }) {
   const [open, setOpen] = useState(false)
@@ -93,22 +61,39 @@ function DateTimeField({
   const selected = parsed && new TZDate(parsed, timeZone)
   const zonedMin = new TZDate(min, timeZone)
 
+  const selectedHour = selected ? String(selected.getHours()).padStart(2, '0') : '09'
+  const selectedMinute = selected ? String(selected.getMinutes()).padStart(2, '0') : '00'
+
   const pickDay = (day: Date) => {
-    const next = atTime(day, selected?.getHours() ?? 9, selected?.getMinutes() ?? 0, timeZone)
+    const hours = selected ? selected.getHours() : 9
+    const minutes = selected ? selected.getMinutes() : 0
+    const next = atTime(day, hours, minutes, timeZone)
     onChange((next <= min ? nextMinute(min) : next).toISOString())
     setOpen(false)
   }
 
-  const pickTime = (time: string) => {
-    const [hours, minutes] = time.split(':').map(Number)
-    if (!Number.isFinite(hours) || !Number.isFinite(minutes)) return
-    onChange(atTime(selected ?? zonedMin, hours, minutes, timeZone).toISOString())
+  const pickHour = (hourStr: string) => {
+    const hours = parseInt(hourStr, 10)
+    if (!Number.isFinite(hours)) return
+    const minutes = selected ? selected.getMinutes() : 0
+    const base = selected ?? zonedMin
+    const next = atTime(base, hours, minutes, timeZone)
+    onChange((next <= min ? nextMinute(min) : next).toISOString())
+  }
+
+  const pickMinute = (minStr: string) => {
+    const minutes = parseInt(minStr, 10)
+    if (!Number.isFinite(minutes)) return
+    const hours = selected ? selected.getHours() : 9
+    const base = selected ?? zonedMin
+    const next = atTime(base, hours, minutes, timeZone)
+    onChange((next <= min ? nextMinute(min) : next).toISOString())
   }
 
   return (
     <div className="flex flex-col gap-2">
       <Label htmlFor={id}>{label}</Label>
-      <div className="flex max-w-xs gap-2">
+      <div className="flex flex-wrap items-center gap-2">
         <Popover open={open} onOpenChange={setOpen}>
           <PopoverTrigger asChild>
             <Button
@@ -116,15 +101,15 @@ function DateTimeField({
               type="button"
               variant="outline"
               data-empty={!selected}
-              className="data-[empty=true]:text-muted-foreground min-w-0 flex-1 justify-between font-normal"
+              className="data-[empty=true]:text-muted-foreground min-w-[140px] flex-1 justify-between font-normal"
             >
               <CalendarIcon data-icon="inline-start" />
               <span className="flex-1 truncate text-left">
                 {selected
-                  ? new Intl.DateTimeFormat(undefined, { dateStyle: 'medium', timeZone }).format(
+                  ? new Intl.DateTimeFormat('id-ID', { dateStyle: 'medium', timeZone }).format(
                       selected,
                     )
-                  : 'Select date'}
+                  : 'Pilih tanggal'}
               </span>
             </Button>
           </PopoverTrigger>
@@ -142,76 +127,62 @@ function DateTimeField({
             />
           </PopoverContent>
         </Popover>
-        <Input
-          type="time"
-          aria-label={`${label} time`}
-          value={toTimeInput(selected)}
-          onChange={(event) => pickTime(event.target.value)}
-          disabled={!selected}
-          required={required}
-          min={selected && isSameDay(selected, zonedMin) ? toTimeInput(zonedMin) : undefined}
-          className="w-24 shrink-0 appearance-none [&::-webkit-calendar-picker-indicator]:hidden"
-        />
+
+        <div className="flex items-center gap-1 rounded-md border bg-background px-1.5 py-0.5">
+          <Select
+            value={selected ? selectedHour : undefined}
+            onValueChange={pickHour}
+            disabled={!selected}
+          >
+            <SelectTrigger
+              className="h-8 w-14 border-0 bg-transparent px-1 font-mono text-xs shadow-none focus:ring-0"
+              aria-label="Jam (24 Jam)"
+            >
+              <SelectValue placeholder="00" />
+            </SelectTrigger>
+            <SelectContent className="max-h-56">
+              {HOURS_24.map((h) => (
+                <SelectItem key={h} value={h} className="font-mono text-xs">
+                  {h}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <span className="font-mono font-bold text-xs text-muted-foreground">:</span>
+          <Select
+            value={selected ? selectedMinute : undefined}
+            onValueChange={pickMinute}
+            disabled={!selected}
+          >
+            <SelectTrigger
+              className="h-8 w-14 border-0 bg-transparent px-1 font-mono text-xs shadow-none focus:ring-0"
+              aria-label="Menit"
+            >
+              <SelectValue placeholder="00" />
+            </SelectTrigger>
+            <SelectContent className="max-h-56">
+              {MINUTES_60.map((m) => (
+                <SelectItem key={m} value={m} className="font-mono text-xs">
+                  {m}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <span className="text-[10px] font-semibold text-muted-foreground px-1">WIB</span>
+        </div>
+
         {!required && selected && (
           <Button
             type="button"
             variant="ghost"
             size="icon"
-            aria-label={`Clear ${label.toLowerCase()}`}
+            aria-label={`Hapus ${label.toLowerCase()}`}
             onClick={() => onChange(undefined)}
           >
             <XIcon />
           </Button>
         )}
       </div>
-    </div>
-  )
-}
-
-function TimezoneField({ value, onChange }: { value: string; onChange: (zone: string) => void }) {
-  const [open, setOpen] = useState(false)
-  const zones = useMemo(() => timezoneOptions(value), [value])
-
-  return (
-    <div className="flex flex-col gap-2">
-      <Label htmlFor="schedule-timezone">Timezone</Label>
-      <Popover open={open} onOpenChange={setOpen}>
-        <PopoverTrigger asChild>
-          <Button
-            id="schedule-timezone"
-            type="button"
-            role="combobox"
-            variant="outline"
-            className="justify-between font-normal"
-          >
-            <span className="truncate">{value}</span>
-            <ChevronsUpDownIcon data-icon="inline-end" className="opacity-50" />
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent className="w-(--radix-popover-trigger-width) p-0" align="start">
-          <Command defaultValue={value}>
-            <CommandInput placeholder="Search" />
-            <CommandList>
-              <CommandEmpty>No timezone found.</CommandEmpty>
-              <CommandGroup>
-                {zones.map((zone) => (
-                  <CommandItem
-                    key={zone}
-                    value={zone}
-                    data-checked={zone === value}
-                    onSelect={() => {
-                      onChange(zone)
-                      setOpen(false)
-                    }}
-                  >
-                    {zone}
-                  </CommandItem>
-                ))}
-              </CommandGroup>
-            </CommandList>
-          </Command>
-        </PopoverContent>
-      </Popover>
     </div>
   )
 }
@@ -224,14 +195,15 @@ export function ScheduleFields({
   patch: (change: Partial<ScheduleDraft>) => void
 }) {
   const { data: info } = useAppInfo()
-  /** Derived so clearing the draft — after a send — also collapses the panel. */
   const enabled = Boolean(draft.scheduled_at)
-  const localTimezone = useMemo(() => draft.timezone || browserTimezone(), [draft.timezone])
+  const localTimezone = PERMANENT_TIMEZONE
   const recurrence = draft.recurrence || 'once'
   const now = new Date()
   const firstSend = parseIso(draft.scheduled_at)
 
-  // Servers without the scheduler never see the panel, so the draft never gains scheduled_at.
+  const [customValue, setCustomValue] = useState('')
+  const [customUnit, setCustomUnit] = useState<'m' | 'h'>('m')
+
   if (!info?.scheduled_sends) return null
 
   const enable = (value: boolean) => {
@@ -239,7 +211,6 @@ export function ScheduleFields({
       const initial = new Date(Date.now() + 10 * 60_000)
       patch({ scheduled_at: initial.toISOString(), timezone: localTimezone })
     } else {
-      // Back to an empty draft, keeping only the chosen timezone.
       patch({
         scheduled_at: undefined,
         recurrence: 'once',
@@ -247,22 +218,27 @@ export function ScheduleFields({
         day_of_month: undefined,
         end_at: undefined,
         occurrence_limit: undefined,
+        timezone: localTimezone,
       })
     }
   }
 
-  /** A user who picked 09:00 still means 09:00 after switching zones. */
-  const changeTimezone = (zone: string) => {
-    const rezoned = rezone(draft.scheduled_at, localTimezone, zone)
-    // The same wall clock in a zone further east can already be past.
-    const scheduledAt =
-      rezoned && new Date(rezoned) <= now ? nextMinute(now).toISOString() : rezoned
+  const applyQuickTimer = (minutes: number) => {
+    const target = new Date(Date.now() + minutes * 60 * 1000)
     patch({
-      timezone: zone,
-      scheduled_at: scheduledAt,
-      // The clamp above can move the first send onto or past the end.
-      end_at: endAfter(rezone(draft.end_at, localTimezone, zone), scheduledAt),
+      scheduled_at: target.toISOString(),
+      timezone: localTimezone,
+      end_at: endAfter(draft.end_at, target.toISOString()),
     })
+  }
+
+  const applyCustomTimer = () => {
+    const val = parseInt(customValue, 10)
+    if (!isNaN(val) && val > 0) {
+      const minutes = customUnit === 'h' ? val * 60 : val
+      applyQuickTimer(minutes)
+      setCustomValue('')
+    }
   }
 
   const changeRecurrence = (value: ScheduleDraft['recurrence']) => {
@@ -272,14 +248,10 @@ export function ScheduleFields({
       day_of_month: value === 'monthly' ? draft.day_of_month : undefined,
       end_at: value === 'once' ? undefined : draft.end_at,
       occurrence_limit: value === 'once' ? undefined : draft.occurrence_limit,
+      timezone: localTimezone,
     })
   }
 
-  /**
-   * Daily is every weekday, so it shows all seven chips lit. Dropping one falls
-   * back to weekly, and lighting the seventh climbs back to daily; the wire
-   * payload still sends no weekdays for daily.
-   */
   const selectedWeekdays = recurrence === 'daily' ? ALL_WEEKDAYS : (draft.weekdays ?? [])
 
   const changeWeekdays = (values: string[]) => {
@@ -296,16 +268,85 @@ export function ScheduleFields({
           checked={enabled}
           onCheckedChange={(checked) => enable(checked === true)}
         />
-        <Label htmlFor="schedule-enabled" className="font-medium">
-          Send later or repeat
+        <Label htmlFor="schedule-enabled" className="font-medium cursor-pointer">
+          Jadwalkan atau ulangi
         </Label>
       </div>
+
       {enabled && (
         <>
+          <div className="flex flex-col gap-2 rounded-lg border bg-muted/40 p-2.5">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground">
+                <Timer className="size-3.5" />
+                <span>Timer Cepat</span>
+              </div>
+              <span className="text-[11px] text-muted-foreground">Format 24 Jam WIB</span>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-2">
+              {[
+                { label: '+10m', minutes: 10 },
+                { label: '+30m', minutes: 30 },
+                { label: '+1j', minutes: 60 },
+                { label: '+2j', minutes: 120 },
+              ].map((preset) => (
+                <Button
+                  key={preset.label}
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="h-7 text-xs px-2.5 rounded-md"
+                  onClick={() => applyQuickTimer(preset.minutes)}
+                >
+                  {preset.label}
+                </Button>
+              ))}
+
+              <div className="flex items-center gap-1.5 sm:ml-auto">
+                <Input
+                  type="number"
+                  min={1}
+                  placeholder="Durasi"
+                  value={customValue}
+                  onChange={(e) => setCustomValue(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault()
+                      applyCustomTimer()
+                    }
+                  }}
+                  className="h-7 w-20 text-xs px-2"
+                />
+                <Select
+                  value={customUnit}
+                  onValueChange={(u) => setCustomUnit(u as 'm' | 'h')}
+                >
+                  <SelectTrigger className="h-7 w-20 text-xs">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="m" className="text-xs">Menit</SelectItem>
+                    <SelectItem value="h" className="text-xs">Jam</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Button
+                  type="button"
+                  size="sm"
+                  className="h-7 text-xs px-2.5 rounded-md"
+                  disabled={!customValue || parseInt(customValue, 10) <= 0}
+                  onClick={applyCustomTimer}
+                >
+                  Terapkan
+                </Button>
+              </div>
+            </div>
+          </div>
+
           <div className="grid gap-3 sm:grid-cols-2">
             <DateTimeField
               id="schedule-at"
-              label="First send"
+              label="Waktu kirim"
               value={draft.scheduled_at}
               onChange={(iso) => patch({ scheduled_at: iso, end_at: endAfter(draft.end_at, iso) })}
               min={now}
@@ -313,26 +354,29 @@ export function ScheduleFields({
               required
             />
             <div className="flex flex-col gap-2">
-              <Label>Recurrence</Label>
+              <Label>Pengulangan</Label>
               <Select
                 value={recurrence}
-                onValueChange={(value) => changeRecurrence(value as ScheduleFields['recurrence'])}
+                onValueChange={(value) => changeRecurrence(value as ScheduleDraft['recurrence'])}
               >
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="once">Once</SelectItem>
-                  <SelectItem value="daily">Daily</SelectItem>
-                  <SelectItem value="weekly">Weekly</SelectItem>
-                  <SelectItem value="monthly">Monthly</SelectItem>
+                  <SelectItem value="once">Sekali</SelectItem>
+                  <SelectItem value="hourly">Setiap Jam</SelectItem>
+                  <SelectItem value="every_2_hours">Setiap 2 Jam</SelectItem>
+                  <SelectItem value="daily">Harian</SelectItem>
+                  <SelectItem value="weekly">Mingguan</SelectItem>
+                  <SelectItem value="monthly">Bulanan</SelectItem>
                 </SelectContent>
               </Select>
             </div>
           </div>
+
           {(recurrence === 'daily' || recurrence === 'weekly') && (
             <div className="flex flex-col gap-2">
-              <Label>Weekdays</Label>
+              <Label>Hari</Label>
               <ToggleGroup
                 type="multiple"
                 variant="outline"
@@ -348,9 +392,10 @@ export function ScheduleFields({
               </ToggleGroup>
             </div>
           )}
+
           {recurrence === 'monthly' && (
             <div className="flex flex-col gap-2 sm:max-w-xs">
-              <Label htmlFor="schedule-day">Day of month</Label>
+              <Label htmlFor="schedule-day">Hari per bulan</Label>
               <Input
                 id="schedule-day"
                 type="number"
@@ -364,52 +409,51 @@ export function ScheduleFields({
               />
             </div>
           )}
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {recurrence !== 'once' && (
-              <>
-                <DateTimeField
-                  id="schedule-end"
-                  label="End date (optional)"
-                  value={draft.end_at}
-                  onChange={(iso) => patch({ end_at: iso })}
-                  min={firstSend && firstSend > now ? firstSend : now}
-                  timeZone={localTimezone}
-                />
-                <div className="flex flex-col gap-2">
-                  <div className="flex items-center gap-1.5">
-                    <Label htmlFor="schedule-count">Occurrences (optional)</Label>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <button
-                          type="button"
-                          aria-label="What are occurrences?"
-                          className="text-muted-foreground hover:text-foreground focus-visible:ring-ring/50 rounded-full outline-none focus-visible:ring-3"
-                        >
-                          <InfoIcon className="size-3.5" />
-                        </button>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        Stop the schedule after this many sends. Leave it empty to keep repeating
-                        until the end date, or until you pause it.
-                      </TooltipContent>
-                    </Tooltip>
-                  </div>
-                  <Input
-                    id="schedule-count"
-                    type="number"
-                    min={1}
-                    value={draft.occurrence_limit ?? ''}
-                    onChange={(event) =>
-                      patch({ occurrence_limit: Number(event.target.value) || undefined })
-                    }
-                  />
+
+          {recurrence !== 'once' && (
+            <div className="grid gap-3 sm:grid-cols-2">
+              <DateTimeField
+                id="schedule-end"
+                label="Tanggal akhir (opsional)"
+                value={draft.end_at}
+                onChange={(iso) => patch({ end_at: iso })}
+                min={firstSend && firstSend > now ? firstSend : now}
+                timeZone={localTimezone}
+              />
+              <div className="flex flex-col gap-2">
+                <div className="flex items-center gap-1.5">
+                  <Label htmlFor="schedule-count">Batas pengulangan</Label>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <button
+                        type="button"
+                        aria-label="Info batas"
+                        className="text-muted-foreground hover:text-foreground focus-visible:ring-ring/50 rounded-full outline-none focus-visible:ring-3"
+                      >
+                        <InfoIcon className="size-3.5" />
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      Hentikan jadwal setelah pengiriman sejumlah ini.
+                    </TooltipContent>
+                  </Tooltip>
                 </div>
-              </>
-            )}
-            <TimezoneField value={localTimezone} onChange={changeTimezone} />
-          </div>
+                <Input
+                  id="schedule-count"
+                  type="number"
+                  min={1}
+                  placeholder="Jumlah"
+                  value={draft.occurrence_limit ?? ''}
+                  onChange={(event) =>
+                    patch({ occurrence_limit: Number(event.target.value) || undefined })
+                  }
+                />
+              </div>
+            </div>
+          )}
+
           <p className="text-muted-foreground text-xs">
-            Times use {localTimezone}. Uploaded media is stored on the server for delayed delivery.
+            Waktu otomatis WIB (Asia/Jakarta).
           </p>
         </>
       )}

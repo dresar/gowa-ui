@@ -10,10 +10,10 @@ const stateStyles: Record<DeviceState, string> = {
 }
 
 const stateLabels: Record<DeviceState, string> = {
-  logged_in: 'Logged in',
-  connected: 'Connected',
-  connecting: 'Connecting',
-  disconnected: 'Disconnected',
+  logged_in: 'Aktif',
+  connected: 'Terhubung',
+  connecting: 'Menyambung',
+  disconnected: 'Terputus',
 }
 
 export function StateBadge({ state }: { state: DeviceState }) {

@@ -41,35 +41,35 @@ export function ChatControls({ chat }: { chat: ChatInfo }) {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        <DropdownMenuItem onClick={() => run('Chat pinned', () => pinChat(chat.jid, true))}>
-          <Pin className="size-4" /> Pin
+        <DropdownMenuItem onClick={() => run('Obrolan disematkan', () => pinChat(chat.jid, true))}>
+          <Pin className="size-4" /> Sematkan
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => run('Chat unpinned', () => pinChat(chat.jid, false))}>
-          <Pin className="size-4" /> Unpin
+        <DropdownMenuItem onClick={() => run('Sematkan dibatalkan', () => pinChat(chat.jid, false))}>
+          <Pin className="size-4" /> Lepas Sematan
         </DropdownMenuItem>
         <DropdownMenuItem
           onClick={() =>
-            run(chat.archived ? 'Chat unarchived' : 'Chat archived', () =>
+            run(chat.archived ? 'Obrolan dipulihkan dari arsip' : 'Obrolan diarsipkan', () =>
               archiveChat(chat.jid, !chat.archived),
             )
           }
         >
-          <Archive className="size-4" /> {chat.archived ? 'Unarchive' : 'Archive'}
+          <Archive className="size-4" /> {chat.archived ? 'Batal Arsip' : 'Arsipkan'}
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuLabel className="flex items-center gap-2">
-          <Timer className="size-4" /> Disappearing
+          <Timer className="size-4" /> Pesan Sementara
         </DropdownMenuLabel>
         {DISAPPEARING_OPTIONS.map((option) => (
           <DropdownMenuItem
             key={option.seconds}
             onClick={() =>
-              run(`Disappearing set: ${option.label}`, () =>
+              run(`Pesan sementara diatur: ${option.label}`, () =>
                 setDisappearing(chat.jid, option.seconds),
               )
             }
           >
-            {option.label}
+            {option.label === 'Off' ? 'Mati' : option.label === '24 hours' ? '24 jam' : option.label === '7 days' ? '7 hari' : option.label === '90 days' ? '90 hari' : option.label}
           </DropdownMenuItem>
         ))}
       </DropdownMenuContent>

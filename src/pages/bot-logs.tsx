@@ -59,12 +59,12 @@ export default function BotLogsPage() {
   const clearMutation = useMutation({
     mutationFn: clearLogs,
     onSuccess: () => {
-      toast.success('Logs cleared')
+      toast.success('Log dihapus')
       setOffset(0)
       void queryClient.invalidateQueries({ queryKey: ['bot-logs'] })
     },
     onError: (err: Error) => {
-      toast.error(err.message || 'Clear failed')
+      toast.error(err.message || 'Gagal menghapus')
     },
   })
 
@@ -89,23 +89,23 @@ export default function BotLogsPage() {
   const getStatusBadge = (st: BotEventLog['status']) => {
     switch (st) {
       case 'success':
-        return <span className="inline-flex size-2 rounded-full bg-emerald-500" title="Success" />
+        return <span className="inline-flex size-2 rounded-full bg-emerald-500" title="Berhasil" />
       case 'failed':
-        return <span className="inline-flex size-2 rounded-full bg-rose-500" title="Failed" />
+        return <span className="inline-flex size-2 rounded-full bg-rose-500" title="Gagal" />
       case 'ignored':
-        return <span className="inline-flex size-2 rounded-full bg-amber-500" title="Ignored" />
+        return <span className="inline-flex size-2 rounded-full bg-amber-500" title="Diabaikan" />
       case 'rate_limited':
-        return <span className="inline-flex size-2 rounded-full bg-purple-500" title="Rate Limited" />
+        return <span className="inline-flex size-2 rounded-full bg-purple-500" title="Dibatasi" />
       default:
         return <span className="inline-flex size-2 rounded-full bg-muted-foreground" />
     }
   }
 
   return (
-    <div className="flex flex-col gap-6 p-4 sm:p-6">
+    <div className="w-full flex flex-col gap-4">
       <PageHeader
-        title="Bot Logs"
-        description="History"
+        title="Log Bot"
+        description="Riwayat"
         actions={
           <div className="flex items-center gap-2">
             <Button
@@ -115,13 +115,13 @@ export default function BotLogsPage() {
               className="h-8 gap-1.5 rounded-[6px] text-xs"
             >
               <RefreshCw className="size-3.5" />
-              <span>Refresh</span>
+              <span>Perbarui</span>
             </Button>
             <Button
               variant="destructive"
               size="sm"
               onClick={() => {
-                if (confirm('Clear all logs?')) {
+                if (confirm('Hapus semua log?')) {
                   clearMutation.mutate()
                 }
               }}
@@ -129,7 +129,7 @@ export default function BotLogsPage() {
               className="h-8 gap-1.5 rounded-[6px] text-xs shadow-xs"
             >
               <Trash2 className="size-3.5" />
-              <span>Clear</span>
+              <span>Bersih</span>
             </Button>
           </div>
         }
@@ -145,7 +145,7 @@ export default function BotLogsPage() {
                 setSearch(e.target.value)
                 setOffset(0)
               }}
-              placeholder="Search"
+              placeholder="Cari"
               className="h-8 pl-8 text-xs rounded-[6px]"
             />
           </div>
@@ -169,11 +169,11 @@ export default function BotLogsPage() {
               <SelectValue placeholder="Event" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Events</SelectItem>
-              <SelectItem value="auto_reply">Auto Reply</SelectItem>
-              <SelectItem value="group_moderation">Moderation</SelectItem>
-              <SelectItem value="ai_chat">AI Chat</SelectItem>
-              <SelectItem value="ai_tool">AI Tool</SelectItem>
+              <SelectItem value="all">Semua</SelectItem>
+              <SelectItem value="auto_reply">Balasan</SelectItem>
+              <SelectItem value="group_moderation">Moderasi</SelectItem>
+              <SelectItem value="ai_chat">Chat AI</SelectItem>
+              <SelectItem value="ai_tool">Tool AI</SelectItem>
               <SelectItem value="error">Error</SelectItem>
             </SelectContent>
           </Select>
@@ -188,11 +188,11 @@ export default function BotLogsPage() {
               <SelectValue placeholder="Status" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Status</SelectItem>
-              <SelectItem value="success">Success</SelectItem>
-              <SelectItem value="failed">Failed</SelectItem>
-              <SelectItem value="ignored">Ignored</SelectItem>
-              <SelectItem value="rate_limited">Limited</SelectItem>
+              <SelectItem value="all">Semua</SelectItem>
+              <SelectItem value="success">Berhasil</SelectItem>
+              <SelectItem value="failed">Gagal</SelectItem>
+              <SelectItem value="ignored">Diabaikan</SelectItem>
+              <SelectItem value="rate_limited">Dibatasi</SelectItem>
             </SelectContent>
           </Select>
         </CardContent>
@@ -201,8 +201,8 @@ export default function BotLogsPage() {
       {logs.length === 0 && !isLoading ? (
         <EmptyState
           icon={ScrollText}
-          title="No Logs Found"
-          hint="No bot events matching the current filter criteria."
+          title="Log Kosong"
+          hint="Tidak ada event bot yang sesuai filter."
         />
       ) : (
         <Card className="border-border/60 bg-card/40 backdrop-blur-sm overflow-hidden">
@@ -211,11 +211,11 @@ export default function BotLogsPage() {
               <TableRow>
                 <TableHead className="w-[40px] text-center"></TableHead>
                 <TableHead className="w-[110px] text-xs font-semibold">Event</TableHead>
-                <TableHead className="w-[150px] text-xs font-semibold">Sender / Group</TableHead>
-                <TableHead className="text-xs font-semibold">Incoming</TableHead>
-                <TableHead className="text-xs font-semibold">Response</TableHead>
-                <TableHead className="w-[80px] text-right text-xs font-semibold">Latency</TableHead>
-                <TableHead className="w-[140px] text-right text-xs font-semibold">Time</TableHead>
+                <TableHead className="w-[150px] text-xs font-semibold">Pengirim</TableHead>
+                <TableHead className="text-xs font-semibold">Pesan Masuk</TableHead>
+                <TableHead className="text-xs font-semibold">Respons</TableHead>
+                <TableHead className="w-[80px] text-right text-xs font-semibold">Latensi</TableHead>
+                <TableHead className="w-[140px] text-right text-xs font-semibold">Waktu</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -248,8 +248,8 @@ export default function BotLogsPage() {
           <div className="flex items-center justify-between border-t border-border/50 px-4 py-3 text-xs text-muted-foreground">
             <span>
               {total === 0
-                ? '0 records'
-                : `${offset + 1}–${Math.min(offset + PAGE_SIZE, total)} of ${total}`}
+                ? '0 data'
+                : `${offset + 1}–${Math.min(offset + PAGE_SIZE, total)} dari ${total}`}
             </span>
             <div className="flex items-center gap-2">
               <Button
@@ -260,7 +260,7 @@ export default function BotLogsPage() {
                 className="h-7 text-xs rounded-[5px] gap-1 px-2.5"
               >
                 <ChevronLeft className="size-3.5" />
-                <span>Prev</span>
+                <span>Sebelum</span>
               </Button>
               <Button
                 variant="outline"
@@ -269,7 +269,7 @@ export default function BotLogsPage() {
                 onClick={() => setOffset(offset + PAGE_SIZE)}
                 className="h-7 text-xs rounded-[5px] gap-1 px-2.5"
               >
-                <span>Next</span>
+                <span>Berikut</span>
                 <ChevronRight className="size-3.5" />
               </Button>
             </div>

@@ -50,19 +50,19 @@ export default function GroupsPage() {
   return (
     <>
       <PageHeader
-        title="Groups"
-        description="Device group memberships."
+        title="Grup"
+        description="Daftar keanggotaan grup perangkat."
         actions={
           <>
             <HeaderDialog
               trigger={
                 <Button variant="outline" size="sm">
                   <Eye className="size-4" />
-                  Preview link
+                  Pratinjau link
                 </Button>
               }
-              title="Preview group"
-              description="Preview a group before joining."
+              title="Pratinjau grup"
+              description="Lihat info grup sebelum bergabung."
             >
               <InfoFromLinkForm />
             </HeaderDialog>
@@ -70,11 +70,11 @@ export default function GroupsPage() {
               trigger={
                 <Button variant="outline" size="sm">
                   <Link className="size-4" />
-                  Join link
+                  Gabung link
                 </Button>
               }
-              title="Join group"
-              description="Join a group from its invite link."
+              title="Gabung grup"
+              description="Gabung ke grup melalui tautan undangan."
             >
               <JoinWithLinkForm />
             </HeaderDialog>
@@ -82,11 +82,11 @@ export default function GroupsPage() {
               trigger={
                 <Button size="sm">
                   <Plus className="size-4" />
-                  Create group
+                  Buat grup
                 </Button>
               }
-              title="Create group"
-              description="Start a new group with participants."
+              title="Buat grup"
+              description="Buat grup baru bersama anggota."
             >
               <CreateGroupForm />
             </HeaderDialog>

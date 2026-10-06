@@ -39,7 +39,7 @@ export function formatDay(iso: string): string {
 export function formatDeviceLabel(
   device?: { id: string; display_name?: string } | null,
 ): string {
-  if (!device) return 'Device'
+  if (!device) return 'Perangkat'
   if (device.display_name && device.display_name.trim().length > 0) {
     return device.display_name.trim()
   }
@@ -55,11 +55,11 @@ export function formatNextRun(
   baseNow?: Date,
 ): { relative: string; absolute: string } {
   if (!iso || isZeroTime(iso)) {
-    return { relative: 'No next run', absolute: '' }
+    return { relative: 'Tidak ada jadwal', absolute: '' }
   }
   const target = new Date(iso)
   if (Number.isNaN(target.getTime())) {
-    return { relative: 'Invalid date', absolute: iso }
+    return { relative: 'Tanggal tidak valid', absolute: iso }
   }
   const now = baseNow ?? new Date()
   const diffMs = target.getTime() - now.getTime()
@@ -87,28 +87,28 @@ export function formatNextRun(
   if (diffMs < -60_000) {
     const pastMin = Math.abs(diffMin)
     if (pastMin < 60) {
-      relative = `${pastMin}m overdue`
+      relative = `${pastMin}m terlambat`
     } else if (Math.abs(diffHours) < 24) {
-      relative = `${Math.abs(diffHours)}h overdue`
+      relative = `${Math.abs(diffHours)}j terlambat`
     } else {
       const pastDays = Math.round(Math.abs(diffHours) / 24)
-      relative = `${pastDays}d overdue`
+      relative = `${pastDays}h terlambat`
     }
   } else if (diffMs < 60_000) {
-    relative = 'due now'
+    relative = 'segera'
   } else if (diffMin < 60) {
-    relative = `in ${diffMin}m`
+    relative = `${diffMin}m lagi`
   } else if (isToday) {
-    relative = `today at ${timeStr}`
+    relative = `hari ini pukul ${timeStr}`
   } else if (isTomorrow) {
-    relative = `tomorrow at ${timeStr}`
+    relative = `besok pukul ${timeStr}`
   } else {
     const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24))
     if (diffDays <= 6) {
       const weekday = new Intl.DateTimeFormat(undefined, { weekday: 'short' }).format(target)
-      relative = `${weekday} at ${timeStr}`
+      relative = `${weekday} pukul ${timeStr}`
     } else {
-      relative = `in ${diffDays}d`
+      relative = `${diffDays}h lagi`
     }
   }
 
