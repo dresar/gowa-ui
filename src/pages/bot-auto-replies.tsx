@@ -3,6 +3,10 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
   Bot,
   Check,
+  ChevronLeft,
+  ChevronRight,
+  ChevronsLeft,
+  ChevronsRight,
   Copy,
   Download,
   Edit,
@@ -126,6 +130,9 @@ export default function BotAutoRepliesPage() {
       }),
   })
 
+  const PAGE_SIZE = 20
+  const [currentPage, setCurrentPage] = useState(1)
+
   const pacarCount = rules.filter(isPacarRule).length
   const globalCount = rules.filter(isGlobalRule).length
   const customCount = rules.filter((r) => !isGlobalRule(r) && !isPacarRule(r)).length
@@ -136,6 +143,13 @@ export default function BotAutoRepliesPage() {
     if (targetFilter === 'custom') return !isGlobalRule(rule) && !isPacarRule(rule)
     return true
   })
+
+  const totalItems = filteredRules.length
+  const totalPages = Math.max(1, Math.ceil(totalItems / PAGE_SIZE))
+  const safeCurrentPage = Math.min(Math.max(1, currentPage), totalPages)
+  const startIndex = (safeCurrentPage - 1) * PAGE_SIZE
+  const endIndex = Math.min(startIndex + PAGE_SIZE, totalItems)
+  const paginatedRules = filteredRules.slice(startIndex, endIndex)
 
   const saveMutation = useMutation({
     mutationFn: async () => {
@@ -472,7 +486,10 @@ export default function BotAutoRepliesPage() {
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
         <button
           type="button"
-          onClick={() => setTargetFilter('all')}
+          onClick={() => {
+            setTargetFilter('all')
+            setCurrentPage(1)
+          }}
           className={`flex items-center justify-between p-2.5 rounded-lg border text-left transition-all ${
             targetFilter === 'all'
               ? 'border-primary/50 bg-primary/5 ring-1 ring-primary/20 shadow-xs'
@@ -488,7 +505,10 @@ export default function BotAutoRepliesPage() {
 
         <button
           type="button"
-          onClick={() => setTargetFilter('pacar')}
+          onClick={() => {
+            setTargetFilter('pacar')
+            setCurrentPage(1)
+          }}
           className={`flex items-center justify-between p-2.5 rounded-lg border text-left transition-all ${
             targetFilter === 'pacar'
               ? 'border-pink-500/60 bg-pink-500/10 ring-1 ring-pink-500/30 shadow-xs'
@@ -509,7 +529,10 @@ export default function BotAutoRepliesPage() {
 
         <button
           type="button"
-          onClick={() => setTargetFilter('global')}
+          onClick={() => {
+            setTargetFilter('global')
+            setCurrentPage(1)
+          }}
           className={`flex items-center justify-between p-2.5 rounded-lg border text-left transition-all ${
             targetFilter === 'global'
               ? 'border-primary/50 bg-primary/5 ring-1 ring-primary/20 shadow-xs'
@@ -525,7 +548,10 @@ export default function BotAutoRepliesPage() {
 
         <button
           type="button"
-          onClick={() => setTargetFilter('custom')}
+          onClick={() => {
+            setTargetFilter('custom')
+            setCurrentPage(1)
+          }}
           className={`flex items-center justify-between p-2.5 rounded-lg border text-left transition-all ${
             targetFilter === 'custom'
               ? 'border-sky-500/60 bg-sky-500/10 ring-1 ring-sky-500/30 shadow-xs'
@@ -547,14 +573,20 @@ export default function BotAutoRepliesPage() {
             <Search className="text-muted-foreground absolute left-2.5 top-1/2 size-3.5 -translate-y-1/2" />
             <Input
               value={search}
-              onChange={(e) => setSearch(e.target.value)}
+              onChange={(e) => {
+                setSearch(e.target.value)
+                setCurrentPage(1)
+              }}
               placeholder="Cari pemicu atau respons"
               className="h-8 pl-8 text-xs rounded-[6px]"
             />
           </div>
           <Select
             value={targetFilter}
-            onValueChange={(val) => setTargetFilter(val as 'all' | 'pacar' | 'global' | 'custom')}
+            onValueChange={(val) => {
+              setTargetFilter(val as 'all' | 'pacar' | 'global' | 'custom')
+              setCurrentPage(1)
+            }}
           >
             <SelectTrigger className="h-8 w-[145px] text-xs rounded-[6px]">
               <SelectValue placeholder="Target" />
@@ -568,7 +600,10 @@ export default function BotAutoRepliesPage() {
           </Select>
           <Select
             value={scopeFilter}
-            onValueChange={(val) => setScopeFilter(val as 'all' | 'private' | 'group')}
+            onValueChange={(val) => {
+              setScopeFilter(val as 'all' | 'private' | 'group')
+              setCurrentPage(1)
+            }}
           >
             <SelectTrigger className="h-8 w-[120px] text-xs rounded-[6px]">
               <SelectValue placeholder="Cakupan" />
@@ -581,7 +616,10 @@ export default function BotAutoRepliesPage() {
           </Select>
           <Select
             value={activeFilter}
-            onValueChange={(val) => setActiveFilter(val as 'all' | 'true' | 'false')}
+            onValueChange={(val) => {
+              setActiveFilter(val as 'all' | 'true' | 'false')
+              setCurrentPage(1)
+            }}
           >
             <SelectTrigger className="h-8 w-[120px] text-xs rounded-[6px]">
               <SelectValue placeholder="Status" />
@@ -652,7 +690,7 @@ export default function BotAutoRepliesPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredRules.map((rule) => {
+              {paginatedRules.map((rule) => {
                 const pacar = isPacarRule(rule)
                 const global = isGlobalRule(rule)
                 return (
@@ -769,6 +807,67 @@ export default function BotAutoRepliesPage() {
             </TableBody>
           </Table>
         </Card>
+      )}
+
+      {/* Pagination Toolbar */}
+      {totalItems > 0 && (
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 px-1 py-1 text-xs">
+          <p className="text-muted-foreground text-xs font-medium">
+            Menampilkan <span className="font-semibold text-foreground">{startIndex + 1}</span>–
+            <span className="font-semibold text-foreground">{endIndex}</span> dari{' '}
+            <span className="font-semibold text-foreground">{totalItems}</span> aturan
+          </p>
+
+          <div className="flex items-center gap-1.5">
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={safeCurrentPage <= 1}
+              onClick={() => setCurrentPage(1)}
+              className="h-8 w-8 p-0 rounded-[6px]"
+              title="Halaman Pertama"
+            >
+              <ChevronsLeft className="size-3.5" />
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={safeCurrentPage <= 1}
+              onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+              className="h-8 px-2.5 rounded-[6px] gap-1 text-xs"
+            >
+              <ChevronLeft className="size-3.5" />
+              <span>Sebelumnya</span>
+            </Button>
+
+            <div className="flex items-center px-2.5 py-1 rounded-[6px] border bg-muted/30 font-mono text-xs">
+              <span className="font-semibold text-foreground">{safeCurrentPage}</span>
+              <span className="text-muted-foreground mx-1">/</span>
+              <span className="text-muted-foreground">{totalPages}</span>
+            </div>
+
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={safeCurrentPage >= totalPages}
+              onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+              className="h-8 px-2.5 rounded-[6px] gap-1 text-xs"
+            >
+              <span>Berikutnya</span>
+              <ChevronRight className="size-3.5" />
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={safeCurrentPage >= totalPages}
+              onClick={() => setCurrentPage(totalPages)}
+              className="h-8 w-8 p-0 rounded-[6px]"
+              title="Halaman Terakhir"
+            >
+              <ChevronsRight className="size-3.5" />
+            </Button>
+          </div>
+        </div>
       )}
 
       {/* Modal Detail Aturan - Luas di Desktop */}
