@@ -105,8 +105,9 @@ export default function BotAIPersonaPage() {
       if (found) {
         setExistingPersona(found)
         setPhoneNumber(found.phone_number)
-        setContactName(found.contact_name || '')
-        setRelationship(found.relationship || 'khusus')
+        const rawRel = (found.relationship || '').toLowerCase().trim()
+        const cleanRel = rawRel === 'pacar' || !rawRel ? 'khusus' : rawRel
+        setRelationship(cleanRel)
         setCustomPrompt(found.custom_prompt)
         setAutoReplyEnabled(found.auto_reply_enabled)
         setUseMemory(found.use_memory)
@@ -295,6 +296,11 @@ export default function BotAIPersonaPage() {
                     <SelectItem value="keluarga">Keluarga</SelectItem>
                     <SelectItem value="rekan">Rekan</SelectItem>
                     <SelectItem value="klien">Klien</SelectItem>
+                    {relationship && !['khusus', 'teman', 'keluarga', 'rekan', 'klien'].includes(relationship) && (
+                      <SelectItem value={relationship} className="capitalize">
+                        {relationship}
+                      </SelectItem>
+                    )}
                   </SelectContent>
                 </Select>
               </div>

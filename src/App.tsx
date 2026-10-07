@@ -19,6 +19,7 @@ import BotAutoRepliesPage from '@/pages/bot-auto-replies'
 import BotAIPage from '@/pages/bot-ai'
 import BotAIPersonaPage from '@/pages/bot-ai-persona-page'
 import BotMenuPage from '@/pages/bot-menu'
+import BotMenuDetailPage from '@/pages/bot-menu-detail-page'
 import BotGroupsPage from '@/pages/bot-groups'
 import BotLogsPage from '@/pages/bot-logs'
 
@@ -84,6 +85,7 @@ function App() {
         <Route path="/bot/auto-replies" element={<BotAutoRepliesPage />} />
         <Route path="/bot/rules" element={<Navigate to="/bot/auto-replies" replace />} />
         <Route path="/bot/menu" element={<BotMenuPage />} />
+        <Route path="/bot/menu/:id" element={<BotMenuDetailPage />} />
         <Route path="/bot/ai" element={<BotAIPage />} />
         <Route path="/bot/ai/new" element={<BotAIPersonaPage />} />
         <Route path="/bot/ai/:phone" element={<BotAIPersonaPage />} />
