@@ -49,8 +49,6 @@ export default function BotMenuDetailPage() {
   const [isActive, setIsActive] = useState(true)
   const [autoTyping, setAutoTyping] = useState(false)
   const [instruction, setInstruction] = useState('')
-  const [exampleInput, setExampleInput] = useState('')
-  const [exampleOutput, setExampleOutput] = useState('')
   const [applyToAllDevices, setApplyToAllDevices] = useState(true)
 
   const [weatherApiKey, setWeatherApiKey] = useState('')
@@ -101,8 +99,6 @@ export default function BotMenuDetailPage() {
     setIsActive(cfg.isActive ?? true)
     setAutoTyping(cfg.autoTyping ?? feature.autoTyping ?? false)
     setInstruction(cfg.instruction || feature.instruction)
-    setExampleInput(cfg.exampleInput || feature.exampleInput)
-    setExampleOutput(cfg.exampleOutput || feature.exampleOutput)
 
     if (cfg.custom) {
       if (cfg.custom.weatherApiKey !== undefined) setWeatherApiKey(cfg.custom.weatherApiKey)
@@ -142,8 +138,6 @@ export default function BotMenuDetailPage() {
       isActive,
       autoTyping,
       instruction: instruction.trim(),
-      exampleInput: exampleInput.trim(),
-      exampleOutput: exampleOutput.trim(),
       custom: {
         weatherApiKey: weatherApiKey.trim(),
         weatherCity: weatherCity.trim(),
@@ -173,8 +167,6 @@ export default function BotMenuDetailPage() {
     setIsActive(true)
     setAutoTyping(feature.autoTyping)
     setInstruction(feature.instruction)
-    setExampleInput(feature.exampleInput)
-    setExampleOutput(feature.exampleOutput)
     toast.success('Direset ke default')
   }
 
@@ -320,35 +312,6 @@ export default function BotMenuDetailPage() {
                   />
                 </div>
               </div>
-
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <div className="space-y-1.5">
-                  <Label htmlFor="input-ex" className="text-xs font-semibold text-foreground">
-                    Contoh Input
-                  </Label>
-                  <Input
-                    id="input-ex"
-                    value={exampleInput}
-                    onChange={(e) => setExampleInput(e.target.value)}
-                    placeholder="Input"
-                    className="h-9 font-mono text-xs rounded-[6px]"
-                  />
-                </div>
-
-                <div className="space-y-1.5">
-                  <Label htmlFor="output-ex" className="text-xs font-semibold text-foreground">
-                    Format Output
-                  </Label>
-                  <Textarea
-                    id="output-ex"
-                    value={exampleOutput}
-                    onChange={(e) => setExampleOutput(e.target.value)}
-                    placeholder="Output"
-                    rows={3}
-                    className="text-xs font-mono rounded-[6px] resize-y"
-                  />
-                </div>
-              </div>
             </CardContent>
           </Card>
 
@@ -374,25 +337,24 @@ export default function BotMenuDetailPage() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="space-y-1.5">
-                    <Label className="text-xs font-semibold">Kota Default</Label>
-                    <Input
-                      value={weatherCity}
-                      onChange={(e) => setWeatherCity(e.target.value)}
-                      placeholder="Jakarta"
-                      className="h-9 text-xs rounded-[6px]"
-                    />
-                  </div>
+                <div className="space-y-1.5">
+                  <Label className="text-xs font-semibold">Kota Default</Label>
+                  <Input
+                    value={weatherCity}
+                    onChange={(e) => setWeatherCity(e.target.value)}
+                    placeholder="Jakarta"
+                    className="h-9 text-xs rounded-[6px]"
+                  />
+                  <span className="text-[11px] text-muted-foreground block">
+                    Digunakan otomatis jika perintah dikirim tanpa nama kota/wilayah.
+                  </span>
+                </div>
 
-                  <div className="space-y-1.5">
-                    <Label className="text-xs font-semibold">Format Wilayah</Label>
-                    <Input
-                      readOnly
-                      value="Nama Kota / Kode adm4"
-                      className="h-9 text-xs rounded-[6px] bg-muted/30 text-muted-foreground"
-                    />
-                  </div>
+                <div className="rounded-lg border border-border/50 bg-muted/15 p-3 text-xs space-y-1.5">
+                  <span className="font-semibold text-foreground block">Auto-Deteksi Wilayah Dinamis</span>
+                  <p className="text-[11px] text-muted-foreground leading-relaxed">
+                    Pengguna bebas mencari lokasi mana pun di seluruh Indonesia (desa, kecamatan, kabupaten, atau kota). Bot langsung mendeteksi database wilayah BMKG secara otomatis tanpa batasan kota tetap.
+                  </p>
                 </div>
               </CardContent>
             </Card>
