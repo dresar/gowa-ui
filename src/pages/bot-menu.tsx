@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import {
   Activity,
   Bot,
@@ -7,16 +8,19 @@ import {
   CalendarClock,
   Check,
   Clock,
+  CloudSun,
   Copy,
-  Cpu,
-  Info,
-  Layers,
+  ExternalLink,
   MessageSquare,
+  Newspaper,
+  Plus,
   Quote,
+  RefreshCw,
   Search,
   Shield,
+  Sliders,
   Sparkles,
-  Terminal,
+  Trash2,
   Zap,
 } from 'lucide-react'
 import { toast } from 'sonner'
@@ -26,7 +30,6 @@ import { Button } from '@/components/ui/button'
 import {
   Card,
   CardContent,
-  CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
@@ -40,7 +43,16 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import { ScrollArea } from '@/components/ui/scroll-area'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { Switch } from '@/components/ui/switch'
 
 export type BotCategory = 'all' | 'AI & Memori' | 'Produktivitas' | 'Grup' | 'Sistem'
 
@@ -62,12 +74,42 @@ export interface BotFeature {
   latency: string
   autoTyping: boolean
   icon: typeof Sparkles
+  isConfigurable?: boolean
 }
+
+export interface QuoteItem {
+  id: string
+  quote: string
+  author: string
+}
+
+const DEFAULT_QUOTES: QuoteItem[] = [
+  {
+    id: '1',
+    quote: 'Kesuksesan berawal dari langkah kecil yang konsisten setiap hari.',
+    author: 'Eka Syarif',
+  },
+  {
+    id: '2',
+    quote: 'Hari ini adalah kesempatan terbaik untuk menjadi lebih baik dari kemarin.',
+    author: 'Anonim',
+  },
+  {
+    id: '3',
+    quote: 'Fokus pada proses, hasil terbaik akan mengikuti dengan sendirinya.',
+    author: 'Pribadi',
+  },
+  {
+    id: '4',
+    quote: 'Jangan menunggu waktu yang sempurna, mulailah sekarang dan sempurnakan jalannya.',
+    author: 'Inspirasi',
+  },
+]
 
 const BOT_FEATURES: BotFeature[] = [
   {
     id: 'ai-chat',
-    name: 'Asisten AI Pintar',
+    name: 'Asisten AI',
     command: '!ai <pesan>',
     alias: '/ai, percakapan langsung',
     category: 'AI & Memori',
@@ -75,20 +117,83 @@ const BOT_FEATURES: BotFeature[] = [
     apiStatus: 'Online • Bebas Kuota',
     endpoint: 'https://router.bynara.id/v1/chat/completions',
     model: 'step-5-preview',
-    shortDesc: 'Asisten percakapan cerdas berbahasa santai dengan memori 100 chat.',
+    shortDesc: 'Asisten percakapan cerdas dengan konteks riwayat obrolan.',
     fullDesc:
-      'Engine AI pintar berbasis model step-5-preview dengan kepribadian ramah, santai, dan non-formal ala manusia Indonesia. Mampu mengenali identitas pushname/username WhatsApp pengguna secara langsung serta meninjau hingga 100 riwayat chat sebelumnya untuk menjaga konteks percakapan yang akurat.',
+      'Engine AI pintar model step-5-preview dengan kepribadian santai, ramah, dan manusiawi. Mengenali identitas username WhatsApp secara langsung serta menyerap konteks riwayat percakapan.',
     exampleInput: '!ai halo kamu kenal aku gak?',
-    exampleOutput:
-      'Halo! Iya kenal dong, kamu dengan username WhatsApp {nama}. Ada yang bisa kubantu hari ini?',
+    exampleOutput: 'Halo! Iya kenal dong, kamu {nama}. Ada yang bisa kubantu?',
     parameters: [
-      '<pesan> (Teks pertanyaan atau perintah)',
-      '100 pesan riwayat chat terakhir (otomatis dikirim sebagai konteks)',
-      'Username / PushName WhatsApp pengirim (otomatis dideteksi)',
+      '<pesan> (Pertanyaan atau perintah)',
+      '100 pesan riwayat chat terakhir',
+      'Username WhatsApp pengirim',
     ],
     latency: '400 - 900 ms',
     autoTyping: true,
     icon: Sparkles,
+    isConfigurable: true,
+  },
+  {
+    id: 'weather',
+    name: 'Prakiraan Cuaca',
+    command: '!cuaca <kota>',
+    alias: '/cuaca, !weather',
+    category: 'Produktivitas',
+    provider: 'OpenWeather / BMKG',
+    apiStatus: 'Aktif • Siap Pakai',
+    endpoint: 'https://api.openweathermap.org/data/2.5/weather',
+    shortDesc: 'Menampilkan prakiraan kondisi cuaca, suhu, dan kelembaban wilayah.',
+    fullDesc:
+      'Layanan info cuaca real-time untuk seluruh kota dan kabupaten di Indonesia. Menampilkan data suhu terkini, kelembaban udara, kecepatan angin, dan ramalan cuaca hari ini.',
+    exampleInput: '!cuaca Jakarta',
+    exampleOutput:
+      '🌤️ *CUACA JAKARTA*\nSuhu: 29°C\nKondisi: Cerah Berawan\nKelembaban: 72%\nAngin: 12 km/jam',
+    parameters: ['<kota> (Nama kota atau kabupaten)'],
+    latency: '150 - 350 ms',
+    autoTyping: false,
+    icon: CloudSun,
+    isConfigurable: true,
+  },
+  {
+    id: 'news',
+    name: 'Berita Terkini',
+    command: '!berita <topik>',
+    alias: '/berita, !news',
+    category: 'Produktivitas',
+    provider: 'NewsAPI / RSS Portal',
+    apiStatus: 'Aktif • Siap Pakai',
+    endpoint: 'https://newsapi.org/v2/top-headlines',
+    shortDesc: 'Menyajikan headline berita terhangat nasional, teknologi, dan bisnis.',
+    fullDesc:
+      'Mengambil intisari berita teraktual dari berbagai portal berita terpercaya secara berkala berdasarkan topik yang diminta pengguna.',
+    exampleInput: '!berita teknologi',
+    exampleOutput:
+      '📰 *BERITA TEKNOLOGI TERKINI*\n1. Inovasi AI Terbaru Resmi Meluncur...\n2. Perkembangan Satelit Komunikasi Nasional...',
+    parameters: ['<topik> (Pilihan: nasional, teknologi, bisnis, olahraga)'],
+    latency: '200 - 450 ms',
+    autoTyping: false,
+    icon: Newspaper,
+    isConfigurable: true,
+  },
+  {
+    id: 'quote',
+    name: 'Kata Mutiara',
+    command: '!quote',
+    alias: '/quote',
+    category: 'Produktivitas',
+    provider: 'Database Kata Bijak',
+    apiStatus: 'Aktif • Database Lokal',
+    endpoint: 'Internal Quote Database',
+    shortDesc: 'Menyajikan kutipan motivasi dan kata bijak dari database.',
+    fullDesc:
+      'Fitur penyemangat harian yang menyajikan kutipan motivasi dan kata mutiara yang tersimpan di dalam database bot secara acak dan instan.',
+    exampleInput: '!quote',
+    exampleOutput:
+      '✨ *KATA BIJAK HARI INI:*\n\n"Kesuksesan berawal dari langkah kecil yang konsisten setiap hari."\n— Eka Syarif',
+    parameters: ['Tanpa parameter'],
+    latency: '< 15 ms',
+    autoTyping: false,
+    icon: Quote,
+    isConfigurable: true,
   },
   {
     id: 'supermemory',
@@ -98,26 +203,43 @@ const BOT_FEATURES: BotFeature[] = [
     category: 'AI & Memori',
     provider: 'Supermemory API (Gratis)',
     apiStatus: 'Terhubung • Free Tier',
-    endpoint: 'https://api.supermemory.ai/v4/search & /v3/documents',
+    endpoint: 'https://api.supermemory.ai/v4/search',
     model: 'Vector Memory & Graph Context',
-    shortDesc: 'Memori jangka panjang untuk mengingat preferensi dan fakta unik pengguna.',
+    shortDesc: 'Memori jangka panjang untuk mengingat preferensi dan fakta pengguna.',
     fullDesc:
-      'Layanan memori persisten modern berbasis Supermemory API. Setiap percakapan pengguna diisolasi rapi menggunakan containerTag per-user. Supermemory secara otomatis mengekstrak fakta penting, preferensi pribadi, dan riwayat obrolan terdahulu agar AI tidak pernah lupa.',
+      'Layanan memori persisten modern berbasis Supermemory API. Setiap percakapan pengguna diisolasi rapi menggunakan containerTag per-user untuk menjaga kesinambungan ingatan AI.',
     exampleInput: '!ai kemarin aku cerita kerja di mana ya?',
     exampleOutput:
-      'Kemarin kamu bilang kerja di bidang jaringan IT! Masih ada yang mau dibahas seputar kerjaanmu?',
-    parameters: [
-      'containerTag: user_<sender_jid>',
-      'taskType: memory (ekstraksi fakta & relasi graph)',
-      'searchMode: hybrid (memori + dokumen konteks)',
-    ],
+      'Kemarin kamu cerita kerja di bidang jaringan IT! Masih ada yang mau dibahas?',
+    parameters: ['containerTag: user_<sender_jid>'],
     latency: '150 - 350 ms',
     autoTyping: false,
     icon: Brain,
+    isConfigurable: true,
+  },
+  {
+    id: 'calc',
+    name: 'Kalkulator',
+    command: '!calc <ekspresi>',
+    alias: '/calc <hitungan>',
+    category: 'Produktivitas',
+    provider: 'Math Engine',
+    apiStatus: 'Online • Bebas Kuota',
+    endpoint: 'Internal Math Evaluator',
+    shortDesc: 'Menghitung rumus matematika secara cepat dan tepat.',
+    fullDesc:
+      'Layanan kalkulasi pintar yang mampu mengevaluasi perhitungan matematika, persentase, konversi unit, dan operasi logika dengan hasil yang ringkas.',
+    exampleInput: '!calc (150000 * 0.12) + 25000',
+    exampleOutput: '🔢 *Hasil Hitung ((150000 * 0.12) + 25000):*\n43.000',
+    parameters: ['<ekspresi> (Ekspresi aritmatika seperti tambah, kurang, persen)'],
+    latency: '< 20 ms',
+    autoTyping: false,
+    icon: Calculator,
+    isConfigurable: true,
   },
   {
     id: 'ping',
-    name: 'Cek Latensi (Ping)',
+    name: 'Latensi (Ping)',
     command: '!ping',
     alias: '/ping',
     category: 'Sistem',
@@ -126,171 +248,166 @@ const BOT_FEATURES: BotFeature[] = [
     endpoint: 'Local WebSocket Handler',
     shortDesc: 'Mengukur kecepatan respon pemrosesan pesan bot secara real-time.',
     fullDesc:
-      'Perintah diagnostik untuk mengukur latensi round-trip antara penerimaan pesan masuk hingga respon keluar terkirim. Membantu memantau kesehatan server dan koneksi WhatsApp.',
+      'Perintah diagnostik untuk mengukur latensi round-trip antara penerimaan pesan masuk hingga respon keluar terkirim.',
     exampleInput: '!ping',
     exampleOutput: 'Pong! 🏓 Kecepatan respon: 18 ms',
-    parameters: ['Tanpa parameter tambahan'],
+    parameters: ['Tanpa parameter'],
     latency: '< 25 ms',
     autoTyping: false,
     icon: Zap,
-  },
-  {
-    id: 'quote',
-    name: 'Kata Bijak & Motivasi',
-    command: '!quote',
-    alias: '/quote',
-    category: 'Produktivitas',
-    provider: 'Generator Kata Bijak',
-    apiStatus: 'Aktif • Bebas Kuota',
-    endpoint: 'Internal Quote Engine',
-    shortDesc: 'Menyajikan kutipan inspiratif dan kata mutiara pilihan secara instan.',
-    fullDesc:
-      'Fitur penambah semangat yang menghasilkan kutipan motivasi, produktivitas, dan kata bijak harian yang dipilih secara acak untuk memotivasi pengguna di obrolan pribadi maupun grup.',
-    exampleInput: '!quote',
-    exampleOutput:
-      '✨ *KATA BIJAK HARI INI:*\n\n"Kesuksesan berawal dari langkah kecil yang konsisten setiap hari."',
-    parameters: ['Tanpa parameter'],
-    latency: '< 15 ms',
-    autoTyping: false,
-    icon: Quote,
-  },
-  {
-    id: 'calc',
-    name: 'Kalkulator Matematika',
-    command: '!calc <ekspresi>',
-    alias: '/calc <hitungan>',
-    category: 'Produktivitas',
-    provider: 'Bynara AI Math Engine',
-    apiStatus: 'Online • Bebas Kuota',
-    endpoint: 'https://router.bynara.id/v1/chat/completions',
-    model: 'step-5-preview',
-    shortDesc: 'Menghitung rumus atau perhitungan matematika secara cepat dan tepat.',
-    fullDesc:
-      'Layanan kalkulasi pintar yang mampu mengevaluasi perhitungan matematika, persentase, konversi unit, dan operasi logika dengan hasil yang ringkas dan langsung to-the-point.',
-    exampleInput: '!calc (150000 * 0.12) + 25000',
-    exampleOutput: '🔢 *Hasil Hitung ((150000 * 0.12) + 25000):*\n43.000',
-    parameters: [
-      '<ekspresi> (Ekspresi aritmatika seperti tambah, kurang, persen, dsb.)',
-    ],
-    latency: '300 - 600 ms',
-    autoTyping: true,
-    icon: Calculator,
-  },
-  {
-    id: 'menu',
-    name: 'Daftar Menu Bot',
-    command: '!menu',
-    alias: '/menu, !help',
-    category: 'Sistem',
-    provider: 'WhatsMeow Bot Handler',
-    apiStatus: 'Aktif • Internal',
-    endpoint: 'Local Message Dispatcher',
-    shortDesc: 'Menampilkan katalog menu dan panduan perintah yang tersedia di WhatsApp.',
-    fullDesc:
-      'Panduan interaktif lengkap yang bisa dipanggil pengguna kapan saja untuk melihat semua perintah aktif yang dapat dijalankan pada bot WhatsApp.',
-    exampleInput: '!menu',
-    exampleOutput:
-      '*🤖 DAFTAR MENU BOT WHATSAPP*\n\n• *!menu* - Tampilkan daftar perintah bot ini\n• *!ping* - Tes kecepatan respon bot (latensi ms)\n• *!ai <pesan>* - Mengobrol santai dengan asisten AI pintar\n• *!quote* - Kutipan motivasi & kata bijak harian\n• *!calc <ekspresi>* - Hitung kalkulasi matematika instan\n• *!info* - Info bot WhatsApp',
-    parameters: ['Tanpa parameter'],
-    latency: '< 20 ms',
-    autoTyping: false,
-    icon: Terminal,
-  },
-  {
-    id: 'info',
-    name: 'Informasi Status Bot',
-    command: '!info',
-    alias: '/info',
-    category: 'Sistem',
-    provider: 'WhatsMeow & Bot Service',
-    apiStatus: 'Aktif • Internal',
-    endpoint: 'System State Provider',
-    shortDesc: 'Menampilkan status operasional, model AI, dan engine memori.',
-    fullDesc:
-      'Menyajikan rangkuman status terkini mengenai bot WhatsApp, mencakup ketersediaan layanan, engine AI Step-5-Preview, integrasi Supermemory, dan versi sistem.',
-    exampleInput: '!info',
-    exampleOutput:
-      '*ℹ️ INFORMASI BOT WHATSAPP*\n\nStatus: Online & Siap Melayani\nModel AI: Step-5-Preview (Bynara)\nFitur: Smart Context Memory (100 Pesan) + Supermemory',
-    parameters: ['Tanpa parameter'],
-    latency: '< 15 ms',
-    autoTyping: false,
-    icon: Info,
+    isConfigurable: true,
   },
   {
     id: 'antilink',
-    name: 'Moderasi Anti-Link Grup',
+    name: 'Moderasi Anti-Link',
     command: 'Otomatis di Grup',
     alias: 'Group Shield',
     category: 'Grup',
     provider: 'WhatsMeow Group Admin',
     apiStatus: 'Aktif • Realtime',
     endpoint: 'Internal Group Moderation',
-    shortDesc: 'Menghapus pesan tautan mencurigakan otomatis saat bot menjadi admin grup.',
+    shortDesc: 'Menghapus tautan mencurigakan otomatis saat bot menjadi admin grup.',
     fullDesc:
-      'Sistem keamanan grup otomatis yang memindai tautan WhatsApp, wa.me, dan URL web ilegal. Jika anggota non-admin mengirimkan tautan, pesan akan langsung ditarik (revoke) secara seketika.',
-    exampleInput: 'Anggota mengirimkan link undangan grup lain',
+      'Sistem keamanan grup otomatis yang memindai tautan WhatsApp, wa.me, dan URL ilegal. Pesan dari non-admin akan ditarik seketika.',
+    exampleInput: 'Anggota mengirimkan link grup lain',
     exampleOutput: 'Pesan ditarik otomatis (revoke) oleh bot.',
-    parameters: [
-      'Membutuhkan izin Admin pada bot di dalam grup',
-      'Pola link: chat.whatsapp.com, wa.me, http/https',
-    ],
+    parameters: ['Izin Admin grup'],
     latency: '< 30 ms',
     autoTyping: false,
     icon: Shield,
+    isConfigurable: true,
   },
   {
     id: 'welcome-farewell',
-    name: 'Sambutan & Perpisahan',
+    name: 'Sambutan & Pamitan',
     command: 'Otomatis di Grup',
     alias: 'Welcome & Farewell',
     category: 'Grup',
     provider: 'WhatsMeow Event Listener',
     apiStatus: 'Aktif • Realtime',
-    endpoint: 'Group Participant Join/Leave Event',
+    endpoint: 'Group Participant Event',
     shortDesc: 'Menyapa anggota baru atau pamitan saat anggota keluar dari grup.',
     fullDesc:
-      'Pesan sambutan dan perpisahan otomatis dengan kustomisasi template dinamis. Mendukung tag variabel {name} untuk nama peserta dan {group} untuk nama grup.',
-    exampleInput: 'Peserta baru bergabung ke dalam grup',
+      'Pesan sambutan dan perpisahan otomatis dengan kustomisasi template dinamis ({name} untuk nama dan {group} untuk nama grup).',
+    exampleInput: 'Peserta bergabung ke dalam grup',
     exampleOutput:
       'Selamat datang {name} di grup {group}! Silakan baca peraturan grup ya.',
-    parameters: [
-      'Variabel: {name} (nama pengguna)',
-      'Variabel: {group} (nama grup WhatsApp)',
-    ],
+    parameters: ['Variabel: {name}, {group}'],
     latency: '< 40 ms',
     autoTyping: false,
     icon: MessageSquare,
+    isConfigurable: true,
   },
   {
     id: 'scheduler',
-    name: 'Pesan Terjadwal 24 Jam',
+    name: 'Pesan Terjadwal',
     command: 'Form Terjadwal',
     alias: 'Smart 24h Scheduler',
     category: 'Produktivitas',
     provider: 'SQLite Worker (WIB)',
     apiStatus: 'Aktif • Background',
     endpoint: 'Internal Scheduler Cron & Worker',
-    shortDesc: 'Mengirim pesan terjadwal otomatis dengan zona waktu 24 jam Indonesia (WIB).',
+    shortDesc: 'Mengirim pesan terjadwal otomatis dengan zona waktu 24 jam WIB.',
     fullDesc:
-      'Sistem penjadwalan pesan berbasis waktu 24 jam (00-23) dan zona waktu permanen Asia/Jakarta (WIB). Mendukung timer cepat kustom serta pengulangan per jam, per 2 jam, harian, mingguan, dan bulanan.',
-    exampleInput: 'Jadwalkan pesan jam 14:30 atau +45 Menit',
+      'Sistem penjadwalan pesan berbasis waktu 24 jam dan zona waktu permanen Asia/Jakarta (WIB) dengan pengulangan fleksibel.',
+    exampleInput: 'Jadwalkan pesan jam 14:30',
     exampleOutput: 'Pesan terkirim tepat waktu ke penerima yang ditentukan.',
-    parameters: [
-      'Waktu kirim format 24 Jam (00-23 : 00-59)',
-      'Pengulangan: Sekali, Setiap Jam, Setiap 2 Jam, Harian, Mingguan, Bulanan',
-      'Timer cepat kustom (menit / jam)',
-    ],
+    parameters: ['Format waktu 24 Jam (00-23 : 00-59)'],
     latency: 'Tepat Waktu',
     autoTyping: false,
     icon: CalendarClock,
+    isConfigurable: true,
   },
 ]
 
 export default function BotMenuPage() {
+  const navigate = useNavigate()
   const [filter, setFilter] = useState<BotCategory>('all')
   const [search, setSearch] = useState('')
   const [selectedFeature, setSelectedFeature] = useState<BotFeature | null>(null)
   const [copiedId, setCopiedId] = useState<string | null>(null)
+
+  const [featureConfigs, setFeatureConfigs] = useState<{
+    weather: { apiKey: string; defaultCity: string; provider: string; isActive: boolean }
+    news: { apiKey: string; category: string; provider: string; isActive: boolean }
+    quote: { isActive: boolean }
+    calc: { isActive: boolean }
+    ping: { isActive: boolean }
+  }>(() => {
+    try {
+      const saved = localStorage.getItem('bot_feature_settings_v1')
+      if (saved) return JSON.parse(saved)
+    } catch {
+      // ignore
+    }
+    return {
+      weather: { apiKey: '', defaultCity: 'Jakarta', provider: 'openweathermap', isActive: true },
+      news: { apiKey: '', category: 'nasional', provider: 'newsapi', isActive: true },
+      quote: { isActive: true },
+      calc: { isActive: true },
+      ping: { isActive: true },
+    }
+  })
+
+  const [quotes, setQuotes] = useState<QuoteItem[]>(() => {
+    try {
+      const saved = localStorage.getItem('bot_quotes_db_v1')
+      if (saved) return JSON.parse(saved)
+    } catch {
+      // ignore
+    }
+    return DEFAULT_QUOTES
+  })
+
+  const [newQuoteText, setNewQuoteText] = useState('')
+  const [newQuoteAuthor, setNewQuoteAuthor] = useState('')
+
+  const saveFeatureConfigs = (updated: typeof featureConfigs) => {
+    setFeatureConfigs(updated)
+    try {
+      localStorage.setItem('bot_feature_settings_v1', JSON.stringify(updated))
+    } catch {
+      // ignore
+    }
+    toast.success('Pengaturan disimpan')
+  }
+
+  const saveQuotesList = (updated: QuoteItem[]) => {
+    setQuotes(updated)
+    try {
+      localStorage.setItem('bot_quotes_db_v1', JSON.stringify(updated))
+    } catch {
+      // ignore
+    }
+  }
+
+  const handleAddQuote = () => {
+    if (!newQuoteText.trim()) {
+      toast.error('Kutipan wajib diisi')
+      return
+    }
+    const item: QuoteItem = {
+      id: Date.now().toString(),
+      quote: newQuoteText.trim(),
+      author: newQuoteAuthor.trim() || 'Anonim',
+    }
+    const updated = [item, ...quotes]
+    saveQuotesList(updated)
+    setNewQuoteText('')
+    setNewQuoteAuthor('')
+    toast.success('Kata mutiara ditambahkan')
+  }
+
+  const handleDeleteQuote = (id: string) => {
+    const updated = quotes.filter((q) => q.id !== id)
+    saveQuotesList(updated)
+    toast.success('Kata mutiara dihapus')
+  }
+
+  const handleResetQuotes = () => {
+    saveQuotesList(DEFAULT_QUOTES)
+    toast.success('Kata mutiara direset ke default')
+  }
 
   const copyText = (text: string, id: string) => {
     void navigator.clipboard.writeText(text)
@@ -316,89 +433,9 @@ export default function BotMenuPage() {
     <div className="flex flex-col gap-6">
       <PageHeader
         title="Menu Bot"
-        description="Manajemen fitur dan perintah interaktif WhatsApp."
+        description="Katalog perintah dan konfigurasi fitur bot WhatsApp."
       />
 
-      {/* Top Stat Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <Card className="glass-card border-border/70 backdrop-blur-xl">
-          <CardHeader className="p-3.5 pb-1">
-            <div className="flex items-center gap-2">
-              <div className="p-1.5 rounded-md bg-red-500/10 text-red-500">
-                <Layers className="size-4" />
-              </div>
-              <CardTitle className="text-xs font-medium text-muted-foreground">
-                Total Fitur
-              </CardTitle>
-            </div>
-            <CardDescription className="text-xl font-bold text-foreground mt-1">
-              {BOT_FEATURES.length} Fitur
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="p-3.5 pt-1 text-[11px] text-muted-foreground">
-            Semua siap digunakan.
-          </CardContent>
-        </Card>
-
-        <Card className="glass-card border-border/70 backdrop-blur-xl">
-          <CardHeader className="p-3.5 pb-1">
-            <div className="flex items-center gap-2">
-              <div className="p-1.5 rounded-md bg-emerald-500/10 text-emerald-500">
-                <Sparkles className="size-4" />
-              </div>
-              <CardTitle className="text-xs font-medium text-muted-foreground">
-                Model AI
-              </CardTitle>
-            </div>
-            <CardDescription className="text-xl font-bold text-foreground mt-1">
-              Step-5-Preview
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="p-3.5 pt-1 text-[11px] text-emerald-600 dark:text-emerald-400 font-medium">
-            Bynara API (Gratis)
-          </CardContent>
-        </Card>
-
-        <Card className="glass-card border-border/70 backdrop-blur-xl">
-          <CardHeader className="p-3.5 pb-1">
-            <div className="flex items-center gap-2">
-              <div className="p-1.5 rounded-md bg-purple-500/10 text-purple-500">
-                <Brain className="size-4" />
-              </div>
-              <CardTitle className="text-xs font-medium text-muted-foreground">
-                Memori
-              </CardTitle>
-            </div>
-            <CardDescription className="text-xl font-bold text-foreground mt-1">
-              Supermemory
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="p-3.5 pt-1 text-[11px] text-purple-600 dark:text-purple-400 font-medium">
-            100 Riwayat Konteks
-          </CardContent>
-        </Card>
-
-        <Card className="glass-card border-border/70 backdrop-blur-xl">
-          <CardHeader className="p-3.5 pb-1">
-            <div className="flex items-center gap-2">
-              <div className="p-1.5 rounded-md bg-blue-500/10 text-blue-500">
-                <Cpu className="size-4" />
-              </div>
-              <CardTitle className="text-xs font-medium text-muted-foreground">
-                WhatsApp Core
-              </CardTitle>
-            </div>
-            <CardDescription className="text-xl font-bold text-foreground mt-1">
-              WhatsMeow
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="p-3.5 pt-1 text-[11px] text-blue-600 dark:text-blue-400 font-medium">
-            Auto-Typing Aktif
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Filter and Search Bar */}
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
         <div className="relative flex-1 max-w-sm">
           <Search className="absolute left-2.5 top-2.5 size-4 text-muted-foreground" />
@@ -433,13 +470,12 @@ export default function BotMenuPage() {
         </div>
       </div>
 
-      {/* Grid Cards Layout */}
       {filteredFeatures.length === 0 ? (
         <div className="flex flex-col items-center justify-center p-12 text-center rounded-xl border border-dashed bg-muted/20">
           <Bot className="size-8 text-muted-foreground mb-2" />
-          <p className="text-sm font-semibold">Tidak ada fitur ditemukan</p>
+          <p className="text-sm font-semibold">Tidak ada fitur</p>
           <p className="text-xs text-muted-foreground mt-1">
-            Coba ubah kata kunci pencarian atau kategori filter.
+            Ubah kata kunci pencarian atau kategori filter.
           </p>
         </div>
       ) : (
@@ -472,7 +508,7 @@ export default function BotMenuPage() {
                       variant="outline"
                       className="text-[10px] py-0 px-1.5 font-semibold text-emerald-600 dark:text-emerald-400 border-emerald-500/30 bg-emerald-500/5"
                     >
-                      {item.provider.includes('Gratis') ? 'Gratis ⚡' : 'Aktif'}
+                      {item.provider.includes('Gratis') ? 'Gratis' : 'Aktif'}
                     </Badge>
                   </div>
 
@@ -544,7 +580,6 @@ export default function BotMenuPage() {
         </div>
       )}
 
-      {/* Feature Detail Modal Dialog */}
       <Dialog
         open={Boolean(selectedFeature)}
         onOpenChange={(open) => {
@@ -571,7 +606,367 @@ export default function BotMenuPage() {
 
             <ScrollArea className="p-5 flex-1 max-h-[60vh] overflow-y-auto">
               <div className="flex flex-col gap-4 text-xs">
-                {/* Deskripsi */}
+                {selectedFeature.id === 'weather' && (
+                  <Card className="border border-border/70 bg-muted/20">
+                    <CardHeader className="p-3 pb-2">
+                      <CardTitle className="text-xs font-semibold flex items-center gap-1.5">
+                        <Sliders className="size-3.5 text-primary" />
+                        <span>Konfigurasi Cuaca</span>
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="p-3 pt-0 space-y-3">
+                      <div className="flex items-center justify-between py-1">
+                        <div>
+                          <Label className="text-xs font-medium block">Status</Label>
+                          <span className="text-[10px] text-muted-foreground block">
+                            Aktifkan fitur cuaca
+                          </span>
+                        </div>
+                        <Switch
+                          checked={featureConfigs.weather.isActive}
+                          onCheckedChange={(val) =>
+                            saveFeatureConfigs({
+                              ...featureConfigs,
+                              weather: { ...featureConfigs.weather, isActive: val },
+                            })
+                          }
+                        />
+                      </div>
+
+                      <div className="space-y-1.5">
+                        <Label className="text-xs font-medium">API Key</Label>
+                        <Input
+                          placeholder="Kunci"
+                          value={featureConfigs.weather.apiKey}
+                          onChange={(e) =>
+                            setFeatureConfigs({
+                              ...featureConfigs,
+                              weather: { ...featureConfigs.weather, apiKey: e.target.value },
+                            })
+                          }
+                          className="h-8 text-xs font-mono"
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-2">
+                        <div className="space-y-1.5">
+                          <Label className="text-xs font-medium">Kota Default</Label>
+                          <Input
+                            placeholder="Kota"
+                            value={featureConfigs.weather.defaultCity}
+                            onChange={(e) =>
+                              setFeatureConfigs({
+                                ...featureConfigs,
+                                weather: { ...featureConfigs.weather, defaultCity: e.target.value },
+                              })
+                            }
+                            className="h-8 text-xs"
+                          />
+                        </div>
+
+                        <div className="space-y-1.5">
+                          <Label className="text-xs font-medium">Provider</Label>
+                          <Select
+                            value={featureConfigs.weather.provider}
+                            onValueChange={(val) =>
+                              setFeatureConfigs({
+                                ...featureConfigs,
+                                weather: { ...featureConfigs.weather, provider: val },
+                              })
+                            }
+                          >
+                            <SelectTrigger className="h-8 text-xs">
+                              <SelectValue placeholder="Provider" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="openweathermap">OpenWeather</SelectItem>
+                              <SelectItem value="weatherapi">WeatherAPI</SelectItem>
+                              <SelectItem value="bmkg">BMKG (Publik)</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+
+                      <div className="flex justify-end pt-1">
+                        <Button
+                          size="sm"
+                          onClick={() => saveFeatureConfigs(featureConfigs)}
+                          className="h-7 text-xs px-3"
+                        >
+                          Simpan
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+
+                {selectedFeature.id === 'news' && (
+                  <Card className="border border-border/70 bg-muted/20">
+                    <CardHeader className="p-3 pb-2">
+                      <CardTitle className="text-xs font-semibold flex items-center gap-1.5">
+                        <Sliders className="size-3.5 text-primary" />
+                        <span>Konfigurasi Berita</span>
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="p-3 pt-0 space-y-3">
+                      <div className="flex items-center justify-between py-1">
+                        <div>
+                          <Label className="text-xs font-medium block">Status</Label>
+                          <span className="text-[10px] text-muted-foreground block">
+                            Aktifkan fitur berita
+                          </span>
+                        </div>
+                        <Switch
+                          checked={featureConfigs.news.isActive}
+                          onCheckedChange={(val) =>
+                            saveFeatureConfigs({
+                              ...featureConfigs,
+                              news: { ...featureConfigs.news, isActive: val },
+                            })
+                          }
+                        />
+                      </div>
+
+                      <div className="space-y-1.5">
+                        <Label className="text-xs font-medium">API Key</Label>
+                        <Input
+                          placeholder="Kunci"
+                          value={featureConfigs.news.apiKey}
+                          onChange={(e) =>
+                            setFeatureConfigs({
+                              ...featureConfigs,
+                              news: { ...featureConfigs.news, apiKey: e.target.value },
+                            })
+                          }
+                          className="h-8 text-xs font-mono"
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-2">
+                        <div className="space-y-1.5">
+                          <Label className="text-xs font-medium">Kategori</Label>
+                          <Select
+                            value={featureConfigs.news.category}
+                            onValueChange={(val) =>
+                              setFeatureConfigs({
+                                ...featureConfigs,
+                                news: { ...featureConfigs.news, category: val },
+                              })
+                            }
+                          >
+                            <SelectTrigger className="h-8 text-xs">
+                              <SelectValue placeholder="Kategori" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="nasional">Nasional</SelectItem>
+                              <SelectItem value="teknologi">Teknologi</SelectItem>
+                              <SelectItem value="bisnis">Bisnis</SelectItem>
+                              <SelectItem value="olahraga">Olahraga</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+
+                        <div className="space-y-1.5">
+                          <Label className="text-xs font-medium">Provider</Label>
+                          <Select
+                            value={featureConfigs.news.provider}
+                            onValueChange={(val) =>
+                              setFeatureConfigs({
+                                ...featureConfigs,
+                                news: { ...featureConfigs.news, provider: val },
+                              })
+                            }
+                          >
+                            <SelectTrigger className="h-8 text-xs">
+                              <SelectValue placeholder="Provider" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="newsapi">NewsAPI</SelectItem>
+                              <SelectItem value="gnews">GNews</SelectItem>
+                              <SelectItem value="antara">Antara RSS</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+
+                      <div className="flex justify-end pt-1">
+                        <Button
+                          size="sm"
+                          onClick={() => saveFeatureConfigs(featureConfigs)}
+                          className="h-7 text-xs px-3"
+                        >
+                          Simpan
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+
+                {selectedFeature.id === 'quote' && (
+                  <Card className="border border-border/70 bg-muted/20">
+                    <CardHeader className="p-3 pb-2 flex flex-row items-center justify-between">
+                      <CardTitle className="text-xs font-semibold flex items-center gap-1.5">
+                        <Quote className="size-3.5 text-primary" />
+                        <span>Database Kata Mutiara</span>
+                        <Badge variant="outline" className="text-[10px] font-mono ml-1">
+                          {quotes.length}
+                        </Badge>
+                      </CardTitle>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={handleResetQuotes}
+                        className="h-6 text-[10px] px-1.5 text-muted-foreground gap-1"
+                        title="Reset Default"
+                      >
+                        <RefreshCw className="size-2.5" />
+                        <span>Reset</span>
+                      </Button>
+                    </CardHeader>
+                    <CardContent className="p-3 pt-0 space-y-3">
+                      <div className="flex items-center justify-between py-1 border-b border-border/40">
+                        <div>
+                          <Label className="text-xs font-medium block">Status</Label>
+                          <span className="text-[10px] text-muted-foreground block">
+                            Aktifkan respon !quote
+                          </span>
+                        </div>
+                        <Switch
+                          checked={featureConfigs.quote.isActive}
+                          onCheckedChange={(val) =>
+                            saveFeatureConfigs({
+                              ...featureConfigs,
+                              quote: { ...featureConfigs.quote, isActive: val },
+                            })
+                          }
+                        />
+                      </div>
+
+                      <div className="rounded-lg border bg-background/50 p-2.5 space-y-2">
+                        <Label className="text-xs font-semibold block">Tambah Baru</Label>
+                        <Input
+                          placeholder="Kutipan"
+                          value={newQuoteText}
+                          onChange={(e) => setNewQuoteText(e.target.value)}
+                          className="h-8 text-xs"
+                        />
+                        <div className="flex items-center gap-2">
+                          <Input
+                            placeholder="Penulis"
+                            value={newQuoteAuthor}
+                            onChange={(e) => setNewQuoteAuthor(e.target.value)}
+                            className="h-8 text-xs flex-1"
+                          />
+                          <Button
+                            type="button"
+                            size="sm"
+                            onClick={handleAddQuote}
+                            className="h-8 text-xs px-3 gap-1"
+                          >
+                            <Plus className="size-3.5" />
+                            <span>Tambah</span>
+                          </Button>
+                        </div>
+                      </div>
+
+                      <div className="space-y-1.5 max-h-[180px] overflow-y-auto pr-1">
+                        {quotes.map((q) => (
+                          <div
+                            key={q.id}
+                            className="flex items-start justify-between gap-2 p-2 rounded-md border bg-card/60 text-xs"
+                          >
+                            <div className="min-w-0 flex-1">
+                              <p className="text-foreground leading-snug line-clamp-2">
+                                "{q.quote}"
+                              </p>
+                              <span className="text-[10px] text-muted-foreground block mt-0.5">
+                                — {q.author}
+                              </span>
+                            </div>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="icon-xs"
+                              onClick={() => handleDeleteQuote(q.id)}
+                              className="size-6 text-muted-foreground hover:text-rose-500 shrink-0"
+                              title="Hapus"
+                            >
+                              <Trash2 className="size-3" />
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+
+                {selectedFeature.id === 'ai-chat' && (
+                  <div className="rounded-lg border bg-muted/40 p-3 flex items-center justify-between">
+                    <div>
+                      <h4 className="font-semibold text-xs text-foreground">Pengaturan AI</h4>
+                      <p className="text-[11px] text-muted-foreground">
+                        Kelola model, prompt umum, dan persona nomor khusus.
+                      </p>
+                    </div>
+                    <Button
+                      size="sm"
+                      onClick={() => {
+                        setSelectedFeature(null)
+                        navigate('/bot/ai')
+                      }}
+                      className="h-7 text-xs px-3 gap-1"
+                    >
+                      <span>Buka AI</span>
+                      <ExternalLink className="size-3" />
+                    </Button>
+                  </div>
+                )}
+
+                {selectedFeature.id === 'antilink' && (
+                  <div className="rounded-lg border bg-muted/40 p-3 flex items-center justify-between">
+                    <div>
+                      <h4 className="font-semibold text-xs text-foreground">Pengaturan Grup</h4>
+                      <p className="text-[11px] text-muted-foreground">
+                        Kelola moderasi anti-link dan sambutan per grup.
+                      </p>
+                    </div>
+                    <Button
+                      size="sm"
+                      onClick={() => {
+                        setSelectedFeature(null)
+                        navigate('/bot/groups')
+                      }}
+                      className="h-7 text-xs px-3 gap-1"
+                    >
+                      <span>Buka Grup</span>
+                      <ExternalLink className="size-3" />
+                    </Button>
+                  </div>
+                )}
+
+                {selectedFeature.id === 'scheduler' && (
+                  <div className="rounded-lg border bg-muted/40 p-3 flex items-center justify-between">
+                    <div>
+                      <h4 className="font-semibold text-xs text-foreground">Jadwal Pesan</h4>
+                      <p className="text-[11px] text-muted-foreground">
+                        Kelola pengiriman pesan otomatis 24 jam.
+                      </p>
+                    </div>
+                    <Button
+                      size="sm"
+                      onClick={() => {
+                        setSelectedFeature(null)
+                        navigate('/scheduled')
+                      }}
+                      className="h-7 text-xs px-3 gap-1"
+                    >
+                      <span>Buka Jadwal</span>
+                      <ExternalLink className="size-3" />
+                    </Button>
+                  </div>
+                )}
+
                 <div>
                   <h4 className="font-semibold text-foreground mb-1 text-xs">
                     Cara Kerja
@@ -581,16 +976,15 @@ export default function BotMenuPage() {
                   </p>
                 </div>
 
-                {/* Spesifikasi Teknis */}
                 <div className="rounded-lg border bg-muted/40 p-3 space-y-2">
                   <h4 className="font-semibold text-foreground text-xs flex items-center gap-1.5">
                     <Activity className="size-3.5 text-primary" />
-                    Spesifikasi API & Sistem
+                    Spesifikasi Teknis
                   </h4>
                   <div className="grid grid-cols-2 gap-2 text-[11px]">
                     <div>
                       <span className="text-muted-foreground block text-[10px]">
-                        API Status
+                        Status
                       </span>
                       <span className="font-medium text-emerald-600 dark:text-emerald-400">
                         {selectedFeature.apiStatus}
@@ -598,23 +992,13 @@ export default function BotMenuPage() {
                     </div>
                     <div>
                       <span className="text-muted-foreground block text-[10px]">
-                        Estimasi Respon
+                        Respon
                       </span>
                       <span className="font-medium">{selectedFeature.latency}</span>
                     </div>
-                    {selectedFeature.model && (
-                      <div className="col-span-2">
-                        <span className="text-muted-foreground block text-[10px]">
-                          Model
-                        </span>
-                        <code className="font-mono bg-muted/60 px-1 py-0.5 rounded text-[11px]">
-                          {selectedFeature.model}
-                        </code>
-                      </div>
-                    )}
                     <div className="col-span-2">
                       <span className="text-muted-foreground block text-[10px]">
-                        Endpoint / Engine
+                        Endpoint
                       </span>
                       <code className="font-mono bg-muted/60 px-1 py-0.5 rounded text-[10px] break-all block">
                         {selectedFeature.endpoint}
@@ -623,7 +1007,6 @@ export default function BotMenuPage() {
                   </div>
                 </div>
 
-                {/* Parameter */}
                 <div>
                   <h4 className="font-semibold text-foreground mb-1 text-xs">
                     Parameter
@@ -637,11 +1020,10 @@ export default function BotMenuPage() {
                   </ul>
                 </div>
 
-                {/* Simulasi Interaksi */}
                 <div>
                   <h4 className="font-semibold text-foreground mb-1.5 text-xs flex items-center gap-1.5">
                     <Clock className="size-3.5 text-muted-foreground" />
-                    Simulasi Chat WhatsApp
+                    Simulasi WhatsApp
                   </h4>
                   <div className="rounded-lg border bg-muted/30 p-3 space-y-2.5">
                     <div className="flex flex-col items-end">

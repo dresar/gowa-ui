@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
   Sparkles,
@@ -24,12 +25,8 @@ import {
   getAIConfig,
   updateAIConfig,
   listAIPersonas,
-  createAIPersona,
-  updateAIPersona,
   deleteAIPersona,
   type BotAIPersona,
-  type CreateAIPersonaPayload,
-  type UpdateAIPersonaPayload,
 } from '@/api/bot'
 import { PageHeader } from '@/components/shared/page-header'
 import { Badge } from '@/components/ui/badge'
@@ -48,14 +45,6 @@ import { Switch } from '@/components/ui/switch'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Textarea } from '@/components/ui/textarea'
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
-import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -66,28 +55,8 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
 
-const PROMPT_PRESETS = [
-  {
-    label: '⭐ Nomor Khusus (Santai & Hangat)',
-    rel: 'khusus',
-    prompt:
-      'Kamu adalah Eka Syarif Maulana S.Kom yang membalas WhatsApp dari nomor khusus (+62 852-1614-9732). Berbicaralah dengan gaya santai, hangat, perhatian harian (tanya makan, kabar, jangan begadang, istirahat), bersahabat, to the point. Selalu gunakan konteks obrolan masa lalu dan memori percakapan. Dilarang keras terdengar seperti AI, bot, atau customer service!',
-  },
-  {
-    label: '🤝 Teman Akrab & Santai',
-    rel: 'teman',
-    prompt:
-      'Kamu mewakili pemilik nomor untuk membalas chat teman akrab. Gunakan bahasa percakapan sehari-hari orang Indonesia yang santai, luwes, to the point (contoh: oke sip, siap, bentar ya, gas, santai aja). Dilarang keras kaku atau memakai bahasa customer service formal.',
-  },
-  {
-    label: '💼 Profesional Ramah',
-    rel: 'klien',
-    prompt:
-      'Kamu mewakili pemilik nomor untuk melayani obrolan bisnis/klien. Balaslah dengan bahasa Indonesia yang ramah, sopan, komunikatif, profesional, dan memberikan kejelasan solusi tanpa terkesan kaku.',
-  },
-]
-
 export default function BotAIPage() {
+  const navigate = useNavigate()
   const queryClient = useQueryClient()
   const [showKey, setShowKey] = useState(false)
 
@@ -106,17 +75,7 @@ export default function BotAIPage() {
   const [isConfigLoaded, setIsConfigLoaded] = useState(false)
 
   const [searchPersona, setSearchPersona] = useState('')
-  const [isPersonaModalOpen, setIsPersonaModalOpen] = useState(false)
-  const [editingPersona, setEditingPersona] = useState<BotAIPersona | null>(null)
   const [personaToDelete, setPersonaToDelete] = useState<BotAIPersona | null>(null)
-
-  const [formPhone, setFormPhone] = useState('')
-  const [formName, setFormName] = useState('')
-  const [formRelationship, setFormRelationship] = useState('khusus')
-  const [formPrompt, setFormPrompt] = useState('')
-  const [formAutoReply, setFormAutoReply] = useState(true)
-  const [formUseMemory, setFormUseMemory] = useState(true)
-  const [formIsActive, setFormIsActive] = useState(true)
 
   useQuery({
     queryKey: ['bot-ai-config'],
@@ -171,51 +130,6 @@ export default function BotAIPage() {
     },
   })
 
-  const savePersonaMutation = useMutation({
-    mutationFn: async () => {
-      const cleanPhone = formPhone.replace(/[^\d]/g, '')
-      if (!cleanPhone) {
-        throw new Error('Nomor telepon wajib diisi')
-      }
-      if (!formPrompt.trim()) {
-        throw new Error('Instruksi prompting wajib diisi')
-      }
-
-      if (editingPersona) {
-        const payload: UpdateAIPersonaPayload = {
-          phone_number: cleanPhone,
-          contact_name: formName.trim(),
-          relationship: formRelationship.trim(),
-          custom_prompt: formPrompt.trim(),
-          auto_reply_enabled: formAutoReply,
-          use_memory: formUseMemory,
-          is_active: formIsActive,
-        }
-        return updateAIPersona(editingPersona.id, payload)
-      } else {
-        const payload: CreateAIPersonaPayload = {
-          phone_number: cleanPhone,
-          contact_name: formName.trim(),
-          relationship: formRelationship.trim(),
-          custom_prompt: formPrompt.trim(),
-          auto_reply_enabled: formAutoReply,
-          use_memory: formUseMemory,
-          is_active: formIsActive,
-        }
-        return createAIPersona(payload)
-      }
-    },
-    onSuccess: () => {
-      toast.success(editingPersona ? 'Persona diperbarui' : 'Persona baru berhasil ditambahkan')
-      setIsPersonaModalOpen(false)
-      setEditingPersona(null)
-      void queryClient.invalidateQueries({ queryKey: ['bot-ai-personas'] })
-    },
-    onError: (err: Error) => {
-      toast.error(err.message || 'Gagal menyimpan persona')
-    },
-  })
-
   const deletePersonaMutation = useMutation({
     mutationFn: (id: number) => deleteAIPersona(id),
     onSuccess: () => {
@@ -227,30 +141,6 @@ export default function BotAIPage() {
       toast.error(err.message || 'Gagal menghapus persona')
     },
   })
-
-  const openCreateModal = () => {
-    setEditingPersona(null)
-    setFormPhone('')
-    setFormName('')
-    setFormRelationship('khusus')
-    setFormPrompt(PROMPT_PRESETS[0].prompt)
-    setFormAutoReply(true)
-    setFormUseMemory(true)
-    setFormIsActive(true)
-    setIsPersonaModalOpen(true)
-  }
-
-  const openEditModal = (p: BotAIPersona) => {
-    setEditingPersona(p)
-    setFormPhone(p.phone_number)
-    setFormName(p.contact_name)
-    setFormRelationship(p.relationship || 'khusus')
-    setFormPrompt(p.custom_prompt)
-    setFormAutoReply(p.auto_reply_enabled)
-    setFormUseMemory(p.use_memory)
-    setFormIsActive(p.is_active)
-    setIsPersonaModalOpen(true)
-  }
 
   const filteredPersonas = useMemo(() => {
     if (!searchPersona.trim()) return personas
@@ -309,19 +199,19 @@ export default function BotAIPage() {
             <div className="relative flex-1 max-w-sm">
               <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground" />
               <Input
-                placeholder="Cari nomor, nama, atau relasi..."
+                placeholder="Cari"
                 value={searchPersona}
                 onChange={(e) => setSearchPersona(e.target.value)}
                 className="pl-8 h-8 text-xs rounded-md"
               />
             </div>
             <Button
-              onClick={openCreateModal}
+              onClick={() => navigate('/bot/ai/new')}
               size="sm"
               className="h-8 text-xs rounded-md bg-emerald-600 hover:bg-emerald-700 text-white gap-1.5 active:scale-[0.98] transition-all"
             >
               <Plus className="size-3.5" />
-              <span>Tambah Persona Nomor</span>
+              <span>Baru</span>
             </Button>
           </div>
 
@@ -335,16 +225,15 @@ export default function BotAIPage() {
                 <Bot className="size-10 text-muted-foreground/40" />
                 <h3 className="text-sm font-semibold text-foreground">Belum ada persona kustom</h3>
                 <p className="text-xs text-muted-foreground max-w-md">
-                  Tambahkan nomor kontak khusus (seperti sahabat atau kontak prioritas) agar AI membalas dengan
-                  gaya percakapan non-formal, luwes, dan menyerap konteks 100 chat serta Supermemory.
+                  Tambahkan nomor kontak khusus agar AI membalas dengan gaya percakapan santai, luwes, dan menyerap konteks Supermemory.
                 </p>
                 <Button
-                  onClick={openCreateModal}
+                  onClick={() => navigate('/bot/ai/new')}
                   size="sm"
                   className="mt-2 h-8 text-xs rounded-md bg-emerald-600 hover:bg-emerald-700 text-white gap-1.5"
                 >
                   <Plus className="size-3.5" />
-                  <span>Buat Persona Sekarang</span>
+                  <span>Baru</span>
                 </Button>
               </CardContent>
             </Card>
@@ -353,7 +242,8 @@ export default function BotAIPage() {
               {filteredPersonas.map((p) => (
                 <Card
                   key={p.id}
-                  className={`border transition-all duration-200 relative overflow-hidden ${
+                  onClick={() => navigate('/bot/ai/' + p.phone_number)}
+                  className={`border transition-all duration-200 relative overflow-hidden cursor-pointer ${
                     p.is_active
                       ? 'border-border/70 bg-card/60 shadow-xs hover:border-emerald-500/40'
                       : 'border-border/40 bg-muted/20 opacity-75'
@@ -388,18 +278,24 @@ export default function BotAIPage() {
                         <Button
                           variant="ghost"
                           size="icon"
-                          onClick={() => openEditModal(p)}
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            navigate('/bot/ai/' + p.phone_number)
+                          }}
                           className="size-7 rounded-md text-muted-foreground hover:text-foreground"
-                          title="Edit Persona"
+                          title="Edit"
                         >
                           <Edit3 className="size-3.5" />
                         </Button>
                         <Button
                           variant="ghost"
                           size="icon"
-                          onClick={() => setPersonaToDelete(p)}
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            setPersonaToDelete(p)
+                          }}
                           className="size-7 rounded-md text-muted-foreground hover:text-rose-500"
-                          title="Hapus Persona"
+                          title="Hapus"
                         >
                           <Trash2 className="size-3.5" />
                         </Button>
@@ -678,179 +574,15 @@ export default function BotAIPage() {
         </TabsContent>
       </Tabs>
 
-      {/* MODAL DIALOG: TAMBAH / EDIT PERSONA */}
-      <Dialog open={isPersonaModalOpen} onOpenChange={setIsPersonaModalOpen}>
-        <DialogContent className="max-w-xl p-5">
-          <DialogHeader>
-            <DialogTitle className="text-base font-semibold flex items-center gap-2">
-              <Users className="size-4 text-emerald-500" />
-              <span>{editingPersona ? 'Edit Persona Nomor' : 'Tambah Persona Nomor Baru'}</span>
-            </DialogTitle>
-            <DialogDescription className="text-xs">
-              Atur prompting khusus dan memori kontekstual agar AI membalas nomor ini dengan bahasa
-              super humanis dan personal.
-            </DialogDescription>
-          </DialogHeader>
-
-          <div className="flex flex-col gap-4 py-2">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div className="flex flex-col gap-1.5">
-                <Label className="text-xs font-medium">
-                  Nomor WhatsApp <span className="text-rose-500">*</span>
-                </Label>
-                <Input
-                  value={formPhone}
-                  onChange={(e) => setFormPhone(e.target.value)}
-                  placeholder="Contoh: 6285216149732"
-                  className="h-9 text-xs rounded-md font-mono"
-                />
-                <span className="text-[10px] text-muted-foreground">Format angka (E.164 tanpa tanda +)</span>
-              </div>
-
-              <div className="flex flex-col gap-1.5">
-                <Label className="text-xs font-medium">Nama Kontak</Label>
-                <Input
-                  value={formName}
-                  onChange={(e) => setFormName(e.target.value)}
-                  placeholder="Contoh: Indah 🧕🌿💝"
-                  className="h-9 text-xs rounded-md"
-                />
-              </div>
-            </div>
-
-            <div className="flex flex-col gap-1.5">
-              <Label className="text-xs font-medium">Relasi / Hubungan</Label>
-              <Select value={formRelationship} onValueChange={setFormRelationship}>
-                <SelectTrigger className="h-9 text-xs rounded-md">
-                  <SelectValue placeholder="Pilih relasi" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="khusus" className="text-xs">
-                    Nomor Khusus / Prioritas ⭐
-                  </SelectItem>
-                  <SelectItem value="teman" className="text-xs">
-                    Teman / Sahabat 🤝
-                  </SelectItem>
-                  <SelectItem value="keluarga" className="text-xs">
-                    Keluarga 👨‍👩‍👧
-                  </SelectItem>
-                  <SelectItem value="klien" className="text-xs">
-                    Klien / Rekan Kerja 💼
-                  </SelectItem>
-                  <SelectItem value="umum" className="text-xs">
-                    Lainnya / Umum
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="flex flex-col gap-1.5">
-              <div className="flex items-center justify-between">
-                <Label className="text-xs font-medium">
-                  Instruksi Prompting Kustom <span className="text-rose-500">*</span>
-                </Label>
-                <span className="text-[10px] text-muted-foreground">Pilih preset cepat:</span>
-              </div>
-
-              <div className="flex flex-wrap gap-1.5 pb-1">
-                {PROMPT_PRESETS.map((p, idx) => (
-                  <Button
-                    key={idx}
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={() => {
-                      setFormPrompt(p.prompt)
-                      setFormRelationship(p.rel)
-                    }}
-                    className="h-6 text-[10px] px-2 rounded-[4px] border-border/70 hover:bg-muted font-normal"
-                  >
-                    {p.label}
-                  </Button>
-                ))}
-              </div>
-
-              <Textarea
-                value={formPrompt}
-                onChange={(e) => setFormPrompt(e.target.value)}
-                placeholder="Tuliskan instruksi peran untuk membalas kontak ini..."
-                className="text-xs min-h-[120px] rounded-md leading-relaxed font-sans"
-              />
-              <span className="text-[10px] text-muted-foreground">
-                AI akan secara otomatis menggabungkan prompt ini dengan 100 obrolan terakhir dan
-                memori Supermemory jangka panjang.
-              </span>
-            </div>
-
-            <div className="flex flex-col gap-2.5 bg-muted/40 p-3 rounded-md border border-border/60">
-              <div className="flex items-center justify-between">
-                <div>
-                  <Label className="text-xs font-medium">Auto-Reply Khusus Nomor Ini</Label>
-                  <p className="text-[10px] text-muted-foreground">
-                    Langsung membalas chat dari nomor ini tanpa harus mengetik prefix !ai.
-                  </p>
-                </div>
-                <Switch checked={formAutoReply} onCheckedChange={setFormAutoReply} />
-              </div>
-
-              <div className="flex items-center justify-between pt-2 border-t border-border/40">
-                <div>
-                  <Label className="text-xs font-medium">Aktifkan Supermemory & 100 Chat History</Label>
-                  <p className="text-[10px] text-muted-foreground">
-                    Menggunakan memori percakapan masa lalu agar gaya bahasa persis manusia asli.
-                  </p>
-                </div>
-                <Switch checked={formUseMemory} onCheckedChange={setFormUseMemory} />
-              </div>
-
-              <div className="flex items-center justify-between pt-2 border-t border-border/40">
-                <div>
-                  <Label className="text-xs font-medium">Status Aktif Persona</Label>
-                  <p className="text-[10px] text-muted-foreground">
-                    Matikan sementara jika tidak ingin persona ini aktif.
-                  </p>
-                </div>
-                <Switch checked={formIsActive} onCheckedChange={setFormIsActive} />
-              </div>
-            </div>
-          </div>
-
-          <DialogFooter className="gap-2 sm:gap-0">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setIsPersonaModalOpen(false)}
-              className="h-8 text-xs rounded-md"
-            >
-              Batal
-            </Button>
-            <Button
-              size="sm"
-              onClick={() => savePersonaMutation.mutate()}
-              disabled={savePersonaMutation.isPending}
-              className="h-8 text-xs rounded-md bg-emerald-600 hover:bg-emerald-700 text-white gap-1.5"
-            >
-              <Save className="size-3.5" />
-              <span>{savePersonaMutation.isPending ? 'Menyimpan...' : 'Simpan Persona'}</span>
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* ALERT DIALOG: KONFIRMASI HAPUS PERSONA */}
       <AlertDialog
         open={!!personaToDelete}
         onOpenChange={(open) => !open && setPersonaToDelete(null)}
       >
         <AlertDialogContent className="p-5 max-w-md">
           <AlertDialogHeader>
-            <AlertDialogTitle className="text-sm font-semibold">Hapus Persona?</AlertDialogTitle>
+            <AlertDialogTitle className="text-sm font-semibold">Hapus Persona</AlertDialogTitle>
             <AlertDialogDescription className="text-xs">
-              Persona untuk kontak{' '}
-              <span className="font-semibold text-foreground">
-                {personaToDelete?.contact_name || personaToDelete?.phone_number}
-              </span>{' '}
-              akan dihapus. AI akan kembali ke pengaturan umum untuk nomor ini.
+              Hapus konfigurasi AI untuk {personaToDelete?.contact_name || personaToDelete?.phone_number}?
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="gap-2 sm:gap-0">
