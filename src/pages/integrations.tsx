@@ -528,9 +528,13 @@ export default function IntegrationsPage() {
 
   const callMcpRpc = async (method: string, params: Record<string, unknown> = {}) => {
     const endpoint = effectiveMcpUrl
+    const currentToken = useConnection.getState().token
     const reqHeaders: Record<string, string> = {
       'Content-Type': 'application/json',
       Accept: 'application/json, text/event-stream',
+    }
+    if (currentToken) {
+      reqHeaders['Authorization'] = `Bearer ${currentToken}`
     }
     if (currentDeviceId) {
       reqHeaders['X-Device-Id'] = currentDeviceId
@@ -544,6 +548,7 @@ export default function IntegrationsPage() {
     const res = await fetch(endpoint, {
       method: 'POST',
       headers: reqHeaders,
+      credentials: 'include',
       body: rpcBody,
     })
     const raw = await res.text()
@@ -782,7 +787,11 @@ export default function IntegrationsPage() {
     }
 
     const runnerPath = 'tools/mcp-runner/runner.mjs'
-    const envObj: Record<string, string> = { GOWA_MCP_URL: effectiveMcpUrl }
+    const activeToken = useConnection.getState().token
+    const envObj: Record<string, string> = {
+      GOWA_MCP_URL: effectiveMcpUrl,
+      GOWA_MCP_PIN: activeToken || 'YOUR_PIN',
+    }
     if (currentDeviceId) {
       envObj['GOWA_DEVICE_ID'] = currentDeviceId
     }

@@ -1,32 +1,21 @@
 import { useEffect, useRef, useState, type FormEvent, type KeyboardEvent } from 'react'
-import { Delete, Loader2, Lock, SlidersHorizontal } from 'lucide-react'
+import { Delete, Loader2, Lock } from 'lucide-react'
 import { Navigate, useNavigate } from 'react-router-dom'
 import { Logo } from '@/components/layout/logo'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
 import { useConnection } from '@/stores/connection'
 import { cn } from '@/lib/utils'
 
 export default function ConnectPage() {
   const navigate = useNavigate()
   const status = useConnection((state) => state.status)
-  const storedUrl = useConnection((state) => state.baseUrl)
   const loginWithPin = useConnection((state) => state.loginWithPin)
-  const connect = useConnection((state) => state.connect)
 
   const [pin, setPin] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [shake, setShake] = useState(false)
-  const [showServerConfig, setShowServerConfig] = useState(false)
-  const [serverUrl, setServerUrl] = useState(
-    storedUrl ??
-      (import.meta.env.VITE_DEFAULT_SERVER_URL as string | undefined) ??
-      (typeof window !== 'undefined' && window.location.origin
-        ? window.location.origin
-        : 'http://localhost:3000'),
-  )
 
   const inputRef = useRef<HTMLInputElement>(null)
 
@@ -38,35 +27,14 @@ export default function ConnectPage() {
     return <Navigate to="/" replace />
   }
 
-  const handleDigit = (digit: string) => {
-    setError(null)
-    if (pin.length < 12) {
-      setPin((prev) => prev + digit)
-    }
-  }
-
-  const handleBackspace = () => {
-    setError(null)
-    setPin((prev) => prev.slice(0, -1))
-  }
-
-  const handleClear = () => {
-    setError(null)
-    setPin('')
-  }
-
-  const handleFormSubmit = async (e?: FormEvent) => {
-    if (e) e.preventDefault()
-    if (!pin.trim() || submitting) return
+  const submitPin = async (candidatePin: string) => {
+    const cleanPin = candidatePin.trim()
+    if (!cleanPin || submitting) return
 
     setSubmitting(true)
     setError(null)
 
-    if (showServerConfig && serverUrl) {
-      await connect(serverUrl)
-    }
-
-    const res = await loginWithPin(pin.trim())
+    const res = await loginWithPin(cleanPin)
     setSubmitting(false)
 
     if (res.ok) {
@@ -80,16 +48,44 @@ export default function ConnectPage() {
     }
   }
 
+  const handleDigit = (digit: string) => {
+    setError(null)
+    if (pin.length < 12) {
+      const nextPin = pin + digit
+      setPin(nextPin)
+      if (nextPin.length === 6) {
+        void submitPin(nextPin)
+      }
+    }
+    inputRef.current?.focus()
+  }
+
+  const handleBackspace = () => {
+    setError(null)
+    setPin((prev) => prev.slice(0, -1))
+    inputRef.current?.focus()
+  }
+
+  const handleClear = () => {
+    setError(null)
+    setPin('')
+    inputRef.current?.focus()
+  }
+
+  const handleFormSubmit = async (e?: FormEvent) => {
+    if (e) e.preventDefault()
+    await submitPin(pin)
+  }
+
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       e.preventDefault()
-      void handleFormSubmit()
+      void submitPin(pin)
     }
   }
 
   const PIN_LENGTH = 6
   const dots = Array.from({ length: PIN_LENGTH })
-
   const keypadNumbers = ['1', '2', '3', '4', '5', '6', '7', '8', '9']
 
   return (
@@ -128,6 +124,9 @@ export default function ConnectPage() {
                 if (clean.length <= 12) {
                   setError(null)
                   setPin(clean)
+                  if (clean.length === 6) {
+                    void submitPin(clean)
+                  }
                 }
               }}
               onKeyDown={handleKeyDown}
@@ -231,37 +230,6 @@ export default function ConnectPage() {
               )}
             </Button>
           </form>
-
-          <div className="flex w-full flex-col items-center pt-1">
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation()
-                setShowServerConfig((prev) => !prev)
-              }}
-              className="text-muted-foreground/60 hover:text-muted-foreground flex items-center gap-1.5 text-[11px] transition-colors"
-            >
-              <SlidersHorizontal className="size-3" />
-              <span>Pengaturan Server</span>
-            </button>
-
-            {showServerConfig && (
-              <div
-                onClick={(e) => e.stopPropagation()}
-                className="bg-card/80 border-border/60 mt-3 flex w-full flex-col gap-2 rounded-lg border p-3"
-              >
-                <div className="flex flex-col gap-1">
-                  <span className="text-muted-foreground text-[10px] font-medium">Server Backend</span>
-                  <Input
-                    value={serverUrl}
-                    onChange={(e) => setServerUrl(e.target.value)}
-                    placeholder="http://localhost:3000"
-                    className="h-8 text-xs font-mono"
-                  />
-                </div>
-              </div>
-            )}
-          </div>
         </CardContent>
       </Card>
     </div>
