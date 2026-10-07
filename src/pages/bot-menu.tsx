@@ -53,6 +53,8 @@ export default function BotMenuPage() {
     { label: 'Semua', value: 'all' },
     { label: 'AI & Memori', value: 'AI & Memori' },
     { label: 'Produktivitas', value: 'Produktivitas' },
+    { label: 'Hiburan', value: 'Edukasi & Hiburan' },
+    { label: 'Utilitas', value: 'Utilitas' },
     { label: 'Grup', value: 'Grup' },
     { label: 'Sistem', value: 'Sistem' },
   ]
