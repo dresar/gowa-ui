@@ -55,7 +55,7 @@ export default function BotMenuDetailPage() {
 
   const [weatherApiKey, setWeatherApiKey] = useState('')
   const [weatherCity, setWeatherCity] = useState('Jakarta')
-  const [weatherProvider, setWeatherProvider] = useState('openweathermap')
+  const [weatherProvider, setWeatherProvider] = useState('bmkg')
 
   const [newsApiKey, setNewsApiKey] = useState('')
   const [newsCategory, setNewsCategory] = useState('nasional')
@@ -352,17 +352,23 @@ export default function BotMenuDetailPage() {
           {feature.id === 'weather' && (
             <Card className="border-border/60 bg-card/50 backdrop-blur-md">
               <CardHeader className="pb-3 pt-4 px-4 sm:px-5">
-                <CardTitle className="text-sm font-semibold">Konfigurasi Cuaca</CardTitle>
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-sm font-semibold">Prakiraan BMKG</CardTitle>
+                  <Badge variant="outline" className="text-[10px] text-emerald-500 border-emerald-500/30 bg-emerald-500/10">
+                    Bebas Kuota
+                  </Badge>
+                </div>
               </CardHeader>
               <CardContent className="space-y-4 px-4 sm:px-5 pb-5">
-                <div className="space-y-1.5">
-                  <Label className="text-xs font-semibold">API Key</Label>
-                  <Input
-                    value={weatherApiKey}
-                    onChange={(e) => setWeatherApiKey(e.target.value)}
-                    placeholder="Kunci"
-                    className="h-9 font-mono text-xs rounded-[6px]"
-                  />
+                <div className="rounded-lg border border-border/50 bg-muted/20 p-3 text-xs space-y-1">
+                  <div className="flex items-center justify-between font-medium">
+                    <span className="text-muted-foreground">Provider:</span>
+                    <span className="text-foreground">BMKG Indonesia (Resmi)</span>
+                  </div>
+                  <div className="flex items-center justify-between font-mono text-[11px]">
+                    <span className="text-muted-foreground">API:</span>
+                    <span className="text-foreground">api.bmkg.go.id (Tanpa Kunci)</span>
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -371,23 +377,18 @@ export default function BotMenuDetailPage() {
                     <Input
                       value={weatherCity}
                       onChange={(e) => setWeatherCity(e.target.value)}
-                      placeholder="Kota"
+                      placeholder="Jakarta"
                       className="h-9 text-xs rounded-[6px]"
                     />
                   </div>
 
                   <div className="space-y-1.5">
-                    <Label className="text-xs font-semibold">Provider</Label>
-                    <Select value={weatherProvider} onValueChange={setWeatherProvider}>
-                      <SelectTrigger className="h-9 w-full text-xs rounded-[6px]">
-                        <SelectValue placeholder="Provider" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="openweathermap">OpenWeather</SelectItem>
-                        <SelectItem value="bmkg">BMKG Indonesia</SelectItem>
-                        <SelectItem value="ai">AI Engine</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <Label className="text-xs font-semibold">Format Wilayah</Label>
+                    <Input
+                      readOnly
+                      value="Nama Kota / Kode adm4"
+                      className="h-9 text-xs rounded-[6px] bg-muted/30 text-muted-foreground"
+                    />
                   </div>
                 </div>
               </CardContent>
