@@ -108,21 +108,21 @@ export const BOT_FEATURES: BotFeature[] = [
   {
     id: 'weather',
     name: 'Prakiraan Cuaca',
-    command: '!cuaca <kota>',
+    command: '!cuaca <wilayah>',
     alias: '/cuaca, !weather',
     category: 'Produktivitas',
     provider: 'BMKG Indonesia (Resmi)',
     apiStatus: 'Aktif • Bebas Kuota',
     endpoint: 'https://api.bmkg.go.id/publik/prakiraan-cuaca',
-    shortDesc: 'Prakiraan cuaca, suhu, kelembaban, dan angin resmi BMKG.',
+    shortDesc: 'Prakiraan cuaca resmi BMKG hingga tingkat desa & kecamatan.',
     fullDesc:
-      'Layanan data terbuka resmi BMKG (Badan Meteorologi, Klimatologi, dan Geofisika). Menyajikan prakiraan cuaca 3 harian, suhu (°C), kelembapan (%), kecepatan angin, dan tutupan awan tanpa API key.',
+      'Layanan data terbuka resmi BMKG (Badan Meteorologi, Klimatologi, dan Geofisika). Menyajikan prakiraan cuaca akurat hingga tingkat desa/kelurahan, kecamatan, dan kota/kabupaten tanpa API key.',
     instruction:
-      'Ambil data prakiraan cuaca BMKG via nama kota atau kode adm4. Sajikan suhu (°C), kelembaban (%), kondisi cuaca, kecepatan/arah angin, serta waktu berikutnya dengan atribusi BMKG.',
-    exampleInput: '!cuaca Jakarta',
+      'Ambil data prakiraan cuaca BMKG via nama desa, kecamatan, kota, atau kode adm4. Sajikan suhu (°C), kelembaban (%), kondisi cuaca, kecepatan/arah angin, serta waktu berikutnya dengan atribusi BMKG.',
+    exampleInput: '!cuaca Torganda',
     exampleOutput:
-      '🌤️ *PRAKIRAAN CUACA BMKG*\n📍 *Lokasi:* Kota Administrasi Jakarta Pusat\n⏱️ *Waktu:* 2026-10-07 10:00:00\n\n🌡️ *Suhu:* 31°C\n💧 *Kelembapan:* 70%\n☁️ *Kondisi:* Cerah Berawan\n💨 *Angin:* 10 km/jam (SE)\n☁️ *Tutupan Awan:* 40%\n\n_Sumber: BMKG_',
-    parameters: ['<kota> (Nama kota/kabupaten atau kode adm4)'],
+      '🌤️ *PRAKIRAAN CUACA BMKG*\n📍 *Lokasi:* Desa Torganda, Kec. Torgamba, Labuhanbatu Selatan (Sumatera Utara)\n⏱️ *Waktu:* 2026-10-07 11:00:00\n\n🌡️ *Suhu:* 32°C\n💧 *Kelembapan:* 63%\n☁️ *Kondisi:* Cerah\n💨 *Angin:* 4.5 km/jam (E)\n☁️ *Tutupan Awan:* 46%\n\n_Sumber: BMKG_',
+    parameters: ['<wilayah> (Nama desa, kecamatan, kota/kab, atau kode adm4)'],
     latency: '150 - 300 ms',
     autoTyping: false,
     icon: CloudSun,
