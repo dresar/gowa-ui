@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import {
+  Blocks,
   Bot,
   CalendarClock,
   LayoutDashboard,
@@ -60,6 +61,12 @@ const navGroups = [
     ],
   },
   {
+    label: 'Integrasi',
+    items: [
+      { to: '/integrations', label: 'Webhook & MCP', icon: Blocks },
+    ],
+  },
+  {
     label: 'Sistem',
     items: [
       { to: '/misc', label: 'Saluran & Panggilan', icon: Wrench },
@@ -81,6 +88,9 @@ const routeTitles: Record<string, { label: string; icon: typeof LayoutDashboard 
   '/bot/logs': { label: 'Log Bot', icon: ScrollText },
   '/groups': { label: 'Grup', icon: Users },
   '/account': { label: 'Akun', icon: UserRound },
+  '/integrations': { label: 'Integrasi Pengembang', icon: Blocks },
+  '/webhook': { label: 'Integrasi Pengembang', icon: Blocks },
+  '/mcp': { label: 'Integrasi Pengembang', icon: Blocks },
   '/misc': { label: 'Saluran', icon: Wrench },
   '/settings': { label: 'Pengaturan', icon: Settings },
 }

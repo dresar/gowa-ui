@@ -71,3 +71,29 @@ export async function updateDeviceWebhook(
 ): Promise<DeviceWebhookConfig> {
   return results(http.patch(`/devices/${enc(deviceId)}/webhook`, payload))
 }
+
+export interface TestWebhookPayload {
+  webhook_url?: string
+  webhook_secret?: string
+  webhook_insecure_skip_verify?: boolean
+  event_type?: string
+}
+
+export interface WebhookTestResult {
+  url: string
+  event: string
+  latency_ms: number
+  sent_payload: Record<string, unknown>
+  status_code: number
+  success: boolean
+  response_body: string
+  error?: string
+}
+
+export async function testDeviceWebhook(
+  deviceId: string,
+  payload: TestWebhookPayload,
+): Promise<WebhookTestResult> {
+  return results(http.post(`/devices/${enc(deviceId)}/webhook/test`, payload))
+}
+
