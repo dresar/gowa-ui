@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import {
   Bot,
   CalendarClock,
@@ -145,6 +145,14 @@ export function AppShell() {
   const status = useConnection((state) => state.status)
   const location = useLocation()
   const [mobileNavOpen, setMobileNavOpen] = useState(false)
+  const mainRef = useRef<HTMLElement>(null)
+
+  useEffect(() => {
+    if (mainRef.current) {
+      mainRef.current.scrollTop = 0
+    }
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' })
+  }, [location.pathname])
 
   const currentRoute = routeTitles[location.pathname] ?? {
     label: 'Dasbor',
@@ -252,19 +260,26 @@ export function AppShell() {
           </div>
         </header>
 
-        <main className={cn(
-          'flex-1 min-h-0 overflow-y-auto pb-20 md:pb-6',
-          location.pathname === '/chats'
-            ? 'p-2 sm:p-3 overflow-hidden flex flex-col md:pb-0'
-            : 'p-3 sm:p-4 md:p-6'
-        )}>
+        <main
+          ref={mainRef}
+          className={cn(
+            'flex-1 min-h-0 overflow-y-auto pb-20 md:pb-6',
+            location.pathname === '/chats'
+              ? 'p-2 sm:p-3 overflow-hidden flex flex-col md:pb-0'
+              : location.pathname.startsWith('/bot/menu')
+                ? 'p-2.5 sm:p-3.5 md:p-4'
+                : 'p-3 sm:p-4 md:p-6'
+          )}
+        >
           <div
             key={location.pathname}
             className={cn(
               'stagger flex flex-col',
               location.pathname === '/chats'
                 ? 'w-full h-full flex-1 max-w-none'
-                : 'w-full max-w-[1600px] mx-auto gap-3.5 sm:gap-4'
+                : location.pathname.startsWith('/bot/menu')
+                  ? 'w-full max-w-none gap-3 sm:gap-3.5'
+                  : 'w-full max-w-[1600px] mx-auto gap-3.5 sm:gap-4'
             )}
           >
             <Outlet />

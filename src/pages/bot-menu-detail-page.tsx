@@ -66,7 +66,6 @@ export default function BotMenuDetailPage() {
       const saved = localStorage.getItem('bot_quotes_db_v1')
       if (saved) return JSON.parse(saved)
     } catch {
-      // ignore
     }
     return DEFAULT_QUOTES
   })
@@ -87,6 +86,12 @@ export default function BotMenuDetailPage() {
   const [farewellTpl, setFarewellTpl] = useState(
     'Sampai jumpa {name}, terima kasih telah bergabung.',
   )
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' })
+    const mainEl = document.querySelector('main')
+    if (mainEl) mainEl.scrollTop = 0
+  }, [id])
 
   useEffect(() => {
     if (!feature) return
@@ -188,7 +193,6 @@ export default function BotMenuDetailPage() {
     try {
       localStorage.setItem('bot_quotes_db_v1', JSON.stringify(updated))
     } catch {
-      // ignore
     }
     setNewQuoteText('')
     setNewQuoteAuthor('')
@@ -201,13 +205,12 @@ export default function BotMenuDetailPage() {
     try {
       localStorage.setItem('bot_quotes_db_v1', JSON.stringify(updated))
     } catch {
-      // ignore
     }
     toast.success('Kutipan dihapus')
   }
 
   return (
-    <div className="mx-auto max-w-4xl space-y-5 pb-12">
+    <div className="w-full space-y-3 pb-8">
       <div className="flex items-center justify-between gap-2">
         <div className="flex items-center gap-2 min-w-0">
           <Button
@@ -266,8 +269,8 @@ export default function BotMenuDetailPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-5 lg:grid-cols-3">
-        <div className="space-y-5 lg:col-span-2">
+      <div className="grid grid-cols-1 gap-3.5 lg:grid-cols-3">
+        <div className="space-y-3.5 lg:col-span-2">
           <Card className="border-border/60 bg-card/50 backdrop-blur-md">
             <CardHeader className="pb-3 pt-4 px-4 sm:px-5">
               <CardTitle className="text-sm font-semibold flex items-center gap-2">
@@ -620,7 +623,7 @@ export default function BotMenuDetailPage() {
           )}
         </div>
 
-        <div className="space-y-5">
+        <div className="space-y-3.5">
           <Card className="border-border/60 bg-card/50 backdrop-blur-md">
             <CardHeader className="pb-3 pt-4 px-4">
               <CardTitle className="text-xs font-semibold text-foreground uppercase tracking-wider">
