@@ -8,10 +8,14 @@ import { useDeviceStore } from '@/stores/device'
 export const http: AxiosInstance = axios.create({ timeout: 45_000 })
 
 http.interceptors.request.use((config) => {
-  const { baseUrl, username, password } = useConnection.getState()
+  const { baseUrl, token, username, password } = useConnection.getState()
   config.baseURL = baseUrl ?? ''
-  if (username && password && !config.headers.Authorization) {
-    config.headers.Authorization = basicAuthHeader(username, password)
+  if (!config.headers.Authorization) {
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`
+    } else if (username && password) {
+      config.headers.Authorization = basicAuthHeader(username, password)
+    }
   }
   if (!config.headers['X-Device-Id']) {
     let deviceId = useDeviceStore.getState().selectedDeviceId
@@ -48,7 +52,6 @@ http.interceptors.response.use(
   },
 )
 
-/** Unwrap the gowa envelope {code, message, results}. */
 export async function results<T>(request: Promise<AxiosResponse<ResponseData<T>>>): Promise<T> {
   const response = await request
   return response.data.results as T

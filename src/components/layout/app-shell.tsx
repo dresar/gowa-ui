@@ -5,6 +5,7 @@ import {
   CalendarClock,
   LayoutDashboard,
   Loader2,
+  Lock,
   Menu,
   MessagesSquare,
   ScrollText,
@@ -153,6 +154,7 @@ function NavContent({ onNavigate }: { onNavigate?: () => void }) {
 
 export function AppShell() {
   const status = useConnection((state) => state.status)
+  const logout = useConnection((state) => state.logout)
   const location = useLocation()
   const [mobileNavOpen, setMobileNavOpen] = useState(false)
   const mainRef = useRef<HTMLElement>(null)
@@ -182,9 +184,8 @@ export function AppShell() {
     )
   }
 
-
   if (status !== 'connected') {
-    return <Navigate to="/connect" replace />
+    return <Navigate to="/login" replace />
   }
 
   return (
@@ -202,12 +203,23 @@ export function AppShell() {
         </ScrollArea>
 
         <div className="border-sidebar-border/70 shrink-0 border-t p-3">
-          <div className="text-muted-foreground flex items-center justify-between rounded-lg border border-red-500/20 bg-gradient-to-r from-red-500/10 via-rose-500/5 to-transparent px-2.5 py-1.5 text-[11px] backdrop-blur-xs">
-            <div className="flex items-center gap-1.5">
-              <span className="size-1.5 rounded-full bg-red-500 shadow-xs shadow-red-500/80" />
-              <span>Core v9.6</span>
+          <div className="flex items-center justify-between gap-1.5">
+            <div className="text-muted-foreground flex flex-1 items-center justify-between rounded-lg border border-red-500/20 bg-gradient-to-r from-red-500/10 via-rose-500/5 to-transparent px-2.5 py-1.5 text-[11px] backdrop-blur-xs">
+              <div className="flex items-center gap-1.5">
+                <span className="size-1.5 rounded-full bg-red-500 shadow-xs shadow-red-500/80" />
+                <span>Core v9.6</span>
+              </div>
+              <span className="font-mono font-medium text-red-500 dark:text-red-400">PureGo</span>
             </div>
-            <span className="font-mono font-medium text-red-500 dark:text-red-400">PureGo</span>
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              title="Kunci / Keluar"
+              onClick={() => void logout()}
+              className="text-muted-foreground hover:text-red-500 hover:bg-red-500/10 size-8 shrink-0 rounded-lg"
+            >
+              <Lock className="size-3.5" />
+            </Button>
           </div>
         </div>
       </aside>
@@ -267,6 +279,15 @@ export function AppShell() {
             </Button>
             <WsBadge />
             <ThemeToggle />
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              title="Kunci / Keluar"
+              onClick={() => void logout()}
+              className="text-muted-foreground hover:text-red-500 hover:bg-red-500/10 size-8 shrink-0 rounded-lg"
+            >
+              <Lock className="size-4" />
+            </Button>
           </div>
         </header>
 

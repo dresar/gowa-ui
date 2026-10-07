@@ -6,39 +6,46 @@ import { basicAuthHeader } from '@/lib/api-error'
 import { normalizeBaseUrl, sameOriginBaseUrl } from '@/lib/url'
 
 export type ConnectionStatus =
-  'booting' | 'unconfigured' | 'connected' | 'unauthorized' | 'unreachable'
+  | 'booting'
+  | 'unconfigured'
+  | 'connected'
+  | 'unauthorized'
+  | 'unreachable'
 
 export type TestResult = 'ok' | 'unauthorized' | 'not-gowa' | 'unreachable'
 
 export interface ConnectionState {
   baseUrl: string | null
+  token: string | null
   username: string | null
   password: string | null
   status: ConnectionStatus
   connect: (baseUrl: string, username?: string, password?: string) => Promise<TestResult>
+  loginWithPin: (pin: string) => Promise<{ ok: boolean; error?: string }>
+  logout: () => Promise<void>
   boot: () => Promise<void>
   disconnect: () => void
   markUnauthorized: () => void
 }
 
-/**
- * Probe a server without the shared axios instance (no interceptors, no
- * global 401 handling). Distinguishes a real gowa server from any web server
- * that happens to answer 200 (e.g. an SPA dev server echoing index.html).
- */
 export async function probeServer(
   baseUrl: string,
+  token?: string,
   username?: string,
   password?: string,
 ): Promise<TestResult> {
   try {
+    const headers: Record<string, string> = { Accept: 'application/json' }
+    if (token) {
+      headers.Authorization = `Bearer ${token}`
+    } else if (username && password) {
+      headers.Authorization = basicAuthHeader(username, password)
+    }
+
     const response = await axios.get<ResponseData<unknown>>(`${baseUrl}/devices`, {
       timeout: 5_000,
       validateStatus: () => true,
-      headers: {
-        Accept: 'application/json',
-        ...(username && password ? { Authorization: basicAuthHeader(username, password) } : {}),
-      },
+      headers,
     })
     if (response.status === 401) return 'unauthorized'
     const body = response.data
@@ -55,13 +62,14 @@ export const useConnection = create<ConnectionState>()(
   persist(
     (set, get) => ({
       baseUrl: null,
+      token: null,
       username: null,
       password: null,
       status: 'booting',
 
       connect: async (rawUrl, username, password) => {
         const baseUrl = normalizeBaseUrl(rawUrl)
-        const result = await probeServer(baseUrl, username, password)
+        const result = await probeServer(baseUrl, undefined, username, password)
         if (result === 'ok') {
           set({
             baseUrl,
@@ -73,24 +81,53 @@ export const useConnection = create<ConnectionState>()(
         return result
       },
 
+      loginWithPin: async (pin: string) => {
+        const targetUrl = get().baseUrl || sameOriginBaseUrl() || ''
+        try {
+          const response = await axios.post<ResponseData<{ token: string }>>(
+            `${targetUrl}/auth/login`,
+            { pin },
+            { timeout: 10_000, validateStatus: () => true },
+          )
+          if (response.status === 200 && response.data?.code === 'SUCCESS') {
+            const token = response.data.results?.token || pin
+            set({
+              baseUrl: targetUrl,
+              token,
+              status: 'connected',
+            })
+            return { ok: true }
+          }
+          return { ok: false, error: response.data?.message || 'PIN salah' }
+        } catch {
+          return { ok: false, error: 'Gagal terhubung ke server' }
+        }
+      },
+
+      logout: async () => {
+        const targetUrl = get().baseUrl || sameOriginBaseUrl() || ''
+        try {
+          await axios.post(`${targetUrl}/auth/logout`, {}, { timeout: 5_000, validateStatus: () => true })
+        } catch {
+        }
+        set({ token: null, username: null, password: null, status: 'unauthorized' })
+      },
+
       boot: async () => {
-        const { baseUrl, username, password } = get()
-        if (baseUrl) {
-          const stored = await probeServer(baseUrl, username ?? undefined, password ?? undefined)
+        const { baseUrl, token, username, password } = get()
+        const origin = sameOriginBaseUrl()
+        const targetUrl = baseUrl || origin
+
+        if (targetUrl) {
+          const stored = await probeServer(targetUrl, token ?? undefined, username ?? undefined, password ?? undefined)
           if (stored === 'ok') {
-            set({ status: 'connected' })
+            set({ baseUrl: targetUrl, status: 'connected' })
             return
           }
           if (stored === 'unauthorized') {
-            set({ status: 'unauthorized' })
+            set({ baseUrl: targetUrl, status: 'unauthorized' })
             return
           }
-        }
-
-        const origin = sameOriginBaseUrl()
-        if ((await probeServer(origin)) === 'ok') {
-          set({ baseUrl: origin, status: 'connected' })
-          return
         }
 
         const defaultServer = normalizeBaseUrl(
@@ -98,25 +135,35 @@ export const useConnection = create<ConnectionState>()(
             'http://localhost:3000',
         )
         if (defaultServer && defaultServer !== origin) {
-          if ((await probeServer(defaultServer)) === 'ok') {
+          const defRes = await probeServer(defaultServer, token ?? undefined)
+          if (defRes === 'ok') {
             set({ baseUrl: defaultServer, status: 'connected' })
+            return
+          }
+          if (defRes === 'unauthorized') {
+            set({ baseUrl: defaultServer, status: 'unauthorized' })
             return
           }
         }
 
         if (origin.includes(':5173')) {
           const gowaProxy = `${origin}/gowa`
-          if ((await probeServer(gowaProxy)) === 'ok') {
+          const proxyRes = await probeServer(gowaProxy, token ?? undefined)
+          if (proxyRes === 'ok') {
             set({ baseUrl: gowaProxy, status: 'connected' })
+            return
+          }
+          if (proxyRes === 'unauthorized') {
+            set({ baseUrl: gowaProxy, status: 'unauthorized' })
             return
           }
         }
 
-        set({ status: 'unconfigured' })
+        set({ baseUrl: targetUrl || origin, status: 'unauthorized' })
       },
 
       disconnect: () =>
-        set({ baseUrl: null, username: null, password: null, status: 'unconfigured' }),
+        set({ baseUrl: null, token: null, username: null, password: null, status: 'unauthorized' }),
 
       markUnauthorized: () => {
         if (get().status === 'connected') set({ status: 'unauthorized' })
@@ -125,7 +172,7 @@ export const useConnection = create<ConnectionState>()(
     {
       name: 'gowa-ui.connection.v1',
       storage: createJSONStorage(() => localStorage),
-      partialize: ({ baseUrl, username, password }) => ({ baseUrl, username, password }),
+      partialize: ({ baseUrl, token, username, password }) => ({ baseUrl, token, username, password }),
     },
   ),
 )

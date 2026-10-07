@@ -18,7 +18,7 @@ class WsClient {
 
   /** Reconcile the socket with the current connection + device selection. */
   sync(): void {
-    const { status, baseUrl, username, password } = useConnection.getState()
+    const { status, baseUrl, token, username, password } = useConnection.getState()
     const deviceId = useDeviceStore.getState().selectedDeviceId
 
     if (status !== 'connected' || !baseUrl) {
@@ -26,10 +26,17 @@ class WsClient {
       return
     }
 
-    const url = toWebSocketUrl(baseUrl, {
+    const params: Record<string, string> = {
       device_id: deviceId ?? '',
-      authorization: username && password ? b64encode(`${username}:${password}`) : '',
-    })
+    }
+    if (token) {
+      params.token = token
+    }
+    if (username && password) {
+      params.authorization = b64encode(`${username}:${password}`)
+    }
+
+    const url = toWebSocketUrl(baseUrl, params)
     if (url === this.url && this.desired) return
 
     this.url = url

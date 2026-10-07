@@ -71,6 +71,7 @@ function App() {
 
   return (
     <Routes>
+      <Route path="/login" element={<ConnectPage />} />
       <Route path="/connect" element={<ConnectPage />} />
       <Route element={<AppShell />}>
         <Route path="/" element={<DashboardPage />} />
