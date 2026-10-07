@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
   Activity,
+  BookOpen,
   Check,
   ChevronRight,
   Code2,
@@ -138,6 +139,257 @@ interface CrudStepResult {
   payload?: unknown
 }
 
+const MCP_CRUD_DOCS: Record<
+  string,
+  {
+    title: string
+    desc: string
+    crudType: string
+    request: Record<string, unknown>
+    response: Record<string, unknown>
+  }
+> = {
+  bot: {
+    title: 'whatsapp_bot: CRUD Aturan Auto-Reply',
+    crudType: 'FULL CRUD (C-R-U-D)',
+    desc: 'Membuat aturan baru (create_rule), melihat aturan (list_rules), mengubah status (toggle_rule), dan menghapus aturan (delete_rule).',
+    request: {
+      jsonrpc: '2.0',
+      id: 1,
+      method: 'tools/call',
+      params: {
+        name: 'whatsapp_bot',
+        arguments: {
+          action: 'create_rule',
+          trigger_value: '!menu',
+          response_content: 'Daftar Layanan: 1. Info Akun 2. Bantuan CS',
+        },
+      },
+    },
+    response: {
+      jsonrpc: '2.0',
+      id: 1,
+      result: {
+        content: [{ type: 'text', text: 'created rule ID=824' }],
+        structuredContent: {
+          id: 824,
+          trigger_type: 'exact',
+          trigger_value: '!menu',
+          response_content: 'Daftar Layanan: 1. Info Akun 2. Bantuan CS',
+          is_active: true,
+        },
+      },
+    },
+  },
+  send: {
+    title: 'whatsapp_send: Mengirim Pesan & Media',
+    crudType: 'CREATE (Write)',
+    desc: 'Mengirim pesan teks, gambar, video, audio/VN, dokumen, polling interaktif, lokasi, atau kontak vCard.',
+    request: {
+      jsonrpc: '2.0',
+      id: 2,
+      method: 'tools/call',
+      params: {
+        name: 'whatsapp_send',
+        arguments: {
+          phone: '6281234567890@s.whatsapp.net',
+          type: 'text',
+          message: 'Halo dari MCP AI Assistant!',
+        },
+      },
+    },
+    response: {
+      jsonrpc: '2.0',
+      id: 2,
+      result: {
+        content: [{ type: 'text', text: 'message sent successfully' }],
+        structuredContent: {
+          message_id: '3EB0A1B2C3D4E5F6',
+          status: 'sent',
+        },
+      },
+    },
+  },
+  chat: {
+    title: 'whatsapp_chat: Membaca Obrolan & Riwayat',
+    crudType: 'READ (Query)',
+    desc: 'Mengambil riwayat pesan dari nomor tertentu (get_messages), daftar obrolan aktif (list_chats), dan daftar kontak.',
+    request: {
+      jsonrpc: '2.0',
+      id: 3,
+      method: 'tools/call',
+      params: {
+        name: 'whatsapp_chat',
+        arguments: {
+          action: 'get_messages',
+          chat_jid: '6281234567890@s.whatsapp.net',
+          limit: 10,
+        },
+      },
+    },
+    response: {
+      jsonrpc: '2.0',
+      id: 3,
+      result: {
+        content: [{ type: 'text', text: 'found 10 messages' }],
+        structuredContent: {
+          total: 10,
+          messages: [],
+        },
+      },
+    },
+  },
+  message: {
+    title: 'whatsapp_message: Reaksi Emoji, Edit & Tarik Pesan',
+    crudType: 'UPDATE / DELETE',
+    desc: 'Memberi reaksi emoji (react), mengedit pesan (edit), atau menarik pesan untuk semua orang (revoke).',
+    request: {
+      jsonrpc: '2.0',
+      id: 4,
+      method: 'tools/call',
+      params: {
+        name: 'whatsapp_message',
+        arguments: {
+          action: 'revoke',
+          phone: '6281234567890@s.whatsapp.net',
+          message_id: '3EB0A1B2C3D4',
+        },
+      },
+    },
+    response: {
+      jsonrpc: '2.0',
+      id: 4,
+      result: {
+        content: [{ type: 'text', text: 'message revoked for everyone' }],
+      },
+    },
+  },
+  group: {
+    title: 'whatsapp_group: Buat & Kelola Komunitas Grup',
+    crudType: 'CREATE / UPDATE / DELETE',
+    desc: 'Membuat grup baru (create), menambah anggota (add), mengeluarkan anggota (remove), dan mengubah admin.',
+    request: {
+      jsonrpc: '2.0',
+      id: 5,
+      method: 'tools/call',
+      params: {
+        name: 'whatsapp_group',
+        arguments: {
+          action: 'participants',
+          group_jid: '120363123456@g.us',
+          operation: 'add',
+          participants: ['6281234567890@s.whatsapp.net'],
+        },
+      },
+    },
+    response: {
+      jsonrpc: '2.0',
+      id: 5,
+      result: {
+        content: [{ type: 'text', text: 'participant added' }],
+      },
+    },
+  },
+  webhook: {
+    title: 'whatsapp_webhook: Konfigurasi & Uji Webhook',
+    crudType: 'READ / UPDATE / TEST',
+    desc: 'Membaca setelan webhook perangkat (get), mengubah URL dan secret (set), serta mengirim paket tes simulasi (test).',
+    request: {
+      jsonrpc: '2.0',
+      id: 6,
+      method: 'tools/call',
+      params: {
+        name: 'whatsapp_webhook',
+        arguments: {
+          action: 'get',
+        },
+      },
+    },
+    response: {
+      jsonrpc: '2.0',
+      id: 6,
+      result: {
+        content: [{ type: 'text', text: 'webhook config for device' }],
+        structuredContent: {
+          webhook_url: 'https://api.domain.com/webhook',
+          webhook_events: 'message,message.ack',
+        },
+      },
+    },
+  },
+  schedule: {
+    title: 'whatsapp_schedule: Jadwal Pesan Otomatis',
+    crudType: 'READ / DELETE (Cancel)',
+    desc: 'Melihat daftar antrean pengiriman pesan terjadwal dan membatalkan jadwal yang belum dikirim.',
+    request: {
+      jsonrpc: '2.0',
+      id: 7,
+      method: 'tools/call',
+      params: {
+        name: 'whatsapp_schedule',
+        arguments: {
+          action: 'list',
+          status: 'active',
+        },
+      },
+    },
+    response: {
+      jsonrpc: '2.0',
+      id: 7,
+      result: {
+        content: [{ type: 'text', text: 'found 1 schedules' }],
+        structuredContent: {
+          schedules: [],
+        },
+      },
+    },
+  },
+  app: {
+    title: 'whatsapp_app: Status Sesi & Pairing Login',
+    crudType: 'SYSTEM / READ',
+    desc: 'Mengecek kondisi koneksi perangkat (status), meminta pairing code 8 digit (login_code), atau logout.',
+    request: {
+      jsonrpc: '2.0',
+      id: 8,
+      method: 'tools/call',
+      params: {
+        name: 'whatsapp_app',
+        arguments: {
+          action: 'status',
+        },
+      },
+    },
+    response: {
+      jsonrpc: '2.0',
+      id: 8,
+      result: {
+        content: [{ type: 'text', text: 'device connected' }],
+        structuredContent: {
+          state: 'connected',
+          logged_in: true,
+        },
+      },
+    },
+  },
+}
+
+const AI_SYSTEM_PROMPT_DOC = `Anda adalah AI Operations Assistant yang terhubung langsung ke WhatsApp Multi-Device Gateway melalui MCP Server (Model Context Protocol).
+
+Anda memiliki akses ke 8 tools WhatsApp resmi berikut:
+1. whatsapp_send: Kirim pesan teks, gambar, video, audio, dokumen, stiker, lokasi, polling, atau link preview. Selalu gunakan format nomor telepon internasional (contoh: "6281234567890@s.whatsapp.net") atau ID grup ("120363xxx@g.us").
+2. whatsapp_chat: Ambil riwayat percakapan (get_messages), daftar chat terkini (list_chats), atau kontak.
+3. whatsapp_message: Reaksi emoji (react), edit teks pesan (edit), atau tarik pesan untuk semua orang (revoke).
+4. whatsapp_group: Buat grup (create), kelola anggota (participants: add/remove/promote/demote), atau ambil link undangan (invite_link).
+5. whatsapp_bot: Kelola aturan balasan otomatis (create_rule, list_rules, toggle_rule, delete_rule, query_logs).
+6. whatsapp_schedule: Jadwalkan pesan otomatis di masa mendatang (list, get, pause, resume, cancel).
+7. whatsapp_webhook: Periksa atau perbarui URL webhook dan kirim simulasi uji coba (get, set, test).
+8. whatsapp_app: Cek status koneksi perangkat (status), minta kode pairing (login_code), atau logout.
+
+Aturan Penting:
+- Jangan mengirim spam atau pesan berulang tanpa instruksi eksplisit pengguna.
+- Lakukan konfirmasi sebelum mengeksekusi operasi destruktif seperti revoke pesan atau mengeluarkan peserta grup.
+- Gunakan bahasa yang sopan, ramah, natural, dan ringkas.`
+
 export default function IntegrationsPage() {
   const queryClient = useQueryClient()
   const baseUrl = useConnection((state) => state.baseUrl)
@@ -165,6 +417,7 @@ export default function IntegrationsPage() {
 
   const [crudSteps, setCrudSteps] = useState<CrudStepResult[]>([])
   const [isCrudTesting, setIsCrudTesting] = useState(false)
+  const [docToolKey, setDocToolKey] = useState('bot')
 
   const { data: webhookConfig, isLoading: isLoadingConfig } = useQuery<DeviceWebhookConfig>({
     queryKey: ['device-webhook', currentDeviceId],
@@ -1005,6 +1258,137 @@ func main() {
                   )}
                 </span>
               </div>
+            </CardContent>
+          </Card>
+
+          <Card className="glass-card border-border/60 rounded-xl backdrop-blur-xl">
+            <CardHeader className="pb-3">
+              <div className="flex items-center justify-between">
+                <CardTitle className="flex items-center gap-2 text-sm font-semibold">
+                  <BookOpen className="size-4 text-purple-500" />
+                  Kamus Lengkap CRUD &amp; System Prompt AI
+                </CardTitle>
+                <div className="flex items-center gap-1.5">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleCopyText(AI_SYSTEM_PROMPT_DOC, 'System Prompt AI')}
+                    className="h-7 rounded-[5px] text-[11px] font-medium"
+                  >
+                    <Copy className="size-3 mr-1" />
+                    Salin System Prompt
+                  </Button>
+                </div>
+              </div>
+              <CardDescription className="text-xs">
+                Dokumentasi lengkap request dan response JSON-RPC untuk setiap tool agar AI agent memahami struktur data secara presisi.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="flex flex-col gap-3 text-xs">
+              <div className="flex flex-col gap-2">
+                <div className="flex items-center justify-between">
+                  <Label className="text-xs font-semibold">Pilih Tool / Operasi:</Label>
+                  <span className="font-mono text-[10px] text-muted-foreground uppercase">
+                    Format: JSON-RPC 2.0
+                  </span>
+                </div>
+                <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-4">
+                  {Object.keys(MCP_CRUD_DOCS).map((k) => (
+                    <Button
+                      key={k}
+                      type="button"
+                      variant={docToolKey === k ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => setDocToolKey(k)}
+                      className={cn(
+                        'h-7 rounded-[5px] text-[11px] font-medium truncate justify-start px-2',
+                        docToolKey === k
+                          ? 'bg-purple-700 text-white hover:bg-purple-800'
+                          : 'hover:bg-muted',
+                      )}
+                    >
+                      {k === 'bot' && '1. whatsapp_bot'}
+                      {k === 'send' && '2. whatsapp_send'}
+                      {k === 'chat' && '3. whatsapp_chat'}
+                      {k === 'message' && '4. whatsapp_msg'}
+                      {k === 'group' && '5. whatsapp_grp'}
+                      {k === 'schedule' && '6. whatsapp_sch'}
+                      {k === 'webhook' && '7. whatsapp_hook'}
+                      {k === 'app' && '8. whatsapp_app'}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+
+              {MCP_CRUD_DOCS[docToolKey] && (
+                <div className="border-border/50 bg-muted/20 flex flex-col gap-3 rounded-lg border p-3">
+                  <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border/40 pb-2">
+                    <div className="flex items-center gap-2">
+                      <span className="font-bold text-xs text-foreground">
+                        {MCP_CRUD_DOCS[docToolKey].title}
+                      </span>
+                      <Badge variant="outline" className="rounded-[4px] border-purple-500/30 text-purple-600 dark:text-purple-400 font-mono text-[10px]">
+                        {MCP_CRUD_DOCS[docToolKey].crudType}
+                      </Badge>
+                    </div>
+                    <span className="text-muted-foreground text-[11px]">
+                      {MCP_CRUD_DOCS[docToolKey].desc}
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+                    <div className="flex flex-col gap-1.5">
+                      <div className="flex items-center justify-between">
+                        <span className="font-semibold text-[11px] text-foreground">
+                          Contoh Request JSON-RPC
+                        </span>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() =>
+                            handleCopyText(
+                              JSON.stringify(MCP_CRUD_DOCS[docToolKey].request, null, 2),
+                              'Request JSON',
+                            )
+                          }
+                          className="h-5 px-1.5 text-[10px]"
+                        >
+                          <Copy className="size-2.5 mr-1" />
+                          Salin
+                        </Button>
+                      </div>
+                      <pre className="border-border/40 bg-background/80 max-h-56 overflow-auto rounded-lg border p-2.5 font-mono text-[11px] leading-tight">
+                        {JSON.stringify(MCP_CRUD_DOCS[docToolKey].request, null, 2)}
+                      </pre>
+                    </div>
+
+                    <div className="flex flex-col gap-1.5">
+                      <div className="flex items-center justify-between">
+                        <span className="font-semibold text-[11px] text-foreground">
+                          Contoh Response JSON-RPC
+                        </span>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() =>
+                            handleCopyText(
+                              JSON.stringify(MCP_CRUD_DOCS[docToolKey].response, null, 2),
+                              'Response JSON',
+                            )
+                          }
+                          className="h-5 px-1.5 text-[10px]"
+                        >
+                          <Copy className="size-2.5 mr-1" />
+                          Salin
+                        </Button>
+                      </div>
+                      <pre className="border-border/40 bg-background/80 max-h-56 overflow-auto rounded-lg border p-2.5 font-mono text-[11px] leading-tight">
+                        {JSON.stringify(MCP_CRUD_DOCS[docToolKey].response, null, 2)}
+                      </pre>
+                    </div>
+                  </div>
+                </div>
+              )}
             </CardContent>
           </Card>
 
