@@ -142,7 +142,7 @@ export default function BotAIPersonaPage() {
       return createAIPersona(payload)
     },
     onSuccess: () => {
-      toast.success(existingPersona ? 'Perubahan disimpan' : 'Persona dibuat')
+      toast.success(existingPersona ? 'Tersimpan' : 'Dibuat')
       void queryClient.invalidateQueries({ queryKey: ['bot-ai-personas'] })
       navigate('/bot/ai')
     },
@@ -157,7 +157,7 @@ export default function BotAIPersonaPage() {
       return deleteAIPersona(existingPersona.id)
     },
     onSuccess: () => {
-      toast.success('Persona dihapus')
+      toast.success('Dihapus')
       void queryClient.invalidateQueries({ queryKey: ['bot-ai-personas'] })
       navigate('/bot/ai')
     },
@@ -171,55 +171,50 @@ export default function BotAIPersonaPage() {
     if (!p) return
     setRelationship(p.id)
     setCustomPrompt(p.prompt)
-    toast.success(`Preset ${p.label} diterapkan`)
+    toast.success('Preset diterapkan')
   }
 
   return (
     <div className="mx-auto max-w-4xl space-y-6 pb-12">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex items-center gap-3">
+      <div className="flex items-center justify-between gap-2">
+        <div className="flex items-center gap-1.5 sm:gap-2.5 min-w-0">
           <Button
             type="button"
             variant="ghost"
-            size="sm"
+            size="icon"
             onClick={() => navigate('/bot/ai')}
-            className="h-8 gap-1.5 px-2.5 text-xs rounded-[6px]"
+            className="h-8 w-8 shrink-0 rounded-[6px]"
           >
-            <ArrowLeft className="size-3.5" />
-            <span>Kembali</span>
+            <ArrowLeft className="size-4" />
           </Button>
-          <div>
-            <div className="flex items-center gap-2">
-              <h1 className="text-lg font-bold tracking-tight text-foreground sm:text-xl">
-                {isNew ? 'Persona Baru' : contactName || phoneNumber || 'Persona Kontak'}
-              </h1>
-              {!isNew && (
-                <Badge
-                  variant={isActive ? 'default' : 'secondary'}
-                  className="text-[10px] font-mono px-1.5 py-0"
-                >
-                  {isActive ? 'Aktif' : 'Nonaktif'}
-                </Badge>
-              )}
-            </div>
-            <p className="text-xs text-muted-foreground">
-              Konfigurasi AI per nomor WhatsApp.
-            </p>
+          <div className="flex items-center gap-2 min-w-0">
+            <h1 className="text-base sm:text-lg font-bold tracking-tight text-foreground truncate">
+              {isNew ? 'Persona Baru' : contactName || phoneNumber || 'Persona Kontak'}
+            </h1>
+            {!isNew && (
+              <Badge
+                variant={isActive ? 'default' : 'secondary'}
+                className="text-[10px] shrink-0 font-medium px-1.5 py-0 rounded-[4px]"
+              >
+                {isActive ? 'Aktif' : 'Nonaktif'}
+              </Badge>
+            )}
           </div>
         </div>
 
-        <div className="flex items-center gap-2 self-end sm:self-auto">
+        <div className="flex items-center gap-1.5 shrink-0">
           {!isNew && existingPersona && (
             <Button
               type="button"
               variant="outline"
-              size="sm"
+              size="icon"
               onClick={() => setDeleteConfirmOpen(true)}
               disabled={deleteMutation.isPending}
-              className="h-8 gap-1.5 text-xs text-destructive hover:bg-destructive/10 rounded-[6px]"
+              className="h-8 w-8 sm:w-auto sm:px-2.5 text-xs text-destructive hover:bg-destructive/10 rounded-[6px]"
+              title="Hapus"
             >
               <Trash2 className="size-3.5" />
-              <span>Hapus</span>
+              <span className="hidden sm:inline">Hapus</span>
             </Button>
           )}
           <Button
@@ -227,7 +222,7 @@ export default function BotAIPersonaPage() {
             variant="outline"
             size="sm"
             onClick={() => navigate('/bot/ai')}
-            className="h-8 text-xs rounded-[6px]"
+            className="h-8 px-2.5 text-xs rounded-[6px]"
           >
             Batal
           </Button>
@@ -236,7 +231,7 @@ export default function BotAIPersonaPage() {
             size="sm"
             onClick={() => saveMutation.mutate()}
             disabled={saveMutation.isPending}
-            className="h-8 gap-1.5 bg-red-600 text-xs text-white hover:bg-red-700 rounded-[6px] shadow-xs"
+            className="h-8 gap-1.5 px-3 bg-red-600 text-xs text-white hover:bg-red-700 rounded-[6px] shadow-xs font-medium"
           >
             <Save className="size-3.5" />
             <span>{saveMutation.isPending ? 'Menyimpan' : 'Simpan'}</span>
@@ -291,7 +286,7 @@ export default function BotAIPersonaPage() {
                   Relasi
                 </Label>
                 <Select value={relationship} onValueChange={setRelationship}>
-                  <SelectTrigger id="rel-select" className="h-9 text-xs rounded-[6px]">
+                  <SelectTrigger id="rel-select" className="h-9 w-full text-xs rounded-[6px]">
                     <SelectValue placeholder="Relasi" />
                   </SelectTrigger>
                   <SelectContent>
@@ -307,7 +302,7 @@ export default function BotAIPersonaPage() {
           </Card>
 
           <Card className="border-border/60 bg-card/50 backdrop-blur-md">
-            <CardHeader className="pb-3 pt-4 px-4 sm:px-5 flex flex-row items-center justify-between">
+            <CardHeader className="pb-3 pt-4 px-4 sm:px-5 flex flex-wrap items-center justify-between gap-2">
               <CardTitle className="text-sm font-semibold flex items-center gap-2">
                 <Bot className="size-4 text-primary" />
                 <span>Instruksi AI</span>
