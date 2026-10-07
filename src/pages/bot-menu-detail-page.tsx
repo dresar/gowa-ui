@@ -2,10 +2,15 @@ import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import {
   ArrowLeft,
+  Copy,
+  Eye,
+  EyeOff,
+  Globe,
+  Key,
   Plus,
   Save,
-  Sliders,
   Smartphone,
+  Terminal,
   Trash2,
 } from 'lucide-react'
 import { toast } from 'sonner'
@@ -48,16 +53,25 @@ export default function BotMenuDetailPage() {
   const [alias, setAlias] = useState('')
   const [isActive, setIsActive] = useState(true)
   const [autoTyping, setAutoTyping] = useState(false)
-  const [instruction, setInstruction] = useState('')
   const [applyToAllDevices, setApplyToAllDevices] = useState(true)
 
-  const [weatherApiKey, setWeatherApiKey] = useState('')
+  const [apiKey, setApiKey] = useState('')
+  const [showApiKey, setShowApiKey] = useState(false)
+  const [customEndpoint, setCustomEndpoint] = useState('')
+
   const [weatherCity, setWeatherCity] = useState('Jakarta')
   const [weatherProvider, setWeatherProvider] = useState('bmkg')
 
-  const [newsApiKey, setNewsApiKey] = useState('')
   const [newsCategory, setNewsCategory] = useState('nasional')
   const [newsProvider, setNewsProvider] = useState('newsapi')
+
+  const [quakeMinMag, setQuakeMinMag] = useState('all')
+  const [quakeTsunamiAlert, setQuakeTsunamiAlert] = useState(true)
+
+  const [dirCheckNum, setDirCheckNum] = useState(true)
+  const [dirUserInfo, setDirUserInfo] = useState(true)
+  const [dirAvatar, setDirAvatar] = useState(true)
+  const [dirBusiness, setDirBusiness] = useState(true)
 
   const [quotes, setQuotes] = useState<QuoteItem[]>(() => {
     try {
@@ -70,10 +84,16 @@ export default function BotMenuDetailPage() {
   const [newQuoteText, setNewQuoteText] = useState('')
   const [newQuoteAuthor, setNewQuoteAuthor] = useState('')
 
-  const [dirCheckNum, setDirCheckNum] = useState(true)
-  const [dirUserInfo, setDirUserInfo] = useState(true)
-  const [dirAvatar, setDirAvatar] = useState(true)
-  const [dirBusiness, setDirBusiness] = useState(true)
+  const [currBase, setCurrBase] = useState('USD')
+  const [currTarget, setCurrTarget] = useState('IDR')
+
+  const [prayerCity, setPrayerCity] = useState('Jakarta')
+
+  const [quranTranslation, setQuranTranslation] = useState(true)
+  const [quranLatin, setQuranLatin] = useState(true)
+
+  const [wikiLang, setWikiLang] = useState('id')
+  const [trTargetLang, setTrTargetLang] = useState('id')
 
   const [antiLinkAction, setAntiLinkAction] = useState('delete')
   const [antiLinkWhitelist, setAntiLinkWhitelist] = useState('')
@@ -98,19 +118,30 @@ export default function BotMenuDetailPage() {
     setAlias(cfg.alias || feature.alias || '')
     setIsActive(cfg.isActive ?? true)
     setAutoTyping(cfg.autoTyping ?? feature.autoTyping ?? false)
-    setInstruction(cfg.instruction || feature.instruction)
 
     if (cfg.custom) {
-      if (cfg.custom.weatherApiKey !== undefined) setWeatherApiKey(cfg.custom.weatherApiKey)
+      if (cfg.custom.apiKey !== undefined) setApiKey(cfg.custom.apiKey)
+      else if (cfg.custom.weatherApiKey !== undefined) setApiKey(cfg.custom.weatherApiKey)
+      else if (cfg.custom.newsApiKey !== undefined) setApiKey(cfg.custom.newsApiKey)
+
+      if (cfg.custom.endpoint !== undefined) setCustomEndpoint(cfg.custom.endpoint)
       if (cfg.custom.weatherCity !== undefined) setWeatherCity(cfg.custom.weatherCity)
       if (cfg.custom.weatherProvider !== undefined) setWeatherProvider(cfg.custom.weatherProvider)
-      if (cfg.custom.newsApiKey !== undefined) setNewsApiKey(cfg.custom.newsApiKey)
       if (cfg.custom.newsCategory !== undefined) setNewsCategory(cfg.custom.newsCategory)
       if (cfg.custom.newsProvider !== undefined) setNewsProvider(cfg.custom.newsProvider)
+      if (cfg.custom.quakeMinMag !== undefined) setQuakeMinMag(cfg.custom.quakeMinMag)
+      if (cfg.custom.quakeTsunamiAlert !== undefined) setQuakeTsunamiAlert(cfg.custom.quakeTsunamiAlert)
       if (cfg.custom.dirCheckNum !== undefined) setDirCheckNum(cfg.custom.dirCheckNum)
       if (cfg.custom.dirUserInfo !== undefined) setDirUserInfo(cfg.custom.dirUserInfo)
       if (cfg.custom.dirAvatar !== undefined) setDirAvatar(cfg.custom.dirAvatar)
       if (cfg.custom.dirBusiness !== undefined) setDirBusiness(cfg.custom.dirBusiness)
+      if (cfg.custom.currBase !== undefined) setCurrBase(cfg.custom.currBase)
+      if (cfg.custom.currTarget !== undefined) setCurrTarget(cfg.custom.currTarget)
+      if (cfg.custom.prayerCity !== undefined) setPrayerCity(cfg.custom.prayerCity)
+      if (cfg.custom.quranTranslation !== undefined) setQuranTranslation(cfg.custom.quranTranslation)
+      if (cfg.custom.quranLatin !== undefined) setQuranLatin(cfg.custom.quranLatin)
+      if (cfg.custom.wikiLang !== undefined) setWikiLang(cfg.custom.wikiLang)
+      if (cfg.custom.trTargetLang !== undefined) setTrTargetLang(cfg.custom.trTargetLang)
       if (cfg.custom.antiLinkAction !== undefined) setAntiLinkAction(cfg.custom.antiLinkAction)
       if (cfg.custom.antiLinkWhitelist !== undefined) setAntiLinkWhitelist(cfg.custom.antiLinkWhitelist)
       if (cfg.custom.welcomeTpl !== undefined) setWelcomeTpl(cfg.custom.welcomeTpl)
@@ -137,18 +168,26 @@ export default function BotMenuDetailPage() {
       alias: alias.trim(),
       isActive,
       autoTyping,
-      instruction: instruction.trim(),
       custom: {
-        weatherApiKey: weatherApiKey.trim(),
+        apiKey: apiKey.trim(),
+        endpoint: customEndpoint.trim(),
         weatherCity: weatherCity.trim(),
         weatherProvider,
-        newsApiKey: newsApiKey.trim(),
         newsCategory,
         newsProvider,
+        quakeMinMag,
+        quakeTsunamiAlert,
         dirCheckNum,
         dirUserInfo,
         dirAvatar,
         dirBusiness,
+        currBase,
+        currTarget,
+        prayerCity: prayerCity.trim(),
+        quranTranslation,
+        quranLatin,
+        wikiLang,
+        trTargetLang,
         antiLinkAction,
         antiLinkWhitelist: antiLinkWhitelist.trim(),
         welcomeTpl: welcomeTpl.trim(),
@@ -158,7 +197,6 @@ export default function BotMenuDetailPage() {
 
     saveStoredFeatureConfig(feature.id, updated, selectedDeviceId, applyToAllDevices)
     toast.success('Pengaturan disimpan')
-    navigate('/bot/menu')
   }
 
   const handleResetToDefault = () => {
@@ -166,7 +204,14 @@ export default function BotMenuDetailPage() {
     setAlias(feature.alias || '')
     setIsActive(true)
     setAutoTyping(feature.autoTyping)
-    setInstruction(feature.instruction)
+    setApiKey('')
+    setCustomEndpoint('')
+    setWeatherCity('Jakarta')
+    setWeatherProvider('bmkg')
+    setNewsCategory('nasional')
+    setNewsProvider('newsapi')
+    setQuakeMinMag('all')
+    setQuakeTsunamiAlert(true)
     toast.success('Direset ke default')
   }
 
@@ -201,6 +246,11 @@ export default function BotMenuDetailPage() {
     toast.success('Kutipan dihapus')
   }
 
+  const handleCopyEndpoint = () => {
+    navigator.clipboard.writeText(customEndpoint || feature.endpoint)
+    toast.success('Endpoint disalin')
+  }
+
   return (
     <div className="w-full space-y-3 pb-8">
       <div className="flex items-center justify-between gap-2">
@@ -210,7 +260,7 @@ export default function BotMenuDetailPage() {
             variant="ghost"
             size="icon"
             onClick={() => navigate('/bot/menu')}
-            className="h-8 w-8 shrink-0 rounded-[6px]"
+            className="size-8 shrink-0 rounded-[6px]"
           >
             <ArrowLeft className="size-4" />
           </Button>
@@ -266,25 +316,11 @@ export default function BotMenuDetailPage() {
           <Card className="border-border/60 bg-card/50 backdrop-blur-md">
             <CardHeader className="pb-3 pt-4 px-4 sm:px-5">
               <CardTitle className="text-sm font-semibold flex items-center gap-2">
-                <Sliders className="size-4 text-primary" />
-                <span>Instruksi & Cara Kerja</span>
+                <Terminal className="size-4 text-primary" />
+                <span>Pemicu Perintah</span>
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4 px-4 sm:px-5 pb-5">
-              <div className="space-y-1.5">
-                <Label htmlFor="inst-input" className="text-xs font-semibold text-foreground">
-                  Instruksi Bot
-                </Label>
-                <Textarea
-                  id="inst-input"
-                  value={instruction}
-                  onChange={(e) => setInstruction(e.target.value)}
-                  placeholder="Instruksi"
-                  rows={5}
-                  className="text-xs leading-relaxed font-sans rounded-[6px] resize-y"
-                />
-              </div>
-
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div className="space-y-1.5">
                   <Label htmlFor="cmd-input" className="text-xs font-semibold text-foreground">
@@ -315,45 +351,164 @@ export default function BotMenuDetailPage() {
             </CardContent>
           </Card>
 
+          <Card className="border-border/60 bg-card/50 backdrop-blur-md">
+            <CardHeader className="pb-3 pt-4 px-4 sm:px-5">
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-sm font-semibold flex items-center gap-2">
+                  <Globe className="size-4 text-primary" />
+                  <span>Integrasi API Langsung</span>
+                </CardTitle>
+                <Badge variant="outline" className="text-[10px] text-emerald-500 border-emerald-500/30 bg-emerald-500/10">
+                  {feature.apiStatus}
+                </Badge>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-4 px-4 sm:px-5 pb-5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                <div className="space-y-1 p-2.5 rounded-lg border border-border/50 bg-muted/20">
+                  <span className="text-[11px] text-muted-foreground block font-medium">Provider API</span>
+                  <span className="text-foreground font-semibold block">{feature.provider}</span>
+                </div>
+                <div className="space-y-1 p-2.5 rounded-lg border border-border/50 bg-muted/20">
+                  <span className="text-[11px] text-muted-foreground block font-medium">Metode Eksekusi</span>
+                  <span className="text-foreground font-semibold block">REST API Native (Go Core)</span>
+                </div>
+              </div>
+
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <Label className="text-xs font-semibold">Endpoint API</Label>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleCopyEndpoint}
+                    className="h-6 px-1.5 text-[11px] text-muted-foreground hover:text-foreground gap-1"
+                  >
+                    <Copy className="size-3" />
+                    <span>Salin</span>
+                  </Button>
+                </div>
+                <Input
+                  value={customEndpoint || feature.endpoint}
+                  onChange={(e) => setCustomEndpoint(e.target.value)}
+                  placeholder={feature.endpoint}
+                  className="h-9 font-mono text-xs rounded-[6px]"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <Label className="text-xs font-semibold flex items-center gap-1.5">
+                    <Key className="size-3 text-muted-foreground" />
+                    <span>Kunci API (API Key)</span>
+                  </Label>
+                  <span className="text-[10px] text-muted-foreground">
+                    {feature.provider.includes('Bebas') || feature.provider.includes('Resmi') || feature.provider.includes('Open Data')
+                      ? 'Opsional / Khusus'
+                      : 'Wajib'}
+                  </span>
+                </div>
+                <div className="relative">
+                  <Input
+                    type={showApiKey ? 'text' : 'password'}
+                    value={apiKey}
+                    onChange={(e) => setApiKey(e.target.value)}
+                    placeholder="Kunci"
+                    className="h-9 font-mono text-xs pr-9 rounded-[6px]"
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => setShowApiKey(!showApiKey)}
+                    className="absolute right-1 top-1 size-7 text-muted-foreground hover:text-foreground"
+                  >
+                    {showApiKey ? <EyeOff className="size-3.5" /> : <Eye className="size-3.5" />}
+                  </Button>
+                </div>
+                <span className="text-[11px] text-muted-foreground block leading-tight">
+                  {feature.provider.includes('Bebas') || feature.provider.includes('Resmi') || feature.provider.includes('Open Data')
+                    ? 'Layanan ini menggunakan API terbuka gratis resmi. Kosongkan jika memakai kuota default.'
+                    : 'Masukkan token atau API key untuk otentikasi ke provider terkait.'}
+                </span>
+              </div>
+            </CardContent>
+          </Card>
+
+          {feature.id === 'earthquake' && (
+            <Card className="border-border/60 bg-card/50 backdrop-blur-md">
+              <CardHeader className="pb-3 pt-4 px-4 sm:px-5">
+                <CardTitle className="text-sm font-semibold">Pengaturan Gempa BMKG</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4 px-4 sm:px-5 pb-5">
+                <div className="space-y-1.5">
+                  <Label className="text-xs font-semibold">Filter Magnitudo Minimum</Label>
+                  <Select value={quakeMinMag} onValueChange={setQuakeMinMag}>
+                    <SelectTrigger className="h-9 w-full text-xs rounded-[6px]">
+                      <SelectValue placeholder="Magnitudo" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Semua Gempa Terkini</SelectItem>
+                      <SelectItem value="3">Magnitudo &ge; 3.0 SR</SelectItem>
+                      <SelectItem value="5">Magnitudo &ge; 5.0 SR (Peringatan)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="flex items-center justify-between rounded-lg border border-border/60 bg-muted/20 p-2.5">
+                  <div>
+                    <Label className="text-xs font-semibold block cursor-pointer">
+                      Peringatan Tsunami
+                    </Label>
+                    <span className="text-[11px] text-muted-foreground block">
+                      Tampilkan status peringatan dini potensi tsunami dari BMKG.
+                    </span>
+                  </div>
+                  <Switch checked={quakeTsunamiAlert} onCheckedChange={setQuakeTsunamiAlert} />
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
           {feature.id === 'weather' && (
             <Card className="border-border/60 bg-card/50 backdrop-blur-md">
               <CardHeader className="pb-3 pt-4 px-4 sm:px-5">
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-sm font-semibold">Prakiraan BMKG</CardTitle>
-                  <Badge variant="outline" className="text-[10px] text-emerald-500 border-emerald-500/30 bg-emerald-500/10">
-                    Bebas Kuota
-                  </Badge>
-                </div>
+                <CardTitle className="text-sm font-semibold">Prakiraan Cuaca</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4 px-4 sm:px-5 pb-5">
-                <div className="rounded-lg border border-border/50 bg-muted/20 p-3 text-xs space-y-1">
-                  <div className="flex items-center justify-between font-medium">
-                    <span className="text-muted-foreground">Provider:</span>
-                    <span className="text-foreground">BMKG Indonesia (Resmi)</span>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                    <Label className="text-xs font-semibold">Kota Default</Label>
+                    <Input
+                      value={weatherCity}
+                      onChange={(e) => setWeatherCity(e.target.value)}
+                      placeholder="Jakarta"
+                      className="h-9 text-xs rounded-[6px]"
+                    />
+                    <span className="text-[11px] text-muted-foreground block">
+                      Dipakai jika perintah dikirim tanpa nama lokasi.
+                    </span>
                   </div>
-                  <div className="flex items-center justify-between font-mono text-[11px]">
-                    <span className="text-muted-foreground">API:</span>
-                    <span className="text-foreground">api.bmkg.go.id (Tanpa Kunci)</span>
-                  </div>
-                </div>
 
-                <div className="space-y-1.5">
-                  <Label className="text-xs font-semibold">Kota Default</Label>
-                  <Input
-                    value={weatherCity}
-                    onChange={(e) => setWeatherCity(e.target.value)}
-                    placeholder="Jakarta"
-                    className="h-9 text-xs rounded-[6px]"
-                  />
-                  <span className="text-[11px] text-muted-foreground block">
-                    Digunakan otomatis jika perintah dikirim tanpa nama kota/wilayah.
-                  </span>
+                  <div className="space-y-1.5">
+                    <Label className="text-xs font-semibold">Provider Cuaca</Label>
+                    <Select value={weatherProvider} onValueChange={setWeatherProvider}>
+                      <SelectTrigger className="h-9 w-full text-xs rounded-[6px]">
+                        <SelectValue placeholder="Provider" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="bmkg">BMKG Indonesia (Resmi)</SelectItem>
+                        <SelectItem value="openweather">OpenWeatherMap (Kustom)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
 
                 <div className="rounded-lg border border-border/50 bg-muted/15 p-3 text-xs space-y-1.5">
                   <span className="font-semibold text-foreground block">Auto-Deteksi Wilayah Dinamis</span>
                   <p className="text-[11px] text-muted-foreground leading-relaxed">
-                    Pengguna bebas mencari lokasi mana pun di seluruh Indonesia (desa, kecamatan, kabupaten, atau kota). Bot langsung mendeteksi database wilayah BMKG secara otomatis tanpa batasan kota tetap.
+                    Pengguna bebas mencari lokasi mana pun di seluruh Indonesia (desa, kecamatan, kabupaten, atau kota). Bot langsung mendeteksi database wilayah BMKG secara otomatis.
                   </p>
                 </div>
               </CardContent>
@@ -366,16 +521,6 @@ export default function BotMenuDetailPage() {
                 <CardTitle className="text-sm font-semibold">Konfigurasi Berita</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4 px-4 sm:px-5 pb-5">
-                <div className="space-y-1.5">
-                  <Label className="text-xs font-semibold">API Key</Label>
-                  <Input
-                    value={newsApiKey}
-                    onChange={(e) => setNewsApiKey(e.target.value)}
-                    placeholder="Kunci"
-                    className="h-9 font-mono text-xs rounded-[6px]"
-                  />
-                </div>
-
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-1.5">
                     <Label className="text-xs font-semibold">Kategori Default</Label>
@@ -393,15 +538,14 @@ export default function BotMenuDetailPage() {
                   </div>
 
                   <div className="space-y-1.5">
-                    <Label className="text-xs font-semibold">Provider</Label>
+                    <Label className="text-xs font-semibold">Provider Berita</Label>
                     <Select value={newsProvider} onValueChange={setNewsProvider}>
                       <SelectTrigger className="h-9 w-full text-xs rounded-[6px]">
                         <SelectValue placeholder="Provider" />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="newsapi">NewsAPI</SelectItem>
-                        <SelectItem value="rss">RSS Portal</SelectItem>
-                        <SelectItem value="ai">AI Summary</SelectItem>
+                        <SelectItem value="rss">Portal RSS Terbuka</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -454,6 +598,133 @@ export default function BotMenuDetailPage() {
                     </span>
                   </div>
                   <Switch checked={dirBusiness} onCheckedChange={setDirBusiness} />
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {feature.id === 'currency' && (
+            <Card className="border-border/60 bg-card/50 backdrop-blur-md">
+              <CardHeader className="pb-3 pt-4 px-4 sm:px-5">
+                <CardTitle className="text-sm font-semibold">Pasangan Mata Uang</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4 px-4 sm:px-5 pb-5">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                    <Label className="text-xs font-semibold">Mata Uang Asal</Label>
+                    <Input
+                      value={currBase}
+                      onChange={(e) => setCurrBase(e.target.value.toUpperCase())}
+                      placeholder="USD"
+                      className="h-9 font-mono text-xs rounded-[6px]"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label className="text-xs font-semibold">Mata Uang Tujuan</Label>
+                    <Input
+                      value={currTarget}
+                      onChange={(e) => setCurrTarget(e.target.value.toUpperCase())}
+                      placeholder="IDR"
+                      className="h-9 font-mono text-xs rounded-[6px]"
+                    />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {feature.id === 'prayer-time' && (
+            <Card className="border-border/60 bg-card/50 backdrop-blur-md">
+              <CardHeader className="pb-3 pt-4 px-4 sm:px-5">
+                <CardTitle className="text-sm font-semibold">Jadwal Sholat</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4 px-4 sm:px-5 pb-5">
+                <div className="space-y-1.5">
+                  <Label className="text-xs font-semibold">Kota Default</Label>
+                  <Input
+                    value={prayerCity}
+                    onChange={(e) => setPrayerCity(e.target.value)}
+                    placeholder="Jakarta"
+                    className="h-9 text-xs rounded-[6px]"
+                  />
+                  <span className="text-[11px] text-muted-foreground block">
+                    Data mengacu pada hisab Kementerian Agama RI.
+                  </span>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {feature.id === 'quran' && (
+            <Card className="border-border/60 bg-card/50 backdrop-blur-md">
+              <CardHeader className="pb-3 pt-4 px-4 sm:px-5">
+                <CardTitle className="text-sm font-semibold">Format Tampilan Al-Qur'an</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3 px-4 sm:px-5 pb-5">
+                <div className="flex items-center justify-between rounded-lg border border-border/60 bg-muted/20 p-2.5">
+                  <div>
+                    <Label className="text-xs font-semibold">Terjemahan Indonesia</Label>
+                    <span className="text-[11px] text-muted-foreground block">
+                      Tampilkan arti ayat dalam bahasa Indonesia.
+                    </span>
+                  </div>
+                  <Switch checked={quranTranslation} onCheckedChange={setQuranTranslation} />
+                </div>
+
+                <div className="flex items-center justify-between rounded-lg border border-border/60 bg-muted/20 p-2.5">
+                  <div>
+                    <Label className="text-xs font-semibold">Teks Transliterasi Latin</Label>
+                    <span className="text-[11px] text-muted-foreground block">
+                      Sertakan ejaan latin untuk mempermudah bacaan.
+                    </span>
+                  </div>
+                  <Switch checked={quranLatin} onCheckedChange={setQuranLatin} />
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {feature.id === 'wiki' && (
+            <Card className="border-border/60 bg-card/50 backdrop-blur-md">
+              <CardHeader className="pb-3 pt-4 px-4 sm:px-5">
+                <CardTitle className="text-sm font-semibold">Ensiklopedia Wikipedia</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4 px-4 sm:px-5 pb-5">
+                <div className="space-y-1.5">
+                  <Label className="text-xs font-semibold">Bahasa Utama</Label>
+                  <Select value={wikiLang} onValueChange={setWikiLang}>
+                    <SelectTrigger className="h-9 w-full text-xs rounded-[6px]">
+                      <SelectValue placeholder="Bahasa" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="id">Bahasa Indonesia (id)</SelectItem>
+                      <SelectItem value="en">English (en)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {feature.id === 'translate' && (
+            <Card className="border-border/60 bg-card/50 backdrop-blur-md">
+              <CardHeader className="pb-3 pt-4 px-4 sm:px-5">
+                <CardTitle className="text-sm font-semibold">Sasaran Terjemahan</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4 px-4 sm:px-5 pb-5">
+                <div className="space-y-1.5">
+                  <Label className="text-xs font-semibold">Bahasa Tujuan Default</Label>
+                  <Select value={trTargetLang} onValueChange={setTrTargetLang}>
+                    <SelectTrigger className="h-9 w-full text-xs rounded-[6px]">
+                      <SelectValue placeholder="Bahasa" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="id">Indonesia (id)</SelectItem>
+                      <SelectItem value="en">Inggris (en)</SelectItem>
+                      <SelectItem value="ar">Arab (ar)</SelectItem>
+                      <SelectItem value="ja">Jepang (ja)</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
               </CardContent>
             </Card>
@@ -694,10 +965,8 @@ export default function BotMenuDetailPage() {
                 <span className="text-foreground">{feature.category}</span>
               </div>
               <div className="flex justify-between py-1 border-b border-border/40">
-                <span>Provider</span>
-                <span className="text-foreground truncate max-w-[140px] text-right">
-                  {feature.provider}
-                </span>
+                <span>Eksekusi</span>
+                <span className="text-foreground">Native Go REST</span>
               </div>
               <div className="flex justify-between py-1 border-b border-border/40">
                 <span>Latensi</span>
