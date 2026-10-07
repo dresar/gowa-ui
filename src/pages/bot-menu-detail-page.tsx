@@ -33,9 +33,11 @@ import { useSelectedDevice } from '@/hooks/use-device-guard'
 import { useDeviceStore } from '@/stores/device'
 import {
   BOT_FEATURES,
+  DEFAULT_FACTS,
   DEFAULT_QUOTES,
   getStoredFeatureConfig,
   saveStoredFeatureConfig,
+  type FactItem,
   type QuoteItem,
   type StoredFeatureConfig,
 } from '@/lib/bot-features-data'
@@ -83,6 +85,18 @@ export default function BotMenuDetailPage() {
   })
   const [newQuoteText, setNewQuoteText] = useState('')
   const [newQuoteAuthor, setNewQuoteAuthor] = useState('')
+
+  const [facts, setFacts] = useState<FactItem[]>(() => {
+    try {
+      const saved = localStorage.getItem('bot_facts_db_v1')
+      if (saved) return JSON.parse(saved)
+    } catch {
+    }
+    return DEFAULT_FACTS
+  })
+  const [newFactCategory, setNewFactCategory] = useState('sains')
+  const [newFactText, setNewFactText] = useState('')
+  const [factFilterTab, setFactFilterTab] = useState('semua')
 
   const [currBase, setCurrBase] = useState('USD')
   const [currTarget, setCurrTarget] = useState('IDR')
@@ -244,6 +258,36 @@ export default function BotMenuDetailPage() {
     } catch {
     }
     toast.success('Kutipan dihapus')
+  }
+
+  const handleAddFact = () => {
+    if (!newFactText.trim()) {
+      toast.error('Teks fakta kosong')
+      return
+    }
+    const item: FactItem = {
+      id: Date.now().toString(),
+      category: newFactCategory.trim().toLowerCase(),
+      fact: newFactText.trim(),
+    }
+    const updated = [item, ...facts]
+    setFacts(updated)
+    try {
+      localStorage.setItem('bot_facts_db_v1', JSON.stringify(updated))
+    } catch {
+    }
+    setNewFactText('')
+    toast.success('Fakta ditambahkan')
+  }
+
+  const handleDeleteFact = (factId: string) => {
+    const updated = facts.filter((f) => f.id !== factId)
+    setFacts(updated)
+    try {
+      localStorage.setItem('bot_facts_db_v1', JSON.stringify(updated))
+    } catch {
+    }
+    toast.success('Fakta dihapus')
   }
 
   const handleCopyEndpoint = () => {
@@ -785,6 +829,102 @@ export default function BotMenuDetailPage() {
                       </Button>
                     </div>
                   ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {feature.id === 'facts' && (
+            <Card className="border-border/60 bg-card/50 backdrop-blur-md">
+              <CardHeader className="pb-3 pt-4 px-4 sm:px-5">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-sm font-semibold">Database Fakta Unik</CardTitle>
+                  <Badge variant="outline" className="text-[10px] text-emerald-500 border-emerald-500/30 bg-emerald-500/10">
+                    {facts.length} Fakta
+                  </Badge>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-4 px-4 sm:px-5 pb-5">
+                <div className="flex flex-wrap gap-1.5 pb-1">
+                  {['semua', 'sains', 'hewan', 'antariksa', 'tubuh', 'sejarah', 'bumi', 'teknologi'].map((cat) => (
+                    <Button
+                      key={cat}
+                      type="button"
+                      variant={factFilterTab === cat ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => setFactFilterTab(cat)}
+                      className={`h-7 px-2.5 text-[11px] rounded-[5px] ${
+                        factFilterTab === cat ? 'bg-red-600 text-white hover:bg-red-700' : ''
+                      }`}
+                    >
+                      {cat.charAt(0).toUpperCase() + cat.slice(1)}
+                    </Button>
+                  ))}
+                </div>
+
+                <div className="flex flex-col gap-2 p-3 bg-muted/30 rounded-lg border border-border/50">
+                  <div className="flex flex-col sm:flex-row gap-2">
+                    <Select value={newFactCategory} onValueChange={setNewFactCategory}>
+                      <SelectTrigger className="h-8 w-full sm:w-32 text-xs rounded-md">
+                        <SelectValue placeholder="Kategori" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="sains">Sains</SelectItem>
+                        <SelectItem value="hewan">Hewan</SelectItem>
+                        <SelectItem value="antariksa">Antariksa</SelectItem>
+                        <SelectItem value="tubuh">Tubuh</SelectItem>
+                        <SelectItem value="sejarah">Sejarah</SelectItem>
+                        <SelectItem value="bumi">Bumi</SelectItem>
+                        <SelectItem value="teknologi">Teknologi</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <Input
+                      value={newFactText}
+                      onChange={(e) => setNewFactText(e.target.value)}
+                      placeholder="Tulis fakta unik baru..."
+                      className="h-8 text-xs rounded-md flex-1"
+                    />
+                    <Button
+                      type="button"
+                      size="sm"
+                      onClick={handleAddFact}
+                      className="h-8 px-3 text-xs rounded-md bg-emerald-600 hover:bg-emerald-700 text-white shrink-0"
+                    >
+                      <Plus className="size-3.5" />
+                      <span>Tambah</span>
+                    </Button>
+                  </div>
+                </div>
+
+                <div className="space-y-2 max-h-60 overflow-y-auto pr-1">
+                  {facts
+                    .filter((f) => factFilterTab === 'semua' || f.category === factFilterTab)
+                    .map((f) => (
+                      <div
+                        key={f.id}
+                        className="flex items-start justify-between gap-2 p-2.5 rounded-lg border border-border/50 bg-card/40 text-xs"
+                      >
+                        <div className="min-w-0 space-y-1">
+                          <p className="text-foreground leading-snug">{f.fact}</p>
+                          <Badge variant="secondary" className="text-[9px] px-1.5 py-0 uppercase">
+                            {f.category}
+                          </Badge>
+                        </div>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleDeleteFact(f.id)}
+                          className="size-6 text-muted-foreground hover:text-destructive shrink-0"
+                        >
+                          <Trash2 className="size-3.5" />
+                        </Button>
+                      </div>
+                    ))}
+                </div>
+
+                <div className="rounded-lg border border-border/50 bg-muted/15 p-2.5 text-[11px] text-muted-foreground">
+                  💡 Bot mengeksekusi fakta langsung dari database lokal ini (&lt;10ms). Jika topik tidak ditemukan, server otomatis mengambil fakta online dan menerjemahkannya ke Bahasa Indonesia.
                 </div>
               </CardContent>
             </Card>

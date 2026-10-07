@@ -108,6 +108,50 @@ export const DEFAULT_QUOTES: QuoteItem[] = [
   },
 ]
 
+export interface FactItem {
+  id: string
+  category: string
+  fact: string
+}
+
+export const DEFAULT_FACTS: FactItem[] = [
+  {
+    id: 'f1',
+    category: 'sains',
+    fact: 'DNA manusia jika dibentangkan dari satu sel tubuh bisa mencapai panjang sekitar 2 meter, dan jika digabungkan seluruh sel tubuh bisa mencapai jarak bolak-balik Bumi ke Matahari ratusan kali!',
+  },
+  {
+    id: 'f2',
+    category: 'hewan',
+    fact: 'Gurita memiliki tiga buah jantung, sembilan otak, dan darah berwarna biru karena mengandung hemosianin.',
+  },
+  {
+    id: 'f3',
+    category: 'antariksa',
+    fact: 'Satu hari di planet Venus lebih lama daripada satu tahun di planet tersebut karena rotasinya yang sangat lambat.',
+  },
+  {
+    id: 'f4',
+    category: 'tubuh',
+    fact: 'Otak manusia menghasilkan daya listrik sekitar 12 hingga 25 watt saat terjaga, cukup untuk menyalakan lampu LED kecil.',
+  },
+  {
+    id: 'f5',
+    category: 'sejarah',
+    fact: 'Perang tersingkat dalam sejarah terjadi antara Britania Raya dan Zanzibar pada tahun 1896, berlangsung hanya 38 menit.',
+  },
+  {
+    id: 'f6',
+    category: 'bumi',
+    fact: 'Sekitar 71% permukaan Bumi tertutup air, namun lebih dari 80% lautan di dunia masih belum pernah dijelajahi manusia.',
+  },
+  {
+    id: 'f7',
+    category: 'teknologi',
+    fact: 'Komputer misi Apollo 11 mendarat di Bulan pada tahun 1969 hanya memiliki RAM sebesar 4 kilobyte.',
+  },
+]
+
 export const BOT_FEATURES: BotFeature[] = [
   {
     id: 'ai-chat',
@@ -799,22 +843,22 @@ export const BOT_FEATURES: BotFeature[] = [
   {
     id: 'facts',
     name: 'Fakta Unik Dunia',
-    command: '!fakta',
+    command: '!fakta <topik>',
     alias: '/fakta, !tahukahkamu',
     category: 'Edukasi & Hiburan',
-    provider: 'UselessFacts Open API',
-    apiStatus: 'Aktif • Bebas Kuota',
-    endpoint: 'https://uselessfacts.jsph.pl/api/v2/facts/random',
-    shortDesc: 'Wawasan mengejutkan dan fakta sains unik yang jarang diketahui orang.',
+    provider: 'Database Fakta Lokal & Terjemahan Otomatis',
+    apiStatus: 'Aktif • Bebas Kuota & Offline',
+    endpoint: 'Internal Database + Google Translate',
+    shortDesc: 'Fakta unik sains, hewan, antariksa, dan sejarah berbahasa Indonesia.',
     fullDesc:
-      'Mengambil fakta-fakta unik dunia sains, biologi, sejarah, dan alam semesta yang telah diverifikasi kebenarannya untuk memperluas cakrawala pengetahuan.',
+      'Koleksi fakta unik dunia terlengkap dalam bahasa Indonesia. Mendukung pencarian topik (sains, hewan, antariksa, tubuh, sejarah, bumi, teknologi) serta terjemahan otomatis.',
     instruction:
-      'Ambil satu fakta unik dunia secara acak, terjemahkan ke bahasa Indonesia santai, dan sajikan dengan emoji menarik.',
-    exampleInput: '!fakta',
+      'Sajikan fakta unik berbahasa Indonesia sesuai topik yang diminta secara ringkas dan informatif.',
+    exampleInput: '!fakta sains',
     exampleOutput:
-      '💡 *TAHUKAH KAMU?*\n\nJantung udang terletak di dalam kepalanya! Selain itu, madu murni adalah satu-satunya makanan alami yang tidak akan pernah basi selama ribuan tahun.',
-    parameters: ['Tanpa parameter'],
-    latency: '120 - 250 ms',
+      '💡 *TAHUKAH KAMU? (FAKTA UNIK)*\n🏷️ *Kategori:* SAINS\n\n"DNA manusia jika dibentangkan dari satu sel tubuh bisa mencapai panjang sekitar 2 meter, dan jika digabungkan seluruh sel tubuh bisa mencapai jarak bolak-balik Bumi ke Matahari ratusan kali!"\n\n_Sumber: Genetika_',
+    parameters: ['<topik> (Pilihan: sains, hewan, antariksa, tubuh, sejarah, bumi, teknologi)'],
+    latency: '< 10 ms',
     autoTyping: false,
     icon: BookOpen,
     isConfigurable: true,
