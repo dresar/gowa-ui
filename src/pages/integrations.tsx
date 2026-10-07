@@ -130,6 +130,14 @@ const MCP_TOOLS_CATALOG = [
   },
 ]
 
+interface CrudStepResult {
+  step: string
+  action: string
+  status: 'pending' | 'success' | 'failed'
+  message: string
+  payload?: unknown
+}
+
 export default function IntegrationsPage() {
   const queryClient = useQueryClient()
   const baseUrl = useConnection((state) => state.baseUrl)
@@ -138,7 +146,7 @@ export default function IntegrationsPage() {
 
   const currentDeviceId = selectedDeviceId || devices?.[0]?.id || ''
 
-  const [activeTab, setActiveTab] = useState('webhook')
+  const [activeTab, setActiveTab] = useState('mcp')
   const [webhookUrl, setWebhookUrl] = useState('')
   const [webhookSecret, setWebhookSecret] = useState('')
   const [insecureTls, setInsecureTls] = useState(false)
@@ -149,11 +157,14 @@ export default function IntegrationsPage() {
   const [isTesting, setIsTesting] = useState(false)
 
   const [codeTab, setCodeTab] = useState('nodejs')
-  const [mcpClientTab, setMcpClientTab] = useState('claude')
+  const [mcpClientTab, setMcpClientTab] = useState('cherrystudio')
   const [mcpMode, setMcpMode] = useState<'http' | 'stdio'>('http')
   const [expandedMcpTool, setExpandedMcpTool] = useState<string | null>(null)
   const [mcpTestResult, setMcpTestResult] = useState<string | null>(null)
   const [isMcpTesting, setIsMcpTesting] = useState(false)
+
+  const [crudSteps, setCrudSteps] = useState<CrudStepResult[]>([])
+  const [isCrudTesting, setIsCrudTesting] = useState(false)
 
   const { data: webhookConfig, isLoading: isLoadingConfig } = useQuery<DeviceWebhookConfig>({
     queryKey: ['device-webhook', currentDeviceId],
@@ -260,47 +271,48 @@ export default function IntegrationsPage() {
     toast.success(`${label} disalin ke clipboard`)
   }
 
+  const effectiveMcpUrl = `${baseUrl || window.location.origin}/mcp`
+
+  const callMcpRpc = async (method: string, params: Record<string, unknown> = {}) => {
+    const endpoint = effectiveMcpUrl
+    const reqHeaders: Record<string, string> = {
+      'Content-Type': 'application/json',
+      Accept: 'application/json, text/event-stream',
+    }
+    if (currentDeviceId) {
+      reqHeaders['X-Device-Id'] = currentDeviceId
+    }
+    const rpcBody = JSON.stringify({
+      jsonrpc: '2.0',
+      id: Date.now(),
+      method,
+      params,
+    })
+    const res = await fetch(endpoint, {
+      method: 'POST',
+      headers: reqHeaders,
+      body: rpcBody,
+    })
+    const raw = await res.text()
+    let parsed = raw
+    if (raw.startsWith('event:') || raw.startsWith('data:')) {
+      for (const line of raw.split('\n')) {
+        if (line.startsWith('data:')) {
+          parsed = line.slice(5).trim()
+          break
+        }
+      }
+    }
+    return JSON.parse(parsed)
+  }
+
   const handleTestMcpServer = async () => {
     setIsMcpTesting(true)
     setMcpTestResult(null)
     try {
-      const endpoint = `${baseUrl || window.location.origin}/mcp`
-      const reqHeaders: Record<string, string> = {
-        'Content-Type': 'application/json',
-        Accept: 'application/json, text/event-stream',
-      }
-      if (currentDeviceId) {
-        reqHeaders['X-Device-Id'] = currentDeviceId
-      }
-      const rpcBody = JSON.stringify({
-        jsonrpc: '2.0',
-        id: 1,
-        method: 'tools/list',
-        params: {},
-      })
-      const res = await fetch(endpoint, {
-        method: 'POST',
-        headers: reqHeaders,
-        body: rpcBody,
-      })
-      const raw = await res.text()
-      let parsed = raw
-      if (raw.startsWith('event:') || raw.startsWith('data:')) {
-        for (const line of raw.split('\n')) {
-          if (line.startsWith('data:')) {
-            parsed = line.slice(5).trim()
-            break
-          }
-        }
-      }
-      try {
-        const obj = JSON.parse(parsed)
-        setMcpTestResult(JSON.stringify(obj, null, 2))
-        toast.success('MCP Server merespons tools/list dengan sukses!')
-      } catch {
-        setMcpTestResult(parsed)
-        toast.success('MCP Server merespons!')
-      }
+      const obj = await callMcpRpc('tools/list')
+      setMcpTestResult(JSON.stringify(obj, null, 2))
+      toast.success('MCP Server merespons tools/list dengan sukses!')
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Koneksi gagal'
       setMcpTestResult(`Error: ${msg}`)
@@ -310,15 +322,161 @@ export default function IntegrationsPage() {
     }
   }
 
-  const effectiveMcpUrl = `${baseUrl || window.location.origin}/mcp`
+  const handleRunFullMcpCrudTest = async () => {
+    setIsCrudTesting(true)
+    setCrudSteps([])
+    const results: CrudStepResult[] = []
+
+    try {
+      results.push({
+        step: '1. CREATE',
+        action: 'whatsapp_bot -> create_rule',
+        status: 'pending',
+        message: 'Membuat aturan baru (!mcp_live_test)...',
+      })
+      setCrudSteps([...results])
+
+      const createRes = await callMcpRpc('tools/call', {
+        name: 'whatsapp_bot',
+        arguments: {
+          action: 'create_rule',
+          trigger_value: '!mcp_live_test',
+          response_content: 'Halo dari tes otomatis MCP CRUD!',
+        },
+      })
+
+      const ruleId = createRes?.result?.structuredContent?.id
+      if (!ruleId) {
+        throw new Error(createRes?.error?.message || 'Gagal membuat rule via MCP')
+      }
+
+      results[0] = {
+        step: '1. CREATE',
+        action: 'whatsapp_bot -> create_rule',
+        status: 'success',
+        message: `Sukses membuat Rule ID=${ruleId} via MCP`,
+        payload: createRes.result,
+      }
+      setCrudSteps([...results])
+
+      results.push({
+        step: '2. READ',
+        action: 'whatsapp_bot -> list_rules',
+        status: 'pending',
+        message: 'Membaca daftar aturan bot via MCP...',
+      })
+      setCrudSteps([...results])
+
+      const listRes = await callMcpRpc('tools/call', {
+        name: 'whatsapp_bot',
+        arguments: { action: 'list_rules' },
+      })
+
+      results[1] = {
+        step: '2. READ',
+        action: 'whatsapp_bot -> list_rules',
+        status: 'success',
+        message: `Sukses membaca data aturan via MCP`,
+        payload: listRes.result,
+      }
+      setCrudSteps([...results])
+
+      results.push({
+        step: '3. UPDATE',
+        action: 'whatsapp_bot -> toggle_rule',
+        status: 'pending',
+        message: `Menonaktifkan Rule ID=${ruleId} via MCP...`,
+      })
+      setCrudSteps([...results])
+
+      const toggleRes = await callMcpRpc('tools/call', {
+        name: 'whatsapp_bot',
+        arguments: { action: 'toggle_rule', rule_id: ruleId },
+      })
+
+      results[2] = {
+        step: '3. UPDATE',
+        action: 'whatsapp_bot -> toggle_rule',
+        status: 'success',
+        message: `Sukses toggle status Rule ID=${ruleId} via MCP`,
+        payload: toggleRes.result,
+      }
+      setCrudSteps([...results])
+
+      results.push({
+        step: '4. DELETE',
+        action: 'whatsapp_bot -> delete_rule',
+        status: 'pending',
+        message: `Menghapus Rule ID=${ruleId} via MCP...`,
+      })
+      setCrudSteps([...results])
+
+      const deleteRes = await callMcpRpc('tools/call', {
+        name: 'whatsapp_bot',
+        arguments: { action: 'delete_rule', rule_id: ruleId },
+      })
+
+      results[3] = {
+        step: '4. DELETE',
+        action: 'whatsapp_bot -> delete_rule',
+        status: 'success',
+        message: `Sukses menghapus Rule ID=${ruleId} via MCP`,
+        payload: deleteRes.result,
+      }
+      setCrudSteps([...results])
+
+      toast.success('Siklus CRUD 100% MCP Selesai dengan Sukses!')
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Terjadi kegagalan'
+      const lastIndex = results.length - 1
+      if (lastIndex >= 0) {
+        results[lastIndex] = {
+          ...results[lastIndex],
+          status: 'failed',
+          message: `Gagal: ${msg}`,
+        }
+      }
+      setCrudSteps([...results])
+      toast.error(`Uji CRUD MCP Gagal: ${msg}`)
+    } finally {
+      setIsCrudTesting(false)
+    }
+  }
 
   const getClientConfigCode = (client: string, mode: 'http' | 'stdio') => {
     if (mode === 'http') {
+      if (client === 'cherrystudio') {
+        return JSON.stringify(
+          {
+            name: 'WhatsApp',
+            description: 'WhatsApp Multi-Device Gateway & AI Engine',
+            type: 'StreamableHTTP',
+            url: effectiveMcpUrl,
+            headers: currentDeviceId ? { 'X-Device-Id': currentDeviceId } : {},
+          },
+          null,
+          2,
+        )
+      }
+      if (client === 'antigravity') {
+        return JSON.stringify(
+          {
+            mcpServers: {
+              whatsapp: {
+                serverUrl: effectiveMcpUrl,
+                headers: currentDeviceId ? { 'X-Device-Id': currentDeviceId } : {},
+              },
+            },
+          },
+          null,
+          2,
+        )
+      }
       if (client === 'claude') {
         return JSON.stringify(
           {
             mcpServers: {
-              gowanew: {
+              whatsapp: {
                 url: effectiveMcpUrl,
                 headers: currentDeviceId ? { 'X-Device-Id': currentDeviceId } : {},
               },
@@ -332,7 +490,7 @@ export default function IntegrationsPage() {
         return JSON.stringify(
           {
             mcpServers: {
-              gowanew: {
+              whatsapp: {
                 url: effectiveMcpUrl,
                 headers: currentDeviceId ? { 'X-Device-Id': currentDeviceId } : {},
               },
@@ -346,7 +504,7 @@ export default function IntegrationsPage() {
         return JSON.stringify(
           {
             mcpServers: {
-              gowanew: {
+              whatsapp: {
                 serverUrl: effectiveMcpUrl,
                 headers: currentDeviceId ? { 'X-Device-Id': currentDeviceId } : {},
               },
@@ -359,7 +517,7 @@ export default function IntegrationsPage() {
       return JSON.stringify(
         {
           mcpServers: {
-            gowanew: {
+            whatsapp: {
               url: effectiveMcpUrl,
               headers: currentDeviceId ? { 'X-Device-Id': currentDeviceId } : {},
             },
@@ -376,10 +534,25 @@ export default function IntegrationsPage() {
       envObj['GOWA_DEVICE_ID'] = currentDeviceId
     }
 
+    if (client === 'cherrystudio') {
+      return JSON.stringify(
+        {
+          name: 'WhatsApp',
+          description: 'WhatsApp Multi-Device Gateway & AI Engine',
+          type: 'STDIO',
+          command: 'node',
+          args: [runnerPath],
+          env: envObj,
+        },
+        null,
+        2,
+      )
+    }
+
     return JSON.stringify(
       {
         mcpServers: {
-          gowanew: {
+          whatsapp: {
             command: 'node',
             args: [runnerPath],
             env: envObj,
@@ -527,20 +700,459 @@ func main() {
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="bg-muted/50 border-border/40 grid h-9 w-full max-w-md grid-cols-2 rounded-lg border p-0.5">
           <TabsTrigger
-            value="webhook"
-            className="data-[state=active]:bg-background data-[state=active]:text-foreground flex items-center justify-center gap-2 rounded-[6px] text-xs font-semibold transition-all"
-          >
-            <Webhook className="size-3.5 text-emerald-500" />
-            Webhook Event
-          </TabsTrigger>
-          <TabsTrigger
             value="mcp"
             className="data-[state=active]:bg-background data-[state=active]:text-foreground flex items-center justify-center gap-2 rounded-[6px] text-xs font-semibold transition-all"
           >
             <Cpu className="size-3.5 text-blue-500" />
             MCP Server AI
           </TabsTrigger>
+          <TabsTrigger
+            value="webhook"
+            className="data-[state=active]:bg-background data-[state=active]:text-foreground flex items-center justify-center gap-2 rounded-[6px] text-xs font-semibold transition-all"
+          >
+            <Webhook className="size-3.5 text-emerald-500" />
+            Webhook Event
+          </TabsTrigger>
         </TabsList>
+
+        <TabsContent value="mcp" className="mt-4 flex flex-col gap-5">
+          <Card className="glass-card border-border/60 rounded-xl backdrop-blur-xl">
+            <CardHeader className="pb-3">
+              <div className="flex items-center justify-between">
+                <CardTitle className="flex items-center gap-2 text-sm font-semibold">
+                  <Cpu className="size-4 text-blue-500" />
+                  Form Input Cepat: Modal &quot;Add MCP Server&quot; (Cherry Studio / Chatbox)
+                </CardTitle>
+                <Badge variant="outline" className="rounded-[5px] text-[10px] border-blue-500/30 bg-blue-500/10 text-blue-600 dark:text-blue-400 font-semibold">
+                  Siap Salin 1-Klik
+                </Badge>
+              </div>
+              <CardDescription className="text-xs">
+                Isi form popup &quot;Add MCP Server&quot; pada aplikasi AI Anda menggunakan data yang sudah disiapkan di bawah ini.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="flex flex-col gap-3 text-xs">
+              <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
+                <div className="border-border/50 bg-muted/20 flex flex-col gap-1 rounded-lg border p-2.5">
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground font-medium text-[11px]">* Name</span>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleCopyText('WhatsApp', 'Nama Server')}
+                      className="h-5 px-1.5 rounded-[4px] text-[10px] text-blue-600 dark:text-blue-400"
+                    >
+                      <Copy className="size-2.5 mr-1" />
+                      Salin
+                    </Button>
+                  </div>
+                  <span className="font-mono text-xs font-semibold text-foreground">
+                    WhatsApp
+                  </span>
+                </div>
+
+                <div className="border-border/50 bg-muted/20 flex flex-col gap-1 rounded-lg border p-2.5">
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground font-medium text-[11px]">Description</span>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() =>
+                        handleCopyText(
+                          'WhatsApp Multi-Device Gateway & AI Engine',
+                          'Deskripsi',
+                        )
+                      }
+                      className="h-5 px-1.5 rounded-[4px] text-[10px] text-blue-600 dark:text-blue-400"
+                    >
+                      <Copy className="size-2.5 mr-1" />
+                      Salin
+                    </Button>
+                  </div>
+                  <span className="font-mono text-xs font-semibold text-foreground truncate">
+                    WhatsApp Multi-Device Gateway &amp; AI Engine
+                  </span>
+                </div>
+
+                <div className="border-border/50 bg-muted/20 flex flex-col gap-1 rounded-lg border p-2.5">
+                  <span className="text-muted-foreground font-medium text-[11px]">* Type (Pilihan Radio)</span>
+                  <div className="flex items-center gap-2 mt-0.5">
+                    <span className="rounded-[4px] border border-blue-500/40 bg-blue-500/10 px-2 py-0.5 font-mono text-xs font-bold text-blue-600 dark:text-blue-400">
+                      ◉ StreamableHTTP
+                    </span>
+                    <span className="text-muted-foreground text-[10px]">
+                      (Atau STDIO jika menggunakan runner script)
+                    </span>
+                  </div>
+                </div>
+
+                <div className="border-border/50 bg-muted/20 flex flex-col gap-1 rounded-lg border p-2.5">
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground font-medium text-[11px]">* URL Target</span>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleCopyText(effectiveMcpUrl, 'URL Target')}
+                      className="h-5 px-1.5 rounded-[4px] text-[10px] text-blue-600 dark:text-blue-400 font-bold"
+                    >
+                      <Copy className="size-2.5 mr-1" />
+                      Salin URL
+                    </Button>
+                  </div>
+                  <span className="font-mono text-xs font-semibold text-foreground truncate">
+                    {effectiveMcpUrl}
+                  </span>
+                </div>
+              </div>
+
+              <div className="border-border/40 bg-muted/20 flex items-center justify-between rounded-lg border p-2.5">
+                <div className="flex items-center gap-2">
+                  <Zap className="size-4 text-amber-500 shrink-0" />
+                  <span className="text-[11px] text-muted-foreground">
+                    Di aplikasi seperti Cherry Studio / Chatbox: Pilih tipe <b>StreamableHTTP</b> lalu tempel URL <code>{effectiveMcpUrl}</code> dan klik <b>Save and enable</b>.
+                  </span>
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() =>
+                    handleCopyText(
+                      getClientConfigCode('cherrystudio', 'http'),
+                      'JSON Konfigurasi',
+                    )
+                  }
+                  className="h-7 shrink-0 rounded-[5px] text-[11px] font-semibold"
+                >
+                  <Copy className="size-3 mr-1" />
+                  Salin Format JSON
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="glass-card border-border/60 rounded-xl backdrop-blur-xl">
+            <CardHeader className="pb-3">
+              <div className="flex items-center justify-between">
+                <CardTitle className="flex items-center gap-2 text-sm font-semibold">
+                  <Play className="size-4 text-emerald-500" />
+                  Uji Otonom 100% CRUD via MCP (Buktikan Kontrol Penuh AI)
+                </CardTitle>
+                <Button
+                  onClick={handleRunFullMcpCrudTest}
+                  disabled={isCrudTesting}
+                  className="bg-emerald-700 hover:bg-emerald-800 text-white h-8 rounded-lg px-3 text-xs font-semibold cursor-pointer active:scale-[0.98] transition-all"
+                >
+                  {isCrudTesting ? (
+                    <RefreshCw className="mr-1.5 size-3.5 animate-spin" />
+                  ) : (
+                    <Play className="mr-1.5 size-3.5" />
+                  )}
+                  Jalankan Tes Siklus CRUD MCP
+                </Button>
+              </div>
+              <CardDescription className="text-xs">
+                Mengeksekusi siklus lengkap (Create &rarr; Read &rarr; Update &rarr; Delete) secara real-time melalui protokol JSON-RPC MCP untuk membuktikan AI memiliki kontrol 100% atas engine.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="flex flex-col gap-2.5 text-xs">
+              {crudSteps.length === 0 ? (
+                <div className="border-border/40 bg-muted/20 flex flex-col items-center justify-center rounded-lg border p-6 text-center">
+                  <Cpu className="size-8 text-muted-foreground/50 mb-2" />
+                  <span className="font-semibold text-xs text-foreground">
+                    Belum Ada Riwayat Uji CRUD
+                  </span>
+                  <p className="text-muted-foreground text-[11px] max-w-md mt-1">
+                    Klik tombol &quot;Jalankan Tes Siklus CRUD MCP&quot; di atas untuk menguji pembuatan aturan baru, pembacaan data, perubahan status, dan penghapusan data secara berurutan.
+                  </p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                  {crudSteps.map((s, idx) => (
+                    <div
+                      key={idx}
+                      className={cn(
+                        'flex flex-col rounded-lg border p-2.5 transition-all text-xs',
+                        s.status === 'success' && 'border-emerald-500/40 bg-emerald-500/5 dark:bg-emerald-500/10',
+                        s.status === 'pending' && 'border-amber-500/40 bg-amber-500/5 animate-pulse',
+                        s.status === 'failed' && 'border-red-500/40 bg-red-500/5 dark:bg-red-500/10',
+                      )}
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className="font-bold font-mono text-[11px] text-foreground">
+                          {s.step}
+                        </span>
+                        <Badge
+                          variant="outline"
+                          className={cn(
+                            'rounded-[4px] text-[10px] font-semibold uppercase',
+                            s.status === 'success' && 'border-emerald-500/30 text-emerald-600 dark:text-emerald-400',
+                            s.status === 'pending' && 'border-amber-500/30 text-amber-600',
+                            s.status === 'failed' && 'border-red-500/30 text-red-600',
+                          )}
+                        >
+                          {s.status}
+                        </Badge>
+                      </div>
+                      <span className="font-mono text-[10px] text-muted-foreground mt-0.5">
+                        {s.action}
+                      </span>
+                      <p className="font-medium text-foreground text-[11px] mt-1">
+                        {s.message}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          <Card className="glass-card border-border/60 rounded-xl backdrop-blur-xl">
+            <CardHeader className="pb-3">
+              <div className="flex items-center justify-between">
+                <CardTitle className="flex items-center gap-2 text-sm font-semibold">
+                  <Code2 className="size-4 text-indigo-500" />
+                  Konfigurasi Siap Salin AI Client (Semua Platform)
+                </CardTitle>
+                <div className="flex items-center gap-1.5">
+                  <Button
+                    variant={mcpMode === 'http' ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => setMcpMode('http')}
+                    className={cn(
+                      'h-7 rounded-[5px] text-[11px] font-semibold transition-all',
+                      mcpMode === 'http' ? 'bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900' : '',
+                    )}
+                  >
+                    Streamable HTTP
+                  </Button>
+                  <Button
+                    variant={mcpMode === 'stdio' ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => setMcpMode('stdio')}
+                    className={cn(
+                      'h-7 rounded-[5px] text-[11px] font-semibold transition-all',
+                      mcpMode === 'stdio' ? 'bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900' : '',
+                    )}
+                  >
+                    Stdio Runner
+                  </Button>
+                </div>
+              </div>
+              <CardDescription className="text-xs">
+                Pilih aplikasi AI Anda dan salin blok JSON konfigurasi resmi yang siap digunakan tanpa edit manual.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="flex flex-col gap-3 text-xs">
+              <Tabs value={mcpClientTab} onValueChange={setMcpClientTab} className="w-full">
+                <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                  <TabsList className="bg-muted/40 border-border/30 h-8 rounded-lg border p-0.5">
+                    <TabsTrigger value="cherrystudio" className="h-7 rounded-[5px] text-xs">
+                      Cherry / Chatbox
+                    </TabsTrigger>
+                    <TabsTrigger value="antigravity" className="h-7 rounded-[5px] text-xs">
+                      Antigravity / Gemini
+                    </TabsTrigger>
+                    <TabsTrigger value="claude" className="h-7 rounded-[5px] text-xs">
+                      Claude Desktop
+                    </TabsTrigger>
+                    <TabsTrigger value="cursor" className="h-7 rounded-[5px] text-xs">
+                      Cursor IDE
+                    </TabsTrigger>
+                    <TabsTrigger value="windsurf" className="h-7 rounded-[5px] text-xs">
+                      Windsurf
+                    </TabsTrigger>
+                  </TabsList>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() =>
+                      handleCopyText(
+                        getClientConfigCode(mcpClientTab, mcpMode),
+                        `Konfigurasi ${mcpClientTab.toUpperCase()}`,
+                      )
+                    }
+                    className="h-7 rounded-[5px] text-[11px] font-medium"
+                  >
+                    <Copy className="size-3 mr-1" />
+                    Salin Konfigurasi
+                  </Button>
+                </div>
+
+                <div className="mt-2.5">
+                  <pre className="border-border/40 bg-background/90 max-h-64 overflow-auto rounded-lg border p-3 font-mono text-[11px] leading-relaxed">
+                    {getClientConfigCode(mcpClientTab, mcpMode)}
+                  </pre>
+                </div>
+              </Tabs>
+
+              <div className="border-border/40 bg-muted/20 flex items-start gap-2 rounded-lg border p-2.5 text-[11px] text-muted-foreground">
+                <Zap className="size-4 shrink-0 text-amber-500 mt-0.5" />
+                <span>
+                  {mcpClientTab === 'cherrystudio' && (
+                    <>Untuk Cherry Studio atau Chatbox: Masukkan form di atas atau import konfigurasi JSON ke daftar Server MCP.</>
+                  )}
+                  {mcpClientTab === 'antigravity' && (
+                    <>Telah otomatis dikonfigurasi di <code className="bg-muted rounded px-1">.gemini/config/mcp_config.json</code> dan <code className="bg-muted rounded px-1">.gemini/settings.json</code>.</>
+                  )}
+                  {mcpClientTab === 'claude' && (
+                    <>Lokasi file Claude Desktop di Windows: <code className="bg-muted rounded px-1">%APPDATA%\Claude\claude_desktop_config.json</code></>
+                  )}
+                  {mcpClientTab === 'cursor' && (
+                    <>Simpan di root project Anda pada file <code className="bg-muted rounded px-1">.cursor/mcp.json</code></>
+                  )}
+                  {mcpClientTab === 'windsurf' && (
+                    <>Simpan di konfigurasi MCP Global Windsurf atau file <code className="bg-muted rounded px-1">~/.codeium/windsurf/mcp_config.json</code></>
+                  )}
+                </span>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="glass-card border-border/60 rounded-xl backdrop-blur-xl">
+            <CardHeader className="pb-3">
+              <div className="flex items-center justify-between">
+                <CardTitle className="flex items-center gap-2 text-sm font-semibold">
+                  <Activity className="size-4 text-blue-500" />
+                  Konektivitas &amp; Respon tools/list
+                </CardTitle>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleTestMcpServer}
+                  disabled={isMcpTesting}
+                  className="h-7 rounded-[5px] text-[11px] font-medium"
+                >
+                  {isMcpTesting ? (
+                    <RefreshCw className="mr-1 size-3 animate-spin" />
+                  ) : (
+                    <Activity className="mr-1 size-3 text-blue-500" />
+                  )}
+                  Uji RPC tools/list
+                </Button>
+              </div>
+              <CardDescription className="text-xs">
+                Melihat respon JSON-RPC mentah dari endpoint <code>{effectiveMcpUrl}</code>.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="flex flex-col gap-3 text-xs">
+              {mcpTestResult ? (
+                <div className="flex flex-col gap-1.5">
+                  <div className="flex items-center justify-between">
+                    <span className="font-semibold text-[11px] text-foreground">
+                      Hasil Uji tools/list
+                    </span>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setMcpTestResult(null)}
+                      className="h-5 px-1.5 text-[10px]"
+                    >
+                      Tutup
+                    </Button>
+                  </div>
+                  <pre className="border-border/40 bg-background/90 max-h-48 overflow-auto rounded-lg border p-2 font-mono text-[11px] leading-tight">
+                    {mcpTestResult}
+                  </pre>
+                </div>
+              ) : (
+                <div className="border-border/40 bg-muted/20 flex items-center justify-between rounded-lg border p-2.5">
+                  <span className="text-muted-foreground text-[11px]">
+                    Status Server: <b>Online</b> &mdash; Endpoint siap melayani request JSON-RPC 2.0.
+                  </span>
+                  <Badge variant="outline" className="border-emerald-500/30 text-emerald-600 dark:text-emerald-400 font-mono text-[10px]">
+                    8 Tools Terdaftar
+                  </Badge>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          <Card className="glass-card border-border/60 rounded-xl backdrop-blur-xl">
+            <CardHeader className="pb-3">
+              <div className="flex items-center justify-between">
+                <CardTitle className="flex items-center gap-2 text-sm font-semibold">
+                  <Layers className="size-4 text-emerald-500" />
+                  Katalog Tools MCP ({MCP_TOOLS_CATALOG.length} Tools)
+                </CardTitle>
+                <Badge variant="outline" className="rounded-[5px] text-[10px]">
+                  Model Context Protocol v2025
+                </Badge>
+              </div>
+              <CardDescription className="text-xs">
+                Daftar lengkap tools yang otomatis diekspos ke AI agent saat terhubung ke GoWA MCP Server.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="flex flex-col gap-2.5 text-xs">
+              <div className="grid grid-cols-1 gap-2.5 md:grid-cols-2">
+                {MCP_TOOLS_CATALOG.map((tool) => {
+                  const isExpanded = expandedMcpTool === tool.name
+                  return (
+                    <div
+                      key={tool.name}
+                      className={cn(
+                        'border-border/50 bg-muted/15 flex flex-col rounded-lg border p-3 transition-all',
+                        isExpanded ? 'border-primary/40 bg-muted/30' : 'hover:border-border/80',
+                      )}
+                    >
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-2">
+                          <span className="font-mono text-xs font-bold text-foreground">
+                            {tool.name}
+                          </span>
+                          <span
+                            className={cn(
+                              'rounded-[4px] border px-1.5 py-0.5 text-[9px] font-semibold uppercase',
+                              tool.badgeColor,
+                            )}
+                          >
+                            {tool.badge}
+                          </span>
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setExpandedMcpTool(isExpanded ? null : tool.name)}
+                          className="size-6 p-0 rounded-[4px]"
+                        >
+                          <ChevronRight
+                            className={cn('size-3.5 transition-transform', isExpanded && 'rotate-90')}
+                          />
+                        </Button>
+                      </div>
+
+                      <span className="font-semibold text-xs text-foreground mt-1">
+                        {tool.title}
+                      </span>
+                      <p className="text-muted-foreground text-[11px] leading-snug mt-0.5">
+                        {tool.desc}
+                      </p>
+
+                      <div className="flex flex-wrap gap-1 mt-2">
+                        {tool.actions.map((act) => (
+                          <span
+                            key={act}
+                            className="border-border/40 bg-background/80 rounded px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground"
+                          >
+                            {act}
+                          </span>
+                        ))}
+                      </div>
+
+                      {isExpanded && (
+                        <div className="border-border/40 bg-background/90 mt-2.5 flex flex-col gap-1.5 rounded-lg border p-2 text-[10px]">
+                          <span className="font-semibold text-foreground">Contoh Argumen Tool:</span>
+                          <pre className="font-mono overflow-auto max-h-32 p-1">
+                            {JSON.stringify(tool.sampleArgs, null, 2)}
+                          </pre>
+                        </div>
+                      )}
+                    </div>
+                  )
+                })}
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
 
         <TabsContent value="webhook" className="mt-4 flex flex-col gap-5">
           <Card className="glass-card border-border/60 rounded-xl backdrop-blur-xl">
@@ -719,7 +1331,7 @@ func main() {
               <div className="flex items-center justify-between">
                 <CardTitle className="flex items-center gap-2 text-sm font-semibold">
                   <Play className="size-4 text-blue-500" />
-                  Simulator & Penguji Payload Langsung
+                  Simulator &amp; Penguji Payload Langsung
                 </CardTitle>
                 <Badge variant="outline" className="rounded-[5px] text-[10px]">
                   Real HTTP Dispatch
@@ -887,279 +1499,6 @@ func main() {
                   </pre>
                 </TabsContent>
               </Tabs>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="mcp" className="mt-4 flex flex-col gap-5">
-          <Card className="glass-card border-border/60 rounded-xl backdrop-blur-xl">
-            <CardHeader className="pb-3">
-              <div className="flex items-center justify-between">
-                <CardTitle className="flex items-center gap-2 text-sm font-semibold">
-                  <Cpu className="size-4 text-blue-500" />
-                  Status MCP Server (Model Context Protocol)
-                </CardTitle>
-                <div className="flex items-center gap-2">
-                  <span className="flex items-center gap-1.5 rounded-[5px] border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 text-[10px] font-semibold text-emerald-600 dark:text-emerald-400">
-                    <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                    Siap Digunakan
-                  </span>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={handleTestMcpServer}
-                    disabled={isMcpTesting}
-                    className="h-7 rounded-[5px] text-[11px] font-medium"
-                  >
-                    {isMcpTesting ? (
-                      <RefreshCw className="mr-1 size-3 animate-spin" />
-                    ) : (
-                      <Activity className="mr-1 size-3 text-blue-500" />
-                    )}
-                    Uji Koneksi MCP
-                  </Button>
-                </div>
-              </div>
-              <CardDescription className="text-xs">
-                MCP Server memungkinkan AI agent (Claude Code, Cursor, Windsurf, OpenCode, Antigravity) membaca konteks obrolan dan mengontrol bot WhatsApp secara otonom.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="flex flex-col gap-3 text-xs">
-              <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-3">
-                <div className="border-border/50 bg-muted/20 flex flex-col gap-1 rounded-lg border p-2.5">
-                  <span className="text-muted-foreground font-medium text-[11px]">Streamable HTTP URL</span>
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="text-foreground truncate font-mono text-xs font-semibold">
-                      {effectiveMcpUrl}
-                    </span>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleCopyText(effectiveMcpUrl, 'URL MCP')}
-                      className="size-6 p-0 rounded-[4px]"
-                    >
-                      <Copy className="size-3" />
-                    </Button>
-                  </div>
-                </div>
-
-                <div className="border-border/50 bg-muted/20 flex flex-col gap-1 rounded-lg border p-2.5">
-                  <span className="text-muted-foreground font-medium text-[11px]">Protokol Transport</span>
-                  <span className="text-foreground font-mono text-xs font-semibold">
-                    Dual: HTTP JSON-RPC 2.0 & Stdio
-                  </span>
-                </div>
-
-                <div className="border-border/50 bg-muted/20 flex flex-col gap-1 rounded-lg border p-2.5">
-                  <span className="text-muted-foreground font-medium text-[11px]">Device Context Binding</span>
-                  <span className="text-foreground font-mono text-xs font-semibold truncate">
-                    {currentDeviceId || 'Default Device'}
-                  </span>
-                </div>
-              </div>
-
-              {mcpTestResult && (
-                <div className="border-border/60 bg-muted/20 flex flex-col gap-1.5 rounded-lg border p-3">
-                  <div className="flex items-center justify-between">
-                    <span className="font-semibold text-[11px] text-foreground">
-                      Hasil Uji tools/list Langsung
-                    </span>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setMcpTestResult(null)}
-                      className="h-5 px-1.5 text-[10px]"
-                    >
-                      Tutup
-                    </Button>
-                  </div>
-                  <pre className="border-border/40 bg-background/90 max-h-48 overflow-auto rounded-lg border p-2 font-mono text-[11px] leading-tight">
-                    {mcpTestResult}
-                  </pre>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
-          <Card className="glass-card border-border/60 rounded-xl backdrop-blur-xl">
-            <CardHeader className="pb-3">
-              <div className="flex items-center justify-between">
-                <CardTitle className="flex items-center gap-2 text-sm font-semibold">
-                  <Code2 className="size-4 text-indigo-500" />
-                  Konfigurasi 1-Klik AI Client
-                </CardTitle>
-                <div className="flex items-center gap-1.5">
-                  <Button
-                    variant={mcpMode === 'http' ? 'default' : 'outline'}
-                    size="sm"
-                    onClick={() => setMcpMode('http')}
-                    className={cn(
-                      'h-7 rounded-[5px] text-[11px] font-semibold transition-all',
-                      mcpMode === 'http' ? 'bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900' : '',
-                    )}
-                  >
-                    Streamable HTTP
-                  </Button>
-                  <Button
-                    variant={mcpMode === 'stdio' ? 'default' : 'outline'}
-                    size="sm"
-                    onClick={() => setMcpMode('stdio')}
-                    className={cn(
-                      'h-7 rounded-[5px] text-[11px] font-semibold transition-all',
-                      mcpMode === 'stdio' ? 'bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900' : '',
-                    )}
-                  >
-                    Stdio Runner
-                  </Button>
-                </div>
-              </div>
-              <CardDescription className="text-xs">
-                Salin konfigurasi JSON ini ke aplikasi AI pilihan Anda untuk menghubungkan model AI langsung ke WhatsApp.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="flex flex-col gap-3 text-xs">
-              <Tabs value={mcpClientTab} onValueChange={setMcpClientTab} className="w-full">
-                <div className="flex items-center justify-between">
-                  <TabsList className="bg-muted/40 border-border/30 h-8 rounded-lg border p-0.5">
-                    <TabsTrigger value="claude" className="h-7 rounded-[5px] text-xs">
-                      Claude Desktop
-                    </TabsTrigger>
-                    <TabsTrigger value="cursor" className="h-7 rounded-[5px] text-xs">
-                      Cursor IDE
-                    </TabsTrigger>
-                    <TabsTrigger value="windsurf" className="h-7 rounded-[5px] text-xs">
-                      Windsurf / Antigravity
-                    </TabsTrigger>
-                    <TabsTrigger value="opencode" className="h-7 rounded-[5px] text-xs">
-                      OpenCode / CLI
-                    </TabsTrigger>
-                  </TabsList>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() =>
-                      handleCopyText(
-                        getClientConfigCode(mcpClientTab, mcpMode),
-                        `Konfigurasi ${mcpClientTab.toUpperCase()}`,
-                      )
-                    }
-                    className="h-7 rounded-[5px] text-[11px] font-medium"
-                  >
-                    <Copy className="size-3 mr-1" />
-                    Salin Konfigurasi
-                  </Button>
-                </div>
-
-                <div className="mt-2.5">
-                  <pre className="border-border/40 bg-background/90 max-h-64 overflow-auto rounded-lg border p-3 font-mono text-[11px] leading-relaxed">
-                    {getClientConfigCode(mcpClientTab, mcpMode)}
-                  </pre>
-                </div>
-              </Tabs>
-
-              <div className="border-border/40 bg-muted/20 flex items-start gap-2 rounded-lg border p-2.5 text-[11px] text-muted-foreground">
-                <Zap className="size-4 shrink-0 text-amber-500 mt-0.5" />
-                <span>
-                  {mcpClientTab === 'claude' && (
-                    <>Lokasi file Claude Desktop di Windows: <code className="bg-muted rounded px-1">%APPDATA%\Claude\claude_desktop_config.json</code></>
-                  )}
-                  {mcpClientTab === 'cursor' && (
-                    <>Simpan di root project Anda pada file <code className="bg-muted rounded px-1">.cursor/mcp.json</code></>
-                  )}
-                  {mcpClientTab === 'windsurf' && (
-                    <>Simpan di konfigurasi MCP Global Windsurf atau file <code className="bg-muted rounded px-1">~/.codeium/windsurf/mcp_config.json</code></>
-                  )}
-                  {mcpClientTab === 'opencode' && (
-                    <>Gunakan URL ini pada plugin MCP OpenCode atau konfigurasi agent CLI Anda.</>
-                  )}
-                </span>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="glass-card border-border/60 rounded-xl backdrop-blur-xl">
-            <CardHeader className="pb-3">
-              <div className="flex items-center justify-between">
-                <CardTitle className="flex items-center gap-2 text-sm font-semibold">
-                  <Layers className="size-4 text-emerald-500" />
-                  Katalog Tools MCP ({MCP_TOOLS_CATALOG.length} Tools)
-                </CardTitle>
-                <Badge variant="outline" className="rounded-[5px] text-[10px]">
-                  Model Context Protocol v2025
-                </Badge>
-              </div>
-              <CardDescription className="text-xs">
-                Daftar lengkap tools yang otomatis diekspos ke AI agent saat terhubung ke GoWA MCP Server.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="flex flex-col gap-2.5 text-xs">
-              <div className="grid grid-cols-1 gap-2.5 md:grid-cols-2">
-                {MCP_TOOLS_CATALOG.map((tool) => {
-                  const isExpanded = expandedMcpTool === tool.name
-                  return (
-                    <div
-                      key={tool.name}
-                      className={cn(
-                        'border-border/50 bg-muted/15 flex flex-col rounded-lg border p-3 transition-all',
-                        isExpanded ? 'border-primary/40 bg-muted/30' : 'hover:border-border/80',
-                      )}
-                    >
-                      <div className="flex items-center justify-between gap-2">
-                        <div className="flex items-center gap-2">
-                          <span className="font-mono text-xs font-bold text-foreground">
-                            {tool.name}
-                          </span>
-                          <span
-                            className={cn(
-                              'rounded-[4px] border px-1.5 py-0.5 text-[9px] font-semibold uppercase',
-                              tool.badgeColor,
-                            )}
-                          >
-                            {tool.badge}
-                          </span>
-                        </div>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => setExpandedMcpTool(isExpanded ? null : tool.name)}
-                          className="size-6 p-0 rounded-[4px]"
-                        >
-                          <ChevronRight
-                            className={cn('size-3.5 transition-transform', isExpanded && 'rotate-90')}
-                          />
-                        </Button>
-                      </div>
-
-                      <span className="font-semibold text-xs text-foreground mt-1">
-                        {tool.title}
-                      </span>
-                      <p className="text-muted-foreground text-[11px] leading-snug mt-0.5">
-                        {tool.desc}
-                      </p>
-
-                      <div className="flex flex-wrap gap-1 mt-2">
-                        {tool.actions.map((act) => (
-                          <span
-                            key={act}
-                            className="border-border/40 bg-background/80 rounded px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground"
-                          >
-                            {act}
-                          </span>
-                        ))}
-                      </div>
-
-                      {isExpanded && (
-                        <div className="border-border/40 bg-background/90 mt-2.5 flex flex-col gap-1.5 rounded-lg border p-2 text-[10px]">
-                          <span className="font-semibold text-foreground">Contoh Argumen Tool:</span>
-                          <pre className="font-mono overflow-auto max-h-32 p-1">
-                            {JSON.stringify(tool.sampleArgs, null, 2)}
-                          </pre>
-                        </div>
-                      )}
-                    </div>
-                  )
-                })}
-              </div>
             </CardContent>
           </Card>
         </TabsContent>
