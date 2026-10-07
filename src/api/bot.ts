@@ -67,6 +67,10 @@ export interface BotAIConfig {
   temperature: number
   trigger_prefix: string
   auto_reply_enabled: boolean
+  access_mode?: 'all' | 'allowlist' | 'blocklist'
+  allowed_jids?: string
+  blocked_jids?: string
+  allow_groups?: boolean
   created_at?: string
   updated_at?: string
 }
@@ -80,6 +84,43 @@ export interface UpdateAIConfigPayload {
   temperature?: number
   trigger_prefix?: string
   auto_reply_enabled?: boolean
+  access_mode?: 'all' | 'allowlist' | 'blocklist'
+  allowed_jids?: string
+  blocked_jids?: string
+  allow_groups?: boolean
+}
+
+export interface BotAIPersona {
+  id: number
+  phone_number: string
+  contact_name: string
+  relationship: string
+  custom_prompt: string
+  auto_reply_enabled: boolean
+  use_memory: boolean
+  is_active: boolean
+  created_at?: string
+  updated_at?: string
+}
+
+export interface CreateAIPersonaPayload {
+  phone_number: string
+  contact_name?: string
+  relationship?: string
+  custom_prompt: string
+  auto_reply_enabled?: boolean
+  use_memory?: boolean
+  is_active?: boolean
+}
+
+export interface UpdateAIPersonaPayload {
+  phone_number?: string
+  contact_name?: string
+  relationship?: string
+  custom_prompt?: string
+  auto_reply_enabled?: boolean
+  use_memory?: boolean
+  is_active?: boolean
 }
 
 export interface AIChatMessage {
@@ -155,8 +196,17 @@ export async function listRules(params?: {
   return (await results<BotRule[]>(http.get('/bot/rules', { params }))) ?? []
 }
 
-export async function autoTagPacarRules(): Promise<{ updated: number }> {
-  return results(http.post('/bot/rules/auto-tag-pacar'))
+export async function autoTagSpecialRules(): Promise<{ updated: number }> {
+  return results(http.post('/bot/rules/auto-tag-special'))
+}
+
+
+export async function clearAllRules(): Promise<{ all: boolean }> {
+  return results(http.delete('/bot/rules?all=true'))
+}
+
+export async function bulkDeleteRules(ids: number[]): Promise<{ deleted_count: number; ids: number[] }> {
+  return results(http.delete('/bot/rules', { data: { ids } }))
 }
 
 export async function createRule(payload: CreateRulePayload): Promise<BotRule> {
@@ -207,6 +257,29 @@ export async function getAIConfig(): Promise<BotAIConfig> {
 
 export async function updateAIConfig(payload: UpdateAIConfigPayload): Promise<BotAIConfig> {
   return results(http.put('/bot/ai/config', payload))
+}
+
+export async function listAIPersonas(): Promise<BotAIPersona[]> {
+  return (await results<BotAIPersona[]>(http.get('/bot/ai/personas'))) ?? []
+}
+
+export async function getAIPersona(id: number): Promise<BotAIPersona> {
+  return results(http.get(`/bot/ai/personas/${id}`))
+}
+
+export async function createAIPersona(payload: CreateAIPersonaPayload): Promise<BotAIPersona> {
+  return results(http.post('/bot/ai/personas', payload))
+}
+
+export async function updateAIPersona(
+  id: number,
+  payload: UpdateAIPersonaPayload,
+): Promise<BotAIPersona> {
+  return results(http.put(`/bot/ai/personas/${id}`, payload))
+}
+
+export async function deleteAIPersona(id: number): Promise<void> {
+  await http.delete(`/bot/ai/personas/${id}`)
 }
 
 export async function chatWithAI(payload: AIChatRequest): Promise<AIChatResult> {
